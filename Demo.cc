@@ -5,7 +5,7 @@
 
 int main(int argc, char** argv)
 {
-  Engine e(&argc, argv, 0.4);
+  Engine e(&argc, argv, 1);
 
   RigidBody* c = new Cube(3);
   e.addRigidBody_p(c);

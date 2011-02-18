@@ -28,7 +28,7 @@ Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
   GLfloat lightSpecular[] = {0.1, 0.1, 0.1, 1.0};
   glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
  
-  GLfloat lightAmbient[] = {0.1, 0.1, 0.1, 1.0};
+  GLfloat lightAmbient[] = {170.0/255, 162.0/255, 113.0/255, 1.0};
   glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
 
   GLfloat lightPosition[] = {0.0, -3.0, 0.0, 1.0};

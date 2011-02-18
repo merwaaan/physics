@@ -7,8 +7,8 @@ RigidBody::RigidBody()
   this->rotation(1, 1, 1);
   this->rotation(2, 2, 1);
 
-  this->velocity.X(0.1);
-  this->velocity.Y(1);
+  this->velocity.X(0.2);
+  this->velocity.Y(3);
 }
 
 RigidBody::~RigidBody()
@@ -42,7 +42,7 @@ void RigidBody::integrate(double t)
   // linear movement
   Vector3 acceleration = this->accumulatedForces * this->inverseMass;
   this->velocity += acceleration * t;
-  //this->position += this->velocity * t;
+  this->position += this->velocity * t;
 
   // angular movement
   //Vector3 angularAcceleration;

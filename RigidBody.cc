@@ -32,9 +32,7 @@ void RigidBody::applyForce(Vector3& force)
 
 void RigidBody::clearAccumulatedForces()
 {
-  this->accumulatedForces.X(0);
-  this->accumulatedForces.Y(0);
-  this->accumulatedForces.Z(0);
+  this->accumulatedForces.reset();
 }
 
 void RigidBody::integrate(double t)
@@ -46,16 +44,15 @@ void RigidBody::integrate(double t)
 
   // angular movement
   //Vector3 angularAcceleration;
-  this->angularVelocity = Vector3(0.01, 0.01, 0);
-  this->rotation = this->rotation + (this->angularVelocity ^ this->rotation);
+  this->angularVelocity = Vector3(0, 5, 0);
+  this->rotation += (this->angularVelocity ^ this->rotation) * t;
 
   this->computeVerticesAbsolutePositions();
 }
 
 void RigidBody::computeVerticesAbsolutePositions()
 {
-  int i;
-  for(i = 0; i < this->structure.vertices.size(); ++i)
+  for(int i = 0; i < this->structure.vertices.size(); ++i)
     this->structure.vertices[i].absPosition = this->rotation * this->structure.vertices[i].localPosition + this->position;
 }
 
@@ -76,8 +73,7 @@ void RigidBody::addPolygon(int count, int* ids)
   p.vertices_p = new Vertex*[count];
 
   // link all referenced vertices with a polygon
-  int i;
-  for(i = 0; i < count; ++i)
+  for(int i = 0; i < count; ++i)
     p.vertices_p[i] = getVertexById_p(ids[i]);
 
   this->structure.polygons.push_back(p);
@@ -87,8 +83,7 @@ void RigidBody::computeCenterOfMass()
 {
   double totalMass = 0.0;
   
-  int i;
-  for(i = 0; i < this->structure.vertices.size(); ++i)
+  for(int i = 0; i < this->structure.vertices.size(); ++i)
   {
     Vertex* v_p = &this->structure.vertices[i];
 

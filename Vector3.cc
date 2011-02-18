@@ -44,11 +44,20 @@ Vector3 Vector3::operator-(const Vector3& v) const
   return result;
 }
 
-Vector3 Vector3::operator+=(const Vector3& v)
+Vector3& Vector3::operator+=(const Vector3& v)
 {
   this->X(this->x + v.X());
   this->Y(this->y + v.Y());
   this->Z(this->z + v.Z());
+
+  return *this;
+}
+
+Vector3& Vector3::operator-=(const Vector3& v)
+{
+  this->X(this->x - v.X());
+  this->Y(this->y - v.Y());
+  this->Z(this->z - v.Z());
 
   return *this;
 }
@@ -134,6 +143,11 @@ Vector3 Vector3::normalize() const
   result = result * (1 / this->length());
 
   return result;
+}
+
+void Vector3::reset()
+{
+	this->x = this->y = this->z = 0.0;
 }
 
 double Vector3::X() const

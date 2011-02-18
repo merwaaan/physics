@@ -19,12 +19,13 @@ class Vector3
 
     Vector3 operator+(const Vector3& v) const;
     Vector3 operator-(const Vector3& v) const;
-    Vector3 operator+=(const Vector3& v);
+    Vector3& operator+=(const Vector3& v);
+    Vector3& operator-=(const Vector3& v);
 
     Vector3 operator*(double k) const;
     friend Vector3 operator*(double k, const Vector3& v);
-
     Vector3 operator*(const Vector3& v) const;
+
     Vector3 operator^(const Vector3& v) const;
     Matrix3 operator^(const Matrix3& m) const;
 
@@ -32,6 +33,8 @@ class Vector3
 
     double length() const;
     Vector3 normalize() const;
+
+		void reset();
 
     double X() const;
     double Y() const;

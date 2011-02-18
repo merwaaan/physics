@@ -86,14 +86,20 @@ void update()
         Polygon* poly_p = &(rb_p->structure.polygons[j]);
 
         Vector3 normal = poly_p->getNormal();
-
-        glBegin(GL_POLYGON);
+std::cout << (poly_p->vertices_p[0]->absPosition - poly_p->vertices_p[1]->absPosition).length() << std::endl;
+        glBegin(GL_LINE_LOOP);
 
         // for each vertex
         for(k = 0; k < poly_p->size; ++k)
         {
           glNormal3f(normal.X(), normal.Y(), normal.Z());
-          glVertex3d(poly_p->vertices_p[k]->absPosition.X(), poly_p->vertices_p[k]->absPosition.Y(), poly_p->vertices_p[k]->absPosition.Z());
+
+          glVertex3d(
+						poly_p->vertices_p[k]->absPosition.X(),
+						poly_p->vertices_p[k]->absPosition.Y(),
+						poly_p->vertices_p[k]->absPosition.Z());
+
+					//std::cout << poly_p->vertices_p[k]->localPosition << std::endl;
         }
 
         glEnd();

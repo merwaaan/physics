@@ -40,12 +40,13 @@ void RigidBody::integrate(double t)
   // linear movement
   Vector3 acceleration = this->accumulatedForces * this->inverseMass;
   this->velocity += acceleration * t;
-  this->position += this->velocity * t;
+  //this->position += this->velocity * t;
 
   // angular movement
   //Vector3 angularAcceleration;
-  this->angularVelocity = Vector3(0, 5, 0);
+  this->angularVelocity = Vector3(0, 2, 0);
   this->rotation += (this->angularVelocity ^ this->rotation) * t;
+  this->rotation.normalize();
 
   this->computeVerticesAbsolutePositions();
 }

@@ -113,15 +113,11 @@ Matrix3 Vector3::operator^(const Matrix3& m) const
 {
   Matrix3 result;
 
-  // transform the vector to a special matrix
-  result(0, 1, this->Z());
-  result(0, 2, -this->Y());
-  result(1, 0, -this->Z());
-  result(1, 2, this->X());
-  result(2, 0, this->Y());
-  result(2, 1, -this->X());
+  result(0, *this ^ m(0));
+  result(1, *this ^ m(1));
+  result(2, *this ^ m(2));
 
-  return result * m;
+  return result;
 }
 
 std::ostream& operator<<(std::ostream& os, const Vector3& v)

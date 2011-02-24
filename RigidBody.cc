@@ -6,49 +6,71 @@ RigidBody::RigidBody()
   this->rotation(0, 0, 1);
   this->rotation(1, 1, 1);
   this->rotation(2, 2, 1);
+  
+  //Vector3 f(0, 300, 0);
+  //applyCenterForce(f);
 
-  this->velocity.X(0.2);
-  this->velocity.Y(3);
+  Vector3 f(0, 10, 0);
+  Vector3 poa(2, 2, 0);
+  this->applyOffCenterForce(f, poa);
 }
 
 RigidBody::~RigidBody()
 {
+  for(int i = 0; i < this->structure.polygons.size(); ++i)
+    delete[] this->structure.polygons[i].vertices_p;
 }
 
 std::ostream& operator<<(std::ostream& os, const RigidBody& rb)
 {
   os << "position :" << rb.position << std::endl;
-  os << "velocity :" << rb.velocity << std::endl;
+  os << "linear momentum :" << rb.linearMomentum << std::endl;
   os << "rotation :" << std::endl << rb.rotation;
-  os << "angular velocity :" << rb.angularVelocity << std::endl;
+  os << "angular momentum :" << rb.angularMomentum << std::endl;
 
   return os;
 }
 
-void RigidBody::applyForce(Vector3& force)
+void RigidBody::clearAccumulators()
+{
+  this->accumulatedForces.reset();
+  this->accumulatedTorques.reset();
+}
+
+void RigidBody::applyCenterForce(Vector3& force)
 {
   this->accumulatedForces += force;
 }
 
-void RigidBody::clearAccumulatedForces()
+void RigidBody::applyOffCenterForce(Vector3& force, Vector3& poa)
 {
-  this->accumulatedForces.reset();
+  this->accumulatedForces += force;
+  this->accumulatedTorques += poa ^ force;
 }
 
 void RigidBody::integrate(double t)
 {
   // linear movement
-  Vector3 acceleration = this->accumulatedForces * this->inverseMass;
-  this->velocity += acceleration * t;
-  //this->position += this->velocity * t;
+  this->linearMomentum += this->accumulatedForces;
+  Vector3 velocity = this->linearMomentum * this->structure.inverseMass;
+  this->position += velocity * t;
 
   // angular movement
-  //Vector3 angularAcceleration;
-  this->angularVelocity = Vector3(0, 2, 0);
-  this->rotation += (this->angularVelocity ^ this->rotation) * t;
-  this->rotation.normalize();
+  std::cout << "________________________" << std::endl;
+  std::cout << *this << std::endl;;
+  this->angularMomentum += this->accumulatedTorques;
+  Matrix3 inertia = (this->rotation * this->structure.inertiaTensor) * this->rotation.transpose();
+  Vector3 angularVelocity = inertia * this->angularMomentum;
+  std::cout << *this << std::endl;;
+  this->rotation += (angularVelocity ^ this->rotation) * t;
+  std::cout << *this << std::endl;;
+
+  // normalize rotation matrix to avoid numerical drift
+  //this->rotation = this->rotation.normalize();
 
   this->computeVerticesAbsolutePositions();
+
+  this->clearAccumulators();
 }
 
 void RigidBody::computeVerticesAbsolutePositions()
@@ -92,9 +114,9 @@ void RigidBody::computeCenterOfMass()
     totalMass += v_p->mass;
   }
 
-  this->inverseMass = 1 / totalMass;
+  this->structure.inverseMass = 1 / totalMass;
 
-  this->position = this->position * this->inverseMass;
+  this->position = this->position * this->structure.inverseMass;
 }
 
 Vertex* RigidBody::getVertexById_p(int id)

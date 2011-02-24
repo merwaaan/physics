@@ -10,20 +10,17 @@ Engine::Engine(int* argc, char** argv, double timeMultiplier) :
 
 Engine::~Engine()
 {
-  int i;
-
-  for(i = 0; i < this->bodies_p.size(); ++i)
+  for(int i = 0; i < this->bodies_p.size(); ++i)
     delete this->bodies_p[i];
   
-  for(i = 0; i < this->forces_p.size(); ++i)
+  for(int i = 0; i < this->forces_p.size(); ++i)
     delete this->forces_p[i];
 }
 
 void Engine::run()
 {
   // compute all centers of mass before we begin the simulation
-  int i;
-  for(i = 0; i < this->bodies_p.size(); ++i)
+  for(int i = 0; i < this->bodies_p.size(); ++i)
     this->bodies_p[i]->computeCenterOfMass();
 
   this->lastUpdateTime = this->getTime();
@@ -38,8 +35,6 @@ void Engine::update()
   int i, j;
   for(i = 0; i < this->bodies_p.size(); ++i)
   {
-    this->bodies_p[i]->clearAccumulatedForces();
-
     // apply all the external forces
     for(j = 0; j < this->forces_p.size(); ++j)
       this->forces_p[j]->apply(this->bodies_p[i]);

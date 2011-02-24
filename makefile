@@ -16,4 +16,4 @@ $(EXEC): $(OBJ)
 	g++ -o $@ -c $^
 
 clean:
-	rm *~ *.o
+	rm *.o *~

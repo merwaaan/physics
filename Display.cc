@@ -67,30 +67,29 @@ void update()
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(50.0, glutGet(GLUT_WINDOW_WIDTH) / glutGet(GLUT_WINDOW_HEIGHT), 1.0, 30.0);
+    gluPerspective(60.0, glutGet(GLUT_WINDOW_WIDTH) / glutGet(GLUT_WINDOW_HEIGHT), 1.0, 30.0);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(0, 0, 10, 0, 0, 0, 0, 1, 0);
 
     glColor3f(0.0, 0.0, 0.0);
 
-    int i, j, k;
     // for each rigid body
-    for(i = 0; i < engine_p->getBodyCount(); ++i)
+    for(int i = 0; i < engine_p->getBodyCount(); ++i)
     {
       RigidBody* rb_p = engine_p->getBody_p(i);
 
       // for each polygon
-      for(j = 0; j < rb_p->getPolyCount(); ++j)
+      for(int j = 0; j < rb_p->getPolyCount(); ++j)
       {
         Polygon* poly_p = &(rb_p->structure.polygons[j]);
 
         Vector3 normal = poly_p->getNormal();
-std::cout << (poly_p->vertices_p[0]->absPosition - poly_p->vertices_p[1]->absPosition).length() << std::endl;
+
         glBegin(GL_LINE_LOOP);
 
         // for each vertex
-        for(k = 0; k < poly_p->size; ++k)
+        for(int k = 0; k < poly_p->size; ++k)
         {
           glNormal3f(normal.X(), normal.Y(), normal.Z());
 

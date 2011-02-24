@@ -6,36 +6,36 @@
 
 class Force
 {
-  private:
+  protected:
+    Vector3 force;
     bool on;
 
   public:
-    Force();
+    Force(Vector3 force);
     ~Force();
 
     virtual void apply(RigidBody* rb_p) = 0;
 };
 
-class Gravity : public Force
+class CenterForce : public Force
 {
-  private:
-    Vector3 force;
-
   public:
-    Gravity(Vector3 force);
-    ~Gravity();
+    CenterForce(Vector3 force);
+    ~CenterForce();
 
     virtual void apply(RigidBody* rb_p);
 };
 
-class AirFriction : public Force
+class OffCenterForce : public Force
 {
-  private:
-
+  protected:
+    Vector3 pointOfApplication;
 
   public:
-    AirFriction();
-    ~AirFriction();
+    OffCenterForce(Vector3 force, Vector3 poa);
+    ~OffCenterForce();
+
+    virtual void apply(RigidBody* rb_p);
 };
 
 #endif

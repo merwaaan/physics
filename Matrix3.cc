@@ -143,9 +143,13 @@ Matrix3 Matrix3::transpose() const
   return result;
 }
 
-void Matrix3::normalize()
+Matrix3 Matrix3::normalize() const
 {
+  Matrix3 result = *this;
+
   for(int i = 0; i < 3; ++i)
-    (*this)(i, (*this)(i).normalize());
+    result(i, result(i).normalize());
+
+  return result;
 }
 

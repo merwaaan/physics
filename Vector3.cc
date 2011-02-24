@@ -136,7 +136,7 @@ Vector3 Vector3::normalize() const
 {
   Vector3 result = *this;
   
-  result = result * (1 / this->length());
+  result = result * (1 / result.length());
 
   return result;
 }

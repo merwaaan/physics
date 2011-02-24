@@ -32,22 +32,25 @@ struct Structure
 {
   std::vector<Vertex> vertices;
   std::vector<Polygon> polygons;
+
+  double inverseMass;
+
+  Matrix3 inertiaTensor;
 };
 
 class RigidBody
 {
   public:
     Structure structure;
-
-    double inverseMass;
     
     Vector3 position;
-    Vector3 velocity;
+    Vector3 linearMomentum;
 
     Matrix3 rotation;
-    Vector3 angularVelocity;
+    Vector3 angularMomentum;
 
     Vector3 accumulatedForces;
+    Vector3 accumulatedTorques;
 
   public:
     RigidBody();
@@ -55,8 +58,9 @@ class RigidBody
 
     friend std::ostream& operator<<(std::ostream& os, const RigidBody& rb);
 
-    void applyForce(Vector3& force);
-    void clearAccumulatedForces();
+    void clearAccumulators();
+    void applyCenterForce(Vector3& force);
+    void applyOffCenterForce(Vector3& force, Vector3& poa);
     void integrate(double t);
     void computeVerticesAbsolutePositions();
 

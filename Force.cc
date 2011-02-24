@@ -1,6 +1,7 @@
 #include "Force.h"
 
-Force::Force() :
+Force::Force(Vector3 force) :
+  force(force),
   on(true)
 {
 }
@@ -9,26 +10,32 @@ Force::~Force()
 {
 }
 
-Gravity::Gravity(Vector3 force) :
-  force(force)
+CenterForce::CenterForce(Vector3 force) :
+  Force(force)
 {
 }
 
-Gravity::~Gravity()
+CenterForce::~CenterForce()
 {
 }
 
-void Gravity::apply(RigidBody* rb_p)
+void CenterForce::apply(RigidBody* rb_p)
 {
-  rb_p->applyForce(this->force);
+  rb_p->applyCenterForce(this->force);
 }
 
-AirFriction::AirFriction()
+OffCenterForce::OffCenterForce(Vector3 force, Vector3 poa) :
+  Force(force),
+  pointOfApplication(poa)
 {
-
 }
 
-AirFriction::~AirFriction()
+OffCenterForce::~OffCenterForce()
 {
+}
+
+void OffCenterForce::apply(RigidBody* rb_p)
+{
+  rb_p->applyOffCenterForce(this->force, this->pointOfApplication);
 }
 

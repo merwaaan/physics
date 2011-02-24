@@ -26,7 +26,6 @@ class Matrix3
     Matrix3 operator-(const Matrix3& m) const;
    	Matrix3& operator+=(const Matrix3& m);
     Matrix3& operator-=(const Matrix3& m);
-    
  
     Matrix3 operator*(double k) const;
     Matrix3 operator*(const Matrix3& m) const;
@@ -35,7 +34,7 @@ class Matrix3
     friend std::ostream& operator<<(std::ostream& os, const Matrix3& m);
 
     Matrix3 transpose() const;
-    void normalize();
+    Matrix3 normalize() const;
 };
 
 #endif

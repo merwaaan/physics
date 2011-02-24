@@ -19,13 +19,20 @@ Cube::Cube(double side) :
   this->addPolygon(4, (int[]){1, 2, 6, 5}); // bottom
   this->addPolygon(4, (int[]){4, 5, 1, 0}); // left
   this->addPolygon(4, (int[]){7, 3, 2, 6}); // right
-
-  this->structure.inertiaTensor(0, 0, 1 / this->structure.inverseMass * 12 * (this->side * this->side + this->side * this->side));
-  this->structure.inertiaTensor(1, 1, 1 / this->structure.inverseMass * 12 * (this->side * this->side + this->side * this->side));
-  this->structure.inertiaTensor(2, 2, 1 / this->structure.inverseMass * 12 * (this->side * this->side + this->side * this->side));
 }
 
 Cube::~Cube()
 {
+}
+
+void Cube::prepare()
+{
+  RigidBody::prepare();
+
+  Matrix3 inertiaTensor;
+  inertiaTensor(0, 0, 1 / this->structure.inverseMass / 12 * (this->side * this->side + this->side * this->side));
+  inertiaTensor(1, 1, 1 / this->structure.inverseMass / 12 * (this->side * this->side + this->side * this->side));
+  inertiaTensor(2, 2, 1 / this->structure.inverseMass / 12 * (this->side * this->side + this->side * this->side));
+  this->structure.inverseInertiaTensor = inertiaTensor.inverse();
 }
 

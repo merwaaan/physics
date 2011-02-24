@@ -6,14 +6,13 @@ Matrix3::Matrix3()
 {
   this->values = new double[9];
 
-  int i;
-  for(i = 0; i < 9; ++i)
+  for(int i = 0; i < 9; ++i)
     this->values[i] = 0;
 }
 
 Matrix3::~Matrix3()
 {
-  delete this->values;
+  //delete this->values;
 }
 
 Vector3 Matrix3::operator()(int column) const
@@ -141,6 +140,38 @@ Matrix3 Matrix3::transpose() const
       result(j, i, (*this)(i, j));
 
   return result;
+}
+
+Matrix3 Matrix3::inverse() const
+{
+  Matrix3 t = *this;
+
+  // find the determinant
+  double d =
+    t(0, 0) * (t(1, 1) * t(2, 2) - t(1, 2) * t(2, 1)) -
+    t(1, 0) * (t(0, 1) * t(2, 2) - t(0, 2) * t(2, 1)) +
+    t(2, 0) * (t(0, 1) * t(1, 2) - t(0, 2) * t(1, 1));
+  
+  // find the matrix of cofactors
+  Matrix3 result;
+  t = t.transpose();
+  result(0, 0, t(1, 1) * t(2, 2) - t(1, 2) * t(2, 1));
+  result(0, 1, t(1, 0) * t(2, 2) - t(1, 2) * t(2, 0));
+  result(0, 2, t(1, 0) * t(2, 1) - t(1, 1) * t(2, 0));
+  result(1, 0, t(0, 1) * t(2, 2) - t(0, 2) * t(2, 1));
+  result(1, 1, t(0, 0) * t(2, 2) - t(0, 2) * t(2, 0));
+  result(1, 2, t(0, 0) * t(2, 1) - t(0, 1) * t(2, 0));
+  result(2, 0, t(0, 1) * t(1, 2) - t(0, 2) * t(1, 1));
+  result(2, 1, t(0, 0) * t(1, 2) - t(0, 2) * t(1, 0));
+  result(2, 2, t(0, 0) * t(1, 1) - t(0, 1) * t(1, 0));
+
+  // apply sign changes
+  result(0, 1, -result(0, 1));
+  result(1, 0, -result(1, 0));
+  result(1, 2, -result(1, 2));
+  result(2, 1, -result(2, 1));
+  
+  return result * (1 / d);
 }
 
 Matrix3 Matrix3::normalize() const

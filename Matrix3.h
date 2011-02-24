@@ -34,6 +34,7 @@ class Matrix3
     friend std::ostream& operator<<(std::ostream& os, const Matrix3& m);
 
     Matrix3 transpose() const;
+    Matrix3 inverse() const;
     Matrix3 normalize() const;
 };
 

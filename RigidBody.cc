@@ -3,15 +3,12 @@
 RigidBody::RigidBody()
 {
   // initial orientation (aligned with the axis)
-  this->rotation(0, 0, 1);
-  this->rotation(1, 1, 1);
-  this->rotation(2, 2, 1);
+  this->orientation(0, 0, 1);
+  this->orientation(1, 1, 1);
+  this->orientation(2, 2, 1);
   
-  //Vector3 f(0, 300, 0);
-  //applyCenterForce(f);
-
-  Vector3 f(0, 10, 0);
-  Vector3 poa(2, 2, 0);
+  Vector3 f(30, 0, 0);
+  Vector3 poa(0, 2, 1);
   this->applyOffCenterForce(f, poa);
 }
 
@@ -23,10 +20,10 @@ RigidBody::~RigidBody()
 
 std::ostream& operator<<(std::ostream& os, const RigidBody& rb)
 {
-  os << "position :" << rb.position << std::endl;
-  os << "linear momentum :" << rb.linearMomentum << std::endl;
-  os << "rotation :" << std::endl << rb.rotation;
-  os << "angular momentum :" << rb.angularMomentum << std::endl;
+  os << "position " << rb.position << std::endl;
+  os << "linear momentum " << rb.linearMomentum << std::endl;
+  os << "orientation " << std::endl << rb.orientation;
+  os << "angular momentum " << rb.angularMomentum << std::endl;
 
   return os;
 }
@@ -56,17 +53,16 @@ void RigidBody::integrate(double t)
   this->position += velocity * t;
 
   // angular movement
-  std::cout << "________________________" << std::endl;
-  std::cout << *this << std::endl;;
   this->angularMomentum += this->accumulatedTorques;
-  Matrix3 inertia = (this->rotation * this->structure.inertiaTensor) * this->rotation.transpose();
-  Vector3 angularVelocity = inertia * this->angularMomentum;
-  std::cout << *this << std::endl;;
-  this->rotation += (angularVelocity ^ this->rotation) * t;
-  std::cout << *this << std::endl;;
+  Matrix3 inverseInertia = this->orientation * this->structure.inverseInertiaTensor * this->orientation.transpose();
+  Vector3 angularVelocity = inverseInertia * this->angularMomentum;
+  this->orientation += (angularVelocity.toStarMatrix() * this->orientation) * t;
 
-  // normalize rotation matrix to avoid numerical drift
-  //this->rotation = this->rotation.normalize();
+  // normalize the orientation matrix to avoid numerical drift
+  this->orientation = this->orientation.normalize();
+  
+  std::cout << *this << std::endl;
+  //usleep(1000000);
 
   this->computeVerticesAbsolutePositions();
 
@@ -76,7 +72,17 @@ void RigidBody::integrate(double t)
 void RigidBody::computeVerticesAbsolutePositions()
 {
   for(int i = 0; i < this->structure.vertices.size(); ++i)
-    this->structure.vertices[i].absPosition = this->rotation * this->structure.vertices[i].localPosition + this->position;
+    this->structure.vertices[i].absPosition = this->orientation * this->structure.vertices[i].localPosition + this->position;
+}
+
+void RigidBody::setPosition(Vector3 position)
+{
+  this->position = position;
+}
+
+void RigidBody::setOrientation(Matrix3 orientation)
+{
+  this->orientation = orientation;
 }
 
 void RigidBody::addVertex(int id, double x, double y, double z, double m)
@@ -102,7 +108,7 @@ void RigidBody::addPolygon(int count, int* ids)
   this->structure.polygons.push_back(p);
 }
 
-void RigidBody::computeCenterOfMass()
+void RigidBody::prepare()
 {
   double totalMass = 0.0;
   

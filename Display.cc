@@ -67,10 +67,10 @@ void update()
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60.0, glutGet(GLUT_WINDOW_WIDTH) / glutGet(GLUT_WINDOW_HEIGHT), 1.0, 30.0);
+    glOrtho(-10, 10, -10, 10, 1, 100);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0, 0, 10, 0, 0, 0, 0, 1, 0);
+    gluLookAt(0, -3, 10, 0, 0, 0, 0, 1, 0);
 
     glColor3f(0.0, 0.0, 0.0);
 

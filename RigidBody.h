@@ -35,7 +35,7 @@ struct Structure
 
   double inverseMass;
 
-  Matrix3 inertiaTensor;
+  Matrix3 inverseInertiaTensor;
 };
 
 class RigidBody
@@ -46,7 +46,7 @@ class RigidBody
     Vector3 position;
     Vector3 linearMomentum;
 
-    Matrix3 rotation;
+    Matrix3 orientation;
     Vector3 angularMomentum;
 
     Vector3 accumulatedForces;
@@ -64,9 +64,12 @@ class RigidBody
     void integrate(double t);
     void computeVerticesAbsolutePositions();
 
+    void setPosition(Vector3 position);
+    void setOrientation(Matrix3 orientation);
+
     void addVertex(int id, double x, double y, double z, double m);
     void addPolygon(int count, int* ids);
-    void computeCenterOfMass();
+    virtual void prepare();
 
     Vertex* getVertexById_p(int id);
     int getPolyCount();

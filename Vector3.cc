@@ -141,6 +141,23 @@ Vector3 Vector3::normalize() const
   return result;
 }
 
+/**
+ * Transforms a Vector3 into a special kind of Matrix3 used in the simulation
+ */
+Matrix3 Vector3::toStarMatrix()
+{
+  Matrix3 result;
+
+  result(0, 1, this->Z());
+  result(0, 2, -this->Y());
+  result(1, 0, -this->Z());
+  result(1, 2, this->X());
+  result(2, 0, this->Y());
+  result(2, 1, -this->X());
+
+  return result;
+}
+
 void Vector3::reset()
 {
 	this->x = this->y = this->z = 0.0;

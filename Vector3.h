@@ -33,6 +33,7 @@ class Vector3
 
     double length() const;
     Vector3 normalize() const;
+    Matrix3 toStarMatrix();
 
 		void reset();
 

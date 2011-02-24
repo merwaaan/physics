@@ -12,6 +12,8 @@ class Cube : public RigidBody
   public:
     Cube(double side);
     ~Cube();
+
+    void prepare();
 };
 
 #endif

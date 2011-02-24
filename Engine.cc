@@ -19,9 +19,9 @@ Engine::~Engine()
 
 void Engine::run()
 {
-  // compute all centers of mass before we begin the simulation
+  // compute all centers of mass and inertia tensors before we begin the simulation
   for(int i = 0; i < this->bodies_p.size(); ++i)
-    this->bodies_p[i]->computeCenterOfMass();
+    this->bodies_p[i]->prepare();
 
   this->lastUpdateTime = this->getTime();
 
@@ -32,11 +32,10 @@ void Engine::update()
 {
   double t = this->getTime() - this->lastUpdateTime;
 
-  int i, j;
-  for(i = 0; i < this->bodies_p.size(); ++i)
+  for(int i = 0; i < this->bodies_p.size(); ++i)
   {
     // apply all the external forces
-    for(j = 0; j < this->forces_p.size(); ++j)
+    for(int j = 0; j < this->forces_p.size(); ++j)
       this->forces_p[j]->apply(this->bodies_p[i]);
 
     // integrate each body state

@@ -26,8 +26,8 @@ class RigidBody
 
     friend std::ostream& operator<<(std::ostream& os, const RigidBody& rb);
 
-    virtual void prepare();
-    virtual void computeInverseInertiaTensor();
+    virtual void prepare() = 0;
+    virtual void computeInverseInertiaTensor() = 0;
 
     void clearAccumulators();
     void applyCenterForce(Vector3 force);

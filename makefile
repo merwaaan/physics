@@ -8,6 +8,7 @@ OBJ= \
 	Force.o \
 	Matrix3.o \
 	RigidBody.o \
+	Sphere.o \
 	Vector3.o
 
 $(EXEC): $(OBJ)

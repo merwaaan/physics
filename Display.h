@@ -3,9 +3,19 @@
 
 class Engine;
 
+struct Camera
+{
+  double radius;
+  double angle;
+
+  int lastX;
+};
+
 class Display
 {
   private:
+    Camera camera;
+
     Engine* engine_p;
 
   public:
@@ -14,9 +24,13 @@ class Display
 
     void run();
 
-    Engine* getEngine_p();
+    void setKeyboardCallback_p(void(*func)(unsigned char k, int x, int y));
+
+    friend void update();
+    friend void mouse(int x, int y);
 };
 
 void update();
+void mouse(int x, int y);
 
 #endif

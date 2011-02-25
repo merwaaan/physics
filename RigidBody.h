@@ -40,7 +40,7 @@ struct Structure
 
 class RigidBody
 {
-  public:
+  protected:
     Structure structure;
     
     Vector3 position;
@@ -59,8 +59,8 @@ class RigidBody
     friend std::ostream& operator<<(std::ostream& os, const RigidBody& rb);
 
     void clearAccumulators();
-    void applyCenterForce(Vector3& force);
-    void applyOffCenterForce(Vector3& force, Vector3& poa);
+    void applyCenterForce(Vector3 force);
+    void applyOffCenterForce(Vector3 force, Vector3 poa);
     void integrate(double t);
     void computeVerticesAbsolutePositions();
 
@@ -73,6 +73,7 @@ class RigidBody
 
     Vertex* getVertexById_p(int id);
     int getPolyCount();
+    Structure* getStructure_p();
 };
 
 #endif

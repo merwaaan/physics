@@ -4,7 +4,7 @@
 
 #include "Engine.h"
 
-Display* g_display_p = NULL;
+Display* display_pg = NULL;
 
 Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
   engine_p(engine_p)
@@ -34,9 +34,12 @@ Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
   GLfloat lightPosition[] = {0.0, -3.0, 0.0, 1.0};
   glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
 
-  g_display_p = this;
-
   glutDisplayFunc(&update);
+  glutPassiveMotionFunc(&mouse);
+
+  this->camera.radius = 10;
+
+  display_pg = this;
 }
 
 Display::~Display()
@@ -48,14 +51,14 @@ void Display::run()
   glutMainLoop();
 }
 
-Engine* Display::getEngine_p()
+void Display::setKeyboardCallback_p(void(*func)(unsigned char k, int x, int y))
 {
-  return this->engine_p;
+  glutKeyboardFunc(func);
 }
 
 void update()
 {
-  Engine* engine_p = g_display_p->getEngine_p();
+  Engine* engine_p = display_pg->engine_p;
 
   if(engine_p->needUpdate())
   {
@@ -65,12 +68,21 @@ void update()
     glClearColor(1.0, 1.0, 1.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    // set an orthogonal perspective
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     glOrtho(-10, 10, -10, 10, 1, 100);
+
+    // place the camera
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0, -3, 10, 0, 0, 0, 0, 1, 0);
+    Camera* cam_p = &display_pg->camera;
+    gluLookAt(
+      cam_p->radius * cos(cam_p->angle),
+      4,
+      cam_p->radius * sin(cam_p->angle),
+      0, 0, 0,
+      0, 1, 0);
 
     glColor3f(0.0, 0.0, 0.0);
 
@@ -82,11 +94,11 @@ void update()
       // for each polygon
       for(int j = 0; j < rb_p->getPolyCount(); ++j)
       {
-        Polygon* poly_p = &(rb_p->structure.polygons[j]);
+        Polygon* poly_p = &(rb_p->getStructure_p()->polygons[j]);
 
         Vector3 normal = poly_p->getNormal();
 
-        glBegin(GL_LINE_LOOP);
+        glBegin(GL_POLYGON);
 
         // for each vertex
         for(int k = 0; k < poly_p->size; ++k)
@@ -97,8 +109,6 @@ void update()
 						poly_p->vertices_p[k]->absPosition.X(),
 						poly_p->vertices_p[k]->absPosition.Y(),
 						poly_p->vertices_p[k]->absPosition.Z());
-
-					//std::cout << poly_p->vertices_p[k]->localPosition << std::endl;
         }
 
         glEnd();
@@ -109,5 +119,14 @@ void update()
   }
 
   glutPostRedisplay();
+}
+
+void mouse(int x, int y)
+{
+  Camera* cam_p = &display_pg->camera;
+
+  cam_p->angle += 0.01 * (x - cam_p->lastX);
+
+  cam_p->lastX = x;
 }
 

@@ -3,11 +3,19 @@
 #include "Engine.h"
 #include "Cube.h"
 
+Cube *c;
+
+void input(unsigned char k, int x, int y)
+{
+  if(k == 32)
+    c->applyOffCenterForce(Vector3(20, 0, 0), Vector3(0, 2, 3));
+}
+
 int main(int argc, char** argv)
 {
   Engine e(&argc, argv, 0.3);
 
-  Cube* c = new Cube(3);
+  c = new Cube(3);
   e.addRigidBody_p(c);
   
   /*Cube* p = new Cube(10);
@@ -16,6 +24,8 @@ int main(int argc, char** argv)
 
   //Force* g = new CenterForce(Vector3(0, -9.81, 0));
   //e.addForce_p(g);
+
+  e.setKeyboardCallback_p(&input);
 
   e.run();
 

@@ -78,3 +78,8 @@ void Engine::addForce_p(Force* force_p)
   this->forces_p.push_back(force_p);
 }
 
+void Engine::setKeyboardCallback_p(void(*func)(unsigned char k, int x, int y))
+{
+  this->display.setKeyboardCallback_p(func);
+}
+

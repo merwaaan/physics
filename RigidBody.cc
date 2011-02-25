@@ -6,10 +6,6 @@ RigidBody::RigidBody()
   this->orientation(0, 0, 1);
   this->orientation(1, 1, 1);
   this->orientation(2, 2, 1);
-  
-  Vector3 f(30, 0, 0);
-  Vector3 poa(0, 2, 1);
-  this->applyOffCenterForce(f, poa);
 }
 
 RigidBody::~RigidBody()
@@ -34,12 +30,12 @@ void RigidBody::clearAccumulators()
   this->accumulatedTorques.reset();
 }
 
-void RigidBody::applyCenterForce(Vector3& force)
+void RigidBody::applyCenterForce(Vector3 force)
 {
   this->accumulatedForces += force;
 }
 
-void RigidBody::applyOffCenterForce(Vector3& force, Vector3& poa)
+void RigidBody::applyOffCenterForce(Vector3 force, Vector3 poa)
 {
   this->accumulatedForces += force;
   this->accumulatedTorques += poa ^ force;
@@ -138,5 +134,10 @@ Vertex* RigidBody::getVertexById_p(int id)
 int RigidBody::getPolyCount()
 {
   return this->structure.polygons.size();
+}
+
+Structure* RigidBody::getStructure_p()
+{
+  return &this->structure;
 }
 

@@ -184,3 +184,9 @@ Matrix3 Matrix3::normalize() const
   return result;
 }
 
+void Matrix3::reset()
+{
+  for(int i = 0; i < 9; ++i)
+    this->values[i] = 0;
+}
+

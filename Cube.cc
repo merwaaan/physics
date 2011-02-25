@@ -25,14 +25,13 @@ Cube::~Cube()
 {
 }
 
-void Cube::prepare()
+void Cube::computeInverseInertiaTensor()
 {
-  RigidBody::prepare();
-
   Matrix3 inertiaTensor;
   inertiaTensor(0, 0, 1 / this->structure.inverseMass / 12 * (this->side * this->side + this->side * this->side));
   inertiaTensor(1, 1, 1 / this->structure.inverseMass / 12 * (this->side * this->side + this->side * this->side));
   inertiaTensor(2, 2, 1 / this->structure.inverseMass / 12 * (this->side * this->side + this->side * this->side));
+
   this->structure.inverseInertiaTensor = inertiaTensor.inverse();
 }
 

@@ -13,7 +13,7 @@ class Cube : public RigidBody
     Cube(double side);
     ~Cube();
 
-    void prepare();
+    void computeInverseInertiaTensor();
 };
 
 #endif

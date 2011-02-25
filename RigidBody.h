@@ -52,6 +52,8 @@ class RigidBody
     Vector3 accumulatedForces;
     Vector3 accumulatedTorques;
 
+    bool fixed;
+
   public:
     RigidBody();
     ~RigidBody();
@@ -66,10 +68,13 @@ class RigidBody
 
     void setPosition(Vector3 position);
     void setOrientation(Matrix3 orientation);
+    void setFixed(bool fixed);
 
     void addVertex(int id, double x, double y, double z, double m);
     void addPolygon(int count, int* ids);
     virtual void prepare();
+    virtual void computeCenterOfMass();
+    virtual void computeInverseInertiaTensor();
 
     Vertex* getVertexById_p(int id);
     int getPolyCount();

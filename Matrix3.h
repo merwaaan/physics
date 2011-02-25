@@ -36,6 +36,8 @@ class Matrix3
     Matrix3 transpose() const;
     Matrix3 inverse() const;
     Matrix3 normalize() const;
+    
+    void reset();
 };
 
 #endif

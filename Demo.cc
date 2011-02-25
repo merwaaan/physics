@@ -4,6 +4,7 @@
 #include "Cube.h"
 
 Cube *c;
+Cube *p;
 
 void input(unsigned char k, int x, int y)
 {
@@ -18,12 +19,13 @@ int main(int argc, char** argv)
   c = new Cube(3);
   e.addRigidBody_p(c);
   
-  /*Cube* p = new Cube(10);
-  p->setPosition(Vector3(0, -100, 0));
-  e.addRigidBody_p(p);*/
+  p = new Cube(10);
+  p->setPosition(Vector3(0, -10, 0));
+  p->setFixed(true);
+  e.addRigidBody_p(p);
 
-  //Force* g = new CenterForce(Vector3(0, -9.81, 0));
-  //e.addForce_p(g);
+  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  e.addForce_p(g);
 
   e.setKeyboardCallback_p(&input);
 

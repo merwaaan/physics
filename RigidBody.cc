@@ -1,6 +1,7 @@
 #include "RigidBody.h"
 
-RigidBody::RigidBody()
+RigidBody::RigidBody() :
+  fixed(false)
 {
   // initial orientation (aligned with the axis)
   this->orientation(0, 0, 1);
@@ -57,8 +58,7 @@ void RigidBody::integrate(double t)
   // normalize the orientation matrix to avoid numerical drift
   this->orientation = this->orientation.normalize();
   
-  std::cout << *this << std::endl;
-  //usleep(1000000);
+  //std::cout << *this << std::endl;
 
   this->computeVerticesAbsolutePositions();
 
@@ -79,6 +79,11 @@ void RigidBody::setPosition(Vector3 position)
 void RigidBody::setOrientation(Matrix3 orientation)
 {
   this->orientation = orientation;
+}
+
+void RigidBody::setFixed(bool fixed)
+{
+  this->fixed = fixed;
 }
 
 void RigidBody::addVertex(int id, double x, double y, double z, double m)
@@ -106,8 +111,22 @@ void RigidBody::addPolygon(int count, int* ids)
 
 void RigidBody::prepare()
 {
-  double totalMass = 0.0;
-  
+  if(this->fixed)
+  {
+    this->structure.inverseMass = 0;
+    this->structure.inverseInertiaTensor.reset();
+  }
+  else
+  {
+    this->computeCenterOfMass();
+    this->computeInverseInertiaTensor();
+  }
+}
+
+void RigidBody::computeCenterOfMass()
+{
+  double totalMass = 0;
+
   for(int i = 0; i < this->structure.vertices.size(); ++i)
   {
     Vertex* v_p = &this->structure.vertices[i];
@@ -117,8 +136,12 @@ void RigidBody::prepare()
   }
 
   this->structure.inverseMass = 1 / totalMass;
-
   this->position = this->position * this->structure.inverseMass;
+}
+
+void RigidBody::computeInverseInertiaTensor()
+{
+
 }
 
 Vertex* RigidBody::getVertexById_p(int id)

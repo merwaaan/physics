@@ -24,6 +24,8 @@ class Engine
 
     void run();
     void update();
+    bool areBoundingBoxesColliding(RigidBody* rb1_p, RigidBody* rb2_p);
+    
     double getTime();
     bool needUpdate();
 

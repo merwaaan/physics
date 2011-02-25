@@ -47,6 +47,8 @@ class RigidBody
     void setPosition(Vector3 position);
     void setOrientation(Matrix3 orientation);
     void setFixed(bool fixed);
+
+    BoundingBox getBoundingBox();
 };
 
 #endif

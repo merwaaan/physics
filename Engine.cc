@@ -42,7 +42,29 @@ void Engine::update()
     this->bodies_p[i]->integrate(t * this->timeMultiplier);
   }
 
+  // check for collisions
+  for(int i = 1; i < this->bodies_p.size(); ++i)
+    for(int j = 0; j < i; ++j)
+      if(this->areBoundingBoxesColliding(this->bodies_p[i], this->bodies_p[j]))
+        std::cout << t << " COLLISION BETWEEN " << i << " " << j << std::endl;
+      else
+        std::cout << t << " NO COLLISION BETWEEN " << i << " " << j << std::endl;
+
   this->lastUpdateTime += t;
+}
+
+bool Engine::areBoundingBoxesColliding(RigidBody* rb1_p, RigidBody* rb2_p)
+{
+  BoundingBox b1 = rb1_p->getBoundingBox();
+  BoundingBox b2 = rb2_p->getBoundingBox();
+
+  if(
+    b1.a.X() > b2.b.X() || b1.b.X() < b2.a.X() ||
+    b1.a.Y() > b2.b.Y() || b1.b.Y() < b2.a.Y() ||
+    b1.a.Z() > b2.b.Z() || b1.b.Z() < b2.a.Z())
+    return false;
+
+  return true;
 }
 
 double Engine::getTime()

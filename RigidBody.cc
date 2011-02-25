@@ -90,3 +90,8 @@ void RigidBody::computeInverseInertiaTensor()
 
 }
 
+BoundingBox RigidBody::getBoundingBox()
+{
+  return this->boundingBox;
+}
+

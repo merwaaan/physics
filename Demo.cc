@@ -17,7 +17,7 @@ void input(unsigned char k, int x, int y)
 
 int main(int argc, char** argv)
 {
-  Engine e(&argc, argv, 0.01);
+  Engine e(&argc, argv, 0.001);
 
   c = new Cube(3);
   c->setPosition(Vector3(-3, 0, 0));

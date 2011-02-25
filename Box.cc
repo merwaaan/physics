@@ -29,11 +29,11 @@ Box::~Box()
 void Box::computeInverseInertiaTensor()
 {
   Matrix3 inertiaTensor;
-  inertiaTensor(0, 0, 1 / this->structure.inverseMass / 12 * (this->height * this->height + this->depth * this->depth));
-  inertiaTensor(1, 1, 1 / this->structure.inverseMass / 12 * (this->width * this->width + this->depth * this->depth));
-  inertiaTensor(2, 2, 1 / this->structure.inverseMass / 12 * (this->width * this->width + this->height * this->height));
+  inertiaTensor(0, 0, 1 / this->inverseMass / 12 * (this->height * this->height + this->depth * this->depth));
+  inertiaTensor(1, 1, 1 / this->inverseMass / 12 * (this->width * this->width + this->depth * this->depth));
+  inertiaTensor(2, 2, 1 / this->inverseMass / 12 * (this->width * this->width + this->height * this->height));
 
-  this->structure.inverseInertiaTensor = inertiaTensor.inverse();
+  this->inverseInertiaTensor = inertiaTensor.inverse();
 }
 
 Cube::Cube(double side) :

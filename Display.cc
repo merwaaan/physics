@@ -51,11 +51,6 @@ void Display::run()
   glutMainLoop();
 }
 
-void Display::setKeyboardCallback_p(void(*func)(unsigned char k, int x, int y))
-{
-  glutKeyboardFunc(func);
-}
-
 void update()
 {
   Engine* engine_p = display_pg->engine_p;
@@ -86,34 +81,9 @@ void update()
 
     glColor3f(0.0, 0.0, 0.0);
 
-    // for each rigid body
+    // draw each rigid body
     for(int i = 0; i < engine_p->getBodyCount(); ++i)
-    {
-      RigidBody* rb_p = engine_p->getBody_p(i);
-
-      // for each polygon
-      for(int j = 0; j < rb_p->getPolyCount(); ++j)
-      {
-        Polygon* poly_p = &(rb_p->getStructure_p()->polygons[j]);
-
-        Vector3 normal = poly_p->getNormal();
-
-        glBegin(GL_POLYGON);
-
-        // for each vertex
-        for(int k = 0; k < poly_p->size; ++k)
-        {
-          glNormal3f(normal.X(), normal.Y(), normal.Z());
-
-          glVertex3d(
-						poly_p->vertices_p[k]->absPosition.X(),
-						poly_p->vertices_p[k]->absPosition.Y(),
-						poly_p->vertices_p[k]->absPosition.Z());
-        }
-
-        glEnd();
-      }  
-    }
+      engine_p->getBody_p(i)->draw();
 
     glutSwapBuffers();
   }

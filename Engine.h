@@ -32,8 +32,6 @@ class Engine
     int getBodyCount();
 
     void addForce_p(Force* force_p);
-
-    void setKeyboardCallback_p(void(*func)(unsigned char k, int x, int y));
 };
 
 #endif

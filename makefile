@@ -1,6 +1,7 @@
 EXEC=demo
 OBJ= \
 	Box.o \
+	CustomRigidBody.o \
 	Demo.o \
 	Display.o \
 	Engine.o \

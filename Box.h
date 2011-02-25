@@ -1,9 +1,9 @@
 #ifndef BOX_H
 #define BOX_H
 
-#include "RigidBody.h"
+#include "CustomRigidBody.h"
 
-class Box : public RigidBody
+class Box : public CustomRigidBody
 {
   private:
     double width;

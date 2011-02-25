@@ -24,8 +24,6 @@ class Display
 
     void run();
 
-    void setKeyboardCallback_p(void(*func)(unsigned char k, int x, int y));
-
     friend void update();
     friend void mouse(int x, int y);
 };

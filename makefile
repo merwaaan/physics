@@ -1,6 +1,6 @@
 EXEC=demo
 OBJ= \
-	Cube.o \
+	Box.o \
 	Demo.o \
 	Display.o \
 	Engine.o \

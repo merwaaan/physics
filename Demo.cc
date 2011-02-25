@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Engine.h"
-#include "Cube.h"
+#include "Box.h"
 
 Cube *c;
 Cube *p;

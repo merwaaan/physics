@@ -56,6 +56,15 @@ Matrix3 Matrix3::operator+(const Matrix3& m) const
   return result;
 }
 
+Matrix3& Matrix3::operator+=(const Matrix3& m)
+{
+  for(int i = 0; i < 3; ++i)
+    for(int j = 0; j < 3; ++j)
+      (*this)(j, i, (*this)(j, i) + m(j, i));
+
+  return *this;
+}
+
 Matrix3 Matrix3::operator-(const Matrix3& m) const
 {
   Matrix3 result;
@@ -67,15 +76,6 @@ Matrix3 Matrix3::operator-(const Matrix3& m) const
   return result;
 }
 
-Matrix3& Matrix3::operator+=(const Matrix3& m)
-{
-  for(int i = 0; i < 3; ++i)
-    for(int j = 0; j < 3; ++j)
-      (*this)(j, i, (*this)(j, i) + m(j, i));
-
-  return *this;
-}
-
 Matrix3& Matrix3::operator-=(const Matrix3& m)
 {
   for(int i = 0; i < 3; ++i)
@@ -84,6 +84,7 @@ Matrix3& Matrix3::operator-=(const Matrix3& m)
 
   return *this;
 }
+
 Matrix3 Matrix3::operator*(double k) const
 {
   Matrix3 result;
@@ -93,6 +94,11 @@ Matrix3 Matrix3::operator*(double k) const
       result(j, i, (*this)(j, i) * k);
 
   return result;
+}
+
+Matrix3 operator*(double k, const Matrix3& m)
+{
+  return m * k;
 }
 
 // TODO

@@ -16,6 +16,8 @@ class Display
   private:
     Camera camera;
 
+    bool drawBoundingBoxes;
+
     Engine* engine_p;
 
   public:
@@ -23,6 +25,10 @@ class Display
     ~Display();
 
     void run();
+
+    void setBoundingBoxesDrawn(bool draw);
+
+    bool areBoundingBoxesDrawn();
 
     friend void update();
     friend void mouse(int x, int y);

@@ -11,6 +11,13 @@ Vector3::Vector3() :
 {
 }
 
+Vector3::Vector3(int v) :
+  x(v),
+  y(v),
+  z(v)
+{
+}
+
 Vector3::Vector3(double x, double y, double z) :
   x(x),
   y(y),
@@ -33,6 +40,15 @@ Vector3 Vector3::operator+(const Vector3& v) const
   return result;
 }
 
+Vector3& Vector3::operator+=(const Vector3& v)
+{
+  this->X(this->x + v.X());
+  this->Y(this->y + v.Y());
+  this->Z(this->z + v.Z());
+
+  return *this;
+}
+
 Vector3 Vector3::operator-(const Vector3& v) const
 {
   Vector3 result;
@@ -42,15 +58,6 @@ Vector3 Vector3::operator-(const Vector3& v) const
   result.Z(this->z - v.Z());
 
   return result;
-}
-
-Vector3& Vector3::operator+=(const Vector3& v)
-{
-  this->X(this->x + v.X());
-  this->Y(this->y + v.Y());
-  this->Z(this->z + v.Z());
-
-  return *this;
 }
 
 Vector3& Vector3::operator-=(const Vector3& v)
@@ -81,15 +88,9 @@ Vector3 operator*(double k, const Vector3& v)
 /**
  * Dot product
  */
-Vector3 Vector3::operator*(const Vector3& v) const
+double Vector3::operator*(const Vector3& v) const
 {
-  Vector3 result;
-
-  result.X(this->x * v.X());
-  result.Y(this->y * v.Y());
-  result.Z(this->z * v.Z());
-
-  return result;
+  return this->x * v.X() + this->y * v.Y() + this->z * v.Z();
 }
 
 /**
@@ -103,20 +104,6 @@ Vector3 Vector3::operator^(const Vector3& v) const
   result.Y(this->x * v.Z() - this->z * v.X());
   result.Z(this->x * v.Y() - this->y * v.X());
   
-  return result;
-}
-
-/**
- * Cross product with a matrix
- */
-Matrix3 Vector3::operator^(const Matrix3& m) const
-{
-  Matrix3 result;
-
-  result(0, *this ^ m(0));
-  result(1, *this ^ m(1));
-  result(2, *this ^ m(2));
-
   return result;
 }
 
@@ -158,11 +145,6 @@ Matrix3 Vector3::toStarMatrix()
   return result;
 }
 
-void Vector3::reset()
-{
-	this->x = this->y = this->z = 0.0;
-}
-
 double Vector3::X() const
 {
   return this->x;
@@ -178,6 +160,11 @@ double Vector3::Z() const
   return this->z;
 }
 
+void Vector3::reset()
+{
+	this->x = this->y = this->z = 0.0;
+}
+
 void Vector3::X(double x)
 {
   this->x = x;
@@ -191,10 +178,5 @@ void Vector3::Y(double y)
 void Vector3::Z(double z)
 {
   this->z = z;
-}
-
-int Vector3::size() const
-{
-  return 3;
 }
 

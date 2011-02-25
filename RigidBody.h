@@ -4,11 +4,19 @@
 #include "Vector3.h"
 #include "Matrix3.h"
 
+struct BoundingBox
+{
+  Vector3 a;
+  Vector3 b;
+};
+
 class RigidBody
 {
   protected:
     double inverseMass;
     Matrix3 inverseInertiaTensor;
+
+    BoundingBox boundingBox;
     
     Vector3 position;
     Vector3 linearMomentum;
@@ -28,6 +36,7 @@ class RigidBody
 
     virtual void prepare() = 0;
     virtual void computeInverseInertiaTensor() = 0;
+    virtual void computeBoundingBox() = 0;
 
     void clearAccumulators();
     void applyCenterForce(Vector3 force);

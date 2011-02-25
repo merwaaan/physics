@@ -7,6 +7,7 @@
 Display* display_pg = NULL;
 
 Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
+  drawBoundingBoxes(true),
   engine_p(engine_p)
 {
   glutInit(argc, argv);
@@ -49,6 +50,16 @@ Display::~Display()
 void Display::run()
 {
   glutMainLoop();
+}
+
+void Display::setBoundingBoxesDrawn(bool draw)
+{
+  this->drawBoundingBoxes = draw;
+}
+
+bool Display::areBoundingBoxesDrawn()
+{
+  return this->drawBoundingBoxes;
 }
 
 void update()

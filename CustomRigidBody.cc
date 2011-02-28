@@ -4,6 +4,7 @@
 #include <limits>
 
 #include "Display.h"
+#include "Sphere.h"
 
 extern Display* display_pg;
 
@@ -161,6 +162,21 @@ void CustomRigidBody::computeVerticesAbsolutePositions()
 {
   for(int i = 0; i < this->structure.vertices.size(); ++i)
     this->structure.vertices[i].absPosition = this->orientation * this->structure.vertices[i].localPosition + this->position;
+}
+
+bool CustomRigidBody::isCollidingWith(RigidBody* rb_p)
+{
+  return rb_p->isCollidingWith(this);
+}
+
+bool CustomRigidBody::isCollidingWith(Sphere* s_p)
+{
+  return s_p->isCollidingWith(this);
+}
+
+bool CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p)
+{
+  return false;
 }
 
 Vertex* CustomRigidBody::getVertexById_p(int id)

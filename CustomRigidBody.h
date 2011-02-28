@@ -52,6 +52,10 @@ class CustomRigidBody : public RigidBody
     void integrate(double t);
     void draw();
     void computeVerticesAbsolutePositions();
+ 
+    bool isCollidingWith(RigidBody* rb_p);
+    bool isCollidingWith(Sphere* s_p);
+    bool isCollidingWith(CustomRigidBody* rb_p);
 
     Vertex* getVertexById_p(int id);
     int getPolyCount();

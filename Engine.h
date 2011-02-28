@@ -33,8 +33,6 @@ class Engine
 
     void run();
     void update();
-    bool areBoundingBoxesColliding(RigidBody* a, RigidBody* b);
-    bool areColliding(RigidBody* a, RigidBody* b);
 
     void addRigidBody_p(RigidBody* rb_p);
     RigidBody* getBody_p(int i);

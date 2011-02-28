@@ -85,9 +85,18 @@ void RigidBody::prepare()
     this->computeInverseInertiaTensor();
 }
 
-void RigidBody::computeInverseInertiaTensor()
+bool RigidBody::isBoundingBoxCollidingWith(RigidBody* rb_p)
 {
+  BoundingBox b1 = this->boundingBox;
+  BoundingBox b2 = rb_p->getBoundingBox();
 
+  if(
+    b1.a.X() > b2.b.X() || b1.b.X() < b2.a.X() ||
+    b1.a.Y() > b2.b.Y() || b1.b.Y() < b2.a.Y() ||
+    b1.a.Z() > b2.b.Z() || b1.b.Z() < b2.a.Z())
+    return false;
+
+  return true;
 }
 
 BoundingBox RigidBody::getBoundingBox()

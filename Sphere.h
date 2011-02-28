@@ -18,6 +18,10 @@ class Sphere : public RigidBody
 
     void integrate(double t);
     void draw();
+
+    bool isCollidingWith(RigidBody* rb_p);
+    bool isCollidingWith(Sphere* s_p);
+    bool isCollidingWith(CustomRigidBody* rb_p);
 };
 
 #endif

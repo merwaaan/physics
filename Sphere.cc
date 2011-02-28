@@ -17,8 +17,16 @@ Sphere::~Sphere()
 
 void Sphere::prepare()
 {
-  this->inverseMass = 1;
-  this->computeInverseInertiaTensor();
+  if(this->fixed)
+  {
+    this->inverseMass = 0;
+    this->inverseInertiaTensor.reset();
+  }
+  else
+  {
+    this->inverseMass = 1;
+    this->computeInverseInertiaTensor();
+  }
 }
 
 void Sphere::computeInverseInertiaTensor()
@@ -57,5 +65,23 @@ void Sphere::draw()
     glutWireCube(this->radius * 2);
 
   glPopMatrix();
+}
+
+bool Sphere::isCollidingWith(RigidBody* rb_p)
+{
+  return rb_p->isCollidingWith(this);
+}
+
+bool Sphere::isCollidingWith(Sphere* s_p)
+{
+  if((this->position - s_p->position).length() > this->radius + s_p->radius)
+    return false;
+
+  return true;
+}
+
+bool Sphere::isCollidingWith(CustomRigidBody* rb_p)
+{
+  return false;
 }
 

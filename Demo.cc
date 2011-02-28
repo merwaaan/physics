@@ -17,20 +17,25 @@ void input(unsigned char k, int x, int y)
 
 int main(int argc, char** argv)
 {
-  Engine e(&argc, argv, 0.001);
+  Engine e(&argc, argv, 0.0001);
 
   c = new Cube(3);
   c->setPosition(Vector3(-3, 0, 0));
-  e.addRigidBody_p(c);
+  //e.addRigidBody_p(c);
   
   s = new Sphere(1.5);
   s->setPosition(Vector3(3, 0, 0));
   e.addRigidBody_p(s);
+  
+  Sphere* s2 = new Sphere(1.5);
+  s2->setPosition(Vector3(3, -5, 0));
+  s2->setFixed(true);
+  e.addRigidBody_p(s2);
 
   plane = new Box(10, 1, 10);
   plane->setPosition(Vector3(0, -6, 0));
   plane->setFixed(true);
-  e.addRigidBody_p(plane);
+  //e.addRigidBody_p(plane);
 
   Force* g = new CenterForce(Vector3(0, -9.81, 0));
   e.addForce_p(g);

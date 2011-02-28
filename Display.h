@@ -16,6 +16,9 @@ class Display
   private:
     Camera camera;
 
+    double startingTime;
+    double lastUpdateTime;
+
     bool drawBoundingBoxes;
 
     Engine* engine_p;
@@ -25,6 +28,8 @@ class Display
     ~Display();
 
     void run();
+    double getAbsoluteTime();
+    double getLocalTime();
 
     void setBoundingBoxesDrawn(bool draw);
 

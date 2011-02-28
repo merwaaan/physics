@@ -1,7 +1,8 @@
 #include <GL/glut.h>
 
-#include "Display.h"
+#include <sys/time.h>
 
+#include "Display.h"
 #include "Engine.h"
 
 Display* display_pg = NULL;
@@ -23,10 +24,10 @@ Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
 
   glShadeModel(GL_SMOOTH);
   
-  GLfloat lightModel[] = {0.2, 0.2, 0.2, 1.0};
+  GLfloat lightModel[] = {0.3, 0.3, 0.3, 1.0};
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lightModel);
 
-  GLfloat lightSpecular[] = {0.1, 0.1, 0.1, 1.0};
+  GLfloat lightSpecular[] = {0.5, 0.5, 0.5, 1.0};
   glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
  
   GLfloat lightAmbient[] = {170.0/255, 162.0/255, 113.0/255, 1.0};
@@ -49,7 +50,23 @@ Display::~Display()
 
 void Display::run()
 {
+  this->startingTime = this->getAbsoluteTime();
+  this->lastUpdateTime = 0;
+
   glutMainLoop();
+}
+
+double Display::getAbsoluteTime()
+{
+  struct timeval t;
+  gettimeofday(&t, NULL);
+
+  return t.tv_sec + (double)t.tv_usec / 1000000;
+}
+
+double Display::getLocalTime()
+{
+  return this->getAbsoluteTime() - this->startingTime;
 }
 
 void Display::setBoundingBoxesDrawn(bool draw)
@@ -65,8 +82,7 @@ bool Display::areBoundingBoxesDrawn()
 void update()
 {
   Engine* engine_p = display_pg->engine_p;
-
-  if(engine_p->needUpdate())
+  if(display_pg->getLocalTime() > display_pg->lastUpdateTime + 0.016) // ~60 FPS
   {
     // update the simulation
     engine_p->update();
@@ -98,6 +114,8 @@ void update()
       engine_p->getBody_p(i)->draw();
 
     glutSwapBuffers();
+
+    display_pg->lastUpdateTime = display_pg->getLocalTime();
   }
 
   glutPostRedisplay();

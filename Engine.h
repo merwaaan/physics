@@ -7,27 +7,34 @@
 #include "RigidBody.h"
 #include "Force.h"
 
+struct Contact
+{
+  RigidBody* a;
+  RigidBody* b;
+
+  Vector3 position;
+  Vector3 normal;
+};
+
 class Engine
 {
   private:
     std::vector<RigidBody*> bodies_p;
     std::vector<Force*> forces_p;
 
-    double timeMultiplier;
+    double timestep;
+    double simulationTime;
 
-    double lastUpdateTime;
     Display display;
 
   public:
-    Engine(int* argc, char** argv, double timeMultiplier);
+    Engine(int* argc, char** argv, double timestep);
     ~Engine();
 
     void run();
     void update();
-    bool areBoundingBoxesColliding(RigidBody* rb1_p, RigidBody* rb2_p);
-    
-    double getTime();
-    bool needUpdate();
+    bool areBoundingBoxesColliding(RigidBody* a, RigidBody* b);
+    bool areColliding(RigidBody* a, RigidBody* b);
 
     void addRigidBody_p(RigidBody* rb_p);
     RigidBody* getBody_p(int i);

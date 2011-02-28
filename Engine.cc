@@ -2,8 +2,8 @@
 
 #include <sys/time.h>
 
-Engine::Engine(int* argc, char** argv, double timeMultiplier) :
-  timeMultiplier(timeMultiplier),
+Engine::Engine(int* argc, char** argv, double timestep) :
+  timestep(timestep),
   display(argc, argv, 400, 400, this)
 {
 }
@@ -23,15 +23,11 @@ void Engine::run()
   for(int i = 0; i < this->bodies_p.size(); ++i)
     this->bodies_p[i]->prepare();
 
-  this->lastUpdateTime = this->getTime();
-
   this->display.run();
 }
 
 void Engine::update()
 {
-  double t = this->getTime() - this->lastUpdateTime;
-
   for(int i = 0; i < this->bodies_p.size(); ++i)
   {
     // apply all the external forces
@@ -39,24 +35,23 @@ void Engine::update()
       this->forces_p[j]->apply(this->bodies_p[i]);
 
     // integrate each body state
-    this->bodies_p[i]->integrate(t * this->timeMultiplier);
+    this->bodies_p[i]->integrate(this->timestep);
   }
 
   // check for collisions
   for(int i = 1; i < this->bodies_p.size(); ++i)
     for(int j = 0; j < i; ++j)
       if(this->areBoundingBoxesColliding(this->bodies_p[i], this->bodies_p[j]))
-        std::cout << t << " COLLISION BETWEEN " << i << " " << j << std::endl;
-      else
-        std::cout << t << " NO COLLISION BETWEEN " << i << " " << j << std::endl;
+        if(this->areColliding(this->bodies_p[i], this->bodies_p[j]))
+          std::cout << " COLLISION BETWEEN " << i << " " << j << std::endl;
 
-  this->lastUpdateTime += t;
+  this->simulationTime += this->timestep;
 }
 
-bool Engine::areBoundingBoxesColliding(RigidBody* rb1_p, RigidBody* rb2_p)
+bool Engine::areBoundingBoxesColliding(RigidBody* a, RigidBody* b)
 {
-  BoundingBox b1 = rb1_p->getBoundingBox();
-  BoundingBox b2 = rb2_p->getBoundingBox();
+  BoundingBox b1 = a->getBoundingBox();
+  BoundingBox b2 = b->getBoundingBox();
 
   if(
     b1.a.X() > b2.b.X() || b1.b.X() < b2.a.X() ||
@@ -67,17 +62,9 @@ bool Engine::areBoundingBoxesColliding(RigidBody* rb1_p, RigidBody* rb2_p)
   return true;
 }
 
-double Engine::getTime()
+bool Engine::areColliding(RigidBody* a, RigidBody* b)
 {
-  struct timeval t;
-  gettimeofday(&t, NULL);
-
-  return t.tv_sec + (double)t.tv_usec / 1000000;
-}
-
-bool Engine::needUpdate()
-{
-  return this->getTime() > this->lastUpdateTime + 0.016; // ~60FPS
+  return false;
 }
 
 void Engine::addRigidBody_p(RigidBody* rb_p)

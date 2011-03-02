@@ -6,8 +6,6 @@
 #include "Sphere.h"
 
 Cube *c;
-Sphere* s;
-Box* plane;
 
 void input(unsigned char k, int x, int y)
 {
@@ -17,22 +15,26 @@ void input(unsigned char k, int x, int y)
 
 int main(int argc, char** argv)
 {
-  Engine e(&argc, argv, 0.0001);
+  Engine e(&argc, argv, 0.001);
 
   c = new Cube(3);
   c->setPosition(Vector3(-3, 0, 0));
   //e.addRigidBody_p(c);
   
-  s = new Sphere(1.5);
-  s->setPosition(Vector3(3, 0, 0));
+  Sphere* s = new Sphere(1.5);
+  s->setPosition(Vector3(0, 5, 0));
   e.addRigidBody_p(s);
   
-  Sphere* s2 = new Sphere(1.5);
-  s2->setPosition(Vector3(3, -5, 0));
-  s2->setFixed(true);
-  e.addRigidBody_p(s2);
-
-  plane = new Box(10, 1, 10);
+  srand(time(NULL));
+  for(int i = 0; i < 10; ++i)
+  {
+    Sphere* s2 = new Sphere(1);
+    s2->setPosition(Vector3(rand() % 10 - 5, rand() % 5 - 5, rand() % 10 - 5));
+    s2->setFixed(true);
+    e.addRigidBody_p(s2);
+  }
+  
+  Box* plane = new Box(10, 1, 10);
   plane->setPosition(Vector3(0, -6, 0));
   plane->setFixed(true);
   //e.addRigidBody_p(plane);

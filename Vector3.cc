@@ -85,6 +85,17 @@ Vector3 operator*(double k, const Vector3& v)
   return v * k;
 }
 
+Vector3 Vector3::operator/(double k) const
+{
+  Vector3 result;
+
+  result.X(this->x / k);
+  result.Y(this->y / k);
+  result.Z(this->z / k);
+
+  return result;
+}
+
 /**
  * Dot product
  */

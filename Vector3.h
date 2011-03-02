@@ -25,6 +25,7 @@ class Vector3
 
     Vector3 operator*(double k) const;
     friend Vector3 operator*(double k, const Vector3& v);
+    Vector3 operator/(double k) const;
     double operator*(const Vector3& v) const;
     Vector3 operator^(const Vector3& v) const;
 

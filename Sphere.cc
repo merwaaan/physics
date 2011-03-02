@@ -3,6 +3,7 @@
 #include <GL/glut.h>
 
 #include "Display.h"
+#include "Engine.h"
 
 extern Display* display_pg;
 
@@ -67,21 +68,30 @@ void Sphere::draw()
   glPopMatrix();
 }
 
-bool Sphere::isCollidingWith(RigidBody* rb_p)
+Contact* Sphere::isCollidingWith(RigidBody* rb_p)
 {
   return rb_p->isCollidingWith(this);
 }
 
-bool Sphere::isCollidingWith(Sphere* s_p)
+Contact* Sphere::isCollidingWith(Sphere* s_p)
 {
-  if((this->position - s_p->position).length() > this->radius + s_p->radius)
-    return false;
+  Contact* contact_p = NULL;
 
-  return true;
+  if((this->position - s_p->position).length() < this->radius + s_p->radius)
+  {
+    contact_p = new Contact;
+
+    contact_p->a = this;
+    contact_p->b = s_p;
+    contact_p->position = (this->position - s_p->position) * (1 / this->radius / (this->radius + s_p->radius));
+    contact_p->normal = (s_p->position - this->position).normalize();
+  }
+
+  return contact_p;
 }
 
-bool Sphere::isCollidingWith(CustomRigidBody* rb_p)
+Contact* Sphere::isCollidingWith(CustomRigidBody* rb_p)
 {
-  return false;
+  return NULL;
 }
 

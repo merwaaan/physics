@@ -1,10 +1,11 @@
 #include "Engine.h"
 
+#include <stdlib.h>
 #include <sys/time.h>
 
 Engine::Engine(int* argc, char** argv, double timestep) :
   timestep(timestep),
-  display(argc, argv, 400, 400, this)
+  display(argc, argv, 600, 600, this)
 {
 }
 
@@ -31,9 +32,29 @@ void Engine::update()
   // check for collisions
   for(int i = 1; i < this->bodies_p.size(); ++i)
     for(int j = 0; j < i; ++j)
+    {
+      Contact* contact_p = NULL;
+
       if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
-        if(this->bodies_p[i]->isCollidingWith(this->bodies_p[j]))
-          std::cout << " COLLISION BETWEEN " << i << " " << j << std::endl;
+        if((contact_p = this->bodies_p[i]->isCollidingWith(this->bodies_p[j])) != NULL)
+        {
+          Vector3 p = contact_p->position;
+          Vector3 n = contact_p->normal;
+
+          double relativeVelocity = n * (contact_p->a->getVelocity() - contact_p->b->getVelocity());
+
+          double t1 = contact_p->a->inverseMass + contact_p->b->inverseMass;
+          double t2 = n * ((contact_p->a->inverseInertiaTensor * (p ^ n)) ^ p);
+          double t3 = n * ((contact_p->b->inverseInertiaTensor * (p ^ n)) ^ p);
+
+          double impulse = (-1.8 * relativeVelocity) / (t1 + t2 + t2);
+          std::cout << impulse * contact_p->normal << std::endl;
+          bodies_p[j]->applyCenterForce(impulse * contact_p->normal);
+          bodies_p[i]->applyCenterForce(-impulse * contact_p->normal);
+
+          delete contact_p;
+        }
+    }
 
   // integrate the rigid bodies states
   for(int i = 0; i < this->bodies_p.size(); ++i)

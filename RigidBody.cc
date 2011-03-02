@@ -59,32 +59,6 @@ void RigidBody::integrate(double t)
   this->clearAccumulators();
 }
 
-void RigidBody::setPosition(Vector3 position)
-{
-  this->position = position;
-}
-
-void RigidBody::setOrientation(Matrix3 orientation)
-{
-  this->orientation = orientation;
-}
-
-void RigidBody::setFixed(bool fixed)
-{
-  this->fixed = fixed;
-}
-
-void RigidBody::prepare()
-{
-  if(this->fixed)
-  {
-    this->inverseMass = 0;
-    this->inverseInertiaTensor.reset();
-  }
-  else
-    this->computeInverseInertiaTensor();
-}
-
 bool RigidBody::isBoundingBoxCollidingWith(RigidBody* rb_p)
 {
   BoundingBox b1 = this->boundingBox;
@@ -102,5 +76,26 @@ bool RigidBody::isBoundingBoxCollidingWith(RigidBody* rb_p)
 BoundingBox RigidBody::getBoundingBox()
 {
   return this->boundingBox;
+}
+
+
+void RigidBody::setPosition(Vector3 position)
+{
+  this->position = position;
+}
+
+void RigidBody::setOrientation(Matrix3 orientation)
+{
+  this->orientation = orientation;
+}
+
+void RigidBody::setFixed(bool fixed)
+{
+  this->fixed = fixed;
+}
+
+Vector3 RigidBody::getVelocity()
+{
+  return this->linearMomentum * this->inverseMass;
 }
 

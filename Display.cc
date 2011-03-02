@@ -40,6 +40,7 @@ Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
   glutPassiveMotionFunc(&mouse);
 
   this->camera.radius = 10;
+  this->camera.angle = 45;
 
   display_pg = this;
 }

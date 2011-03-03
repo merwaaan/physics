@@ -22,7 +22,7 @@ class Engine
     std::vector<RigidBody*> bodies_p;
     std::vector<Force*> forces_p;
 
-    double timestep;
+    double timeStep;
     double simulationTime;
 
     Display display;
@@ -33,6 +33,8 @@ class Engine
 
     void run();
     void update();
+
+    void reverseTime();
 
     void addRigidBody_p(RigidBody* rb_p);
     RigidBody* getBody_p(int i);

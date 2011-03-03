@@ -44,13 +44,13 @@ void RigidBody::integrate(double t)
 {
   // linear movement
   this->linearMomentum += this->accumulatedForces;
-  Vector3 velocity = this->linearMomentum * this->inverseMass;
+  Vector3 velocity = this->linearMomentum * this->inverseMass * t;
   this->position += velocity * t;
 
   // angular movement
   this->angularMomentum += this->accumulatedTorques;
   Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
-  Vector3 angularVelocity = inverseInertia * this->angularMomentum;
+  Vector3 angularVelocity = inverseInertia * this->angularMomentum * t;
   this->orientation += (angularVelocity.toStarMatrix() * this->orientation) * t;
 
   // normalize the orientation matrix to avoid numerical drift

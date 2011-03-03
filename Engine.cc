@@ -23,7 +23,7 @@ void Engine::run()
   // compute all centers of mass and inertia tensors before we begin the simulation
   for(int i = 0; i < this->bodies_p.size(); ++i)
     this->bodies_p[i]->prepare();
-
+  std::cout << this->bodies_p.size() << std::endl;
   this->display.run();
 }
 
@@ -48,7 +48,7 @@ void Engine::update()
           double t3 = n * ((contact_p->b->inverseInertiaTensor * (p ^ n)) ^ p);
 
           double impulse = (-1.8 * relativeVelocity) / (t1 + t2 + t2);
-          std::cout << impulse * contact_p->normal << std::endl;
+
           bodies_p[j]->applyCenterForce(impulse * contact_p->normal);
           bodies_p[i]->applyCenterForce(-impulse * contact_p->normal);
 

@@ -53,9 +53,9 @@ class CustomRigidBody : public RigidBody
     void draw();
     void computeVerticesAbsolutePositions();
  
-    Contact* isCollidingWith(RigidBody* rb_p);
-    Contact* isCollidingWith(Sphere* s_p);
-    Contact* isCollidingWith(CustomRigidBody* rb_p);
+    Contact* isCollidingWith(RigidBody* rb_p, double dt);
+    Contact* isCollidingWith(Sphere* s_p, double dt);
+    Contact* isCollidingWith(CustomRigidBody* rb_p, double dt);
 
     Vertex* getVertexById_p(int id);
     int getPolyCount();

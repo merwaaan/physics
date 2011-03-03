@@ -55,8 +55,6 @@ void RigidBody::integrate(double t)
 
   // normalize the orientation matrix to avoid numerical drift
   this->orientation = this->orientation.normalize();
-
-  this->clearAccumulators();
 }
 
 bool RigidBody::isBoundingBoxCollidingWith(RigidBody* rb_p)

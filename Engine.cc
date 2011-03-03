@@ -3,10 +3,13 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
+Engine* engine_pg = NULL;
+
 Engine::Engine(int* argc, char** argv, double timeStep) :
   timeStep(timeStep),
   display(argc, argv, 600, 600, this)
 {
+  engine_pg = this;
 }
 
 Engine::~Engine()
@@ -23,7 +26,7 @@ void Engine::run()
   // compute all centers of mass and inertia tensors before we begin the simulation
   for(int i = 0; i < this->bodies_p.size(); ++i)
     this->bodies_p[i]->prepare();
-  std::cout << this->bodies_p.size() << std::endl;
+
   this->display.run();
 }
 
@@ -35,11 +38,17 @@ void Engine::update()
     for(int i = 1; i < this->bodies_p.size(); ++i)
       for(int j = 0; j < i; ++j)
       {
-        Contact* contact_p = NULL;
-
+        // bounding boxes test
         if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
-          if((contact_p = this->bodies_p[i]->isCollidingWith(this->bodies_p[j])) != NULL)
+        {
+          std::cout << "TESTING " << i << " " << j << std::endl;
+
+          // accurate test
+          Contact* contact_p = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
+        
+          if(contact_p != NULL)
           {
+            std::cout << contact_p->position << contact_p->normal << std::endl;
             Vector3 p = contact_p->position;
             Vector3 n = contact_p->normal;
 
@@ -51,22 +60,26 @@ void Engine::update()
 
             double restitution = this->timeStep > 0 ? 0.8 : 1.25;
             double impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t2);
-
+            std::cout << impulse * contact_p->normal << std::endl;
             bodies_p[j]->applyCenterForce(impulse * contact_p->normal);
             bodies_p[i]->applyCenterForce(-impulse * contact_p->normal);
 
             delete contact_p;
           }
+        }
       }
 
     // integrate the rigid bodies states
     for(int i = 0; i < this->bodies_p.size(); ++i)
-    {
+    {      
       // apply the external forces
       for(int j = 0; j < this->forces_p.size(); ++j)
         this->forces_p[j]->apply(this->bodies_p[i]);
 
       this->bodies_p[i]->integrate(this->timeStep);
+    
+      // erase the forces from the last frame
+      this->bodies_p[i]->clearAccumulators();
     }
 
     this->simulationTime += this->timeStep;
@@ -76,7 +89,6 @@ void Engine::update()
     this->simulationTime = 0;
     this->reverseTime();
   }
-  std::cout << simulationTime << std::endl;
 }
 
 void Engine::reverseTime()

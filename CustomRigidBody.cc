@@ -163,17 +163,17 @@ void CustomRigidBody::computeVerticesAbsolutePositions()
     this->structure.vertices[i].absPosition = this->orientation * this->structure.vertices[i].localPosition + this->position;
 }
 
-Contact* CustomRigidBody::isCollidingWith(RigidBody* rb_p)
+Contact* CustomRigidBody::isCollidingWith(RigidBody* rb_p, double dt)
 {
-  return rb_p->isCollidingWith(this);
+  return rb_p->isCollidingWith(this, dt);
 }
 
-Contact* CustomRigidBody::isCollidingWith(Sphere* s_p)
+Contact* CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
 {
-  return s_p->isCollidingWith(this);
+  return s_p->isCollidingWith(this, dt);
 }
 
-Contact* CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p)
+Contact* CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
   return NULL;
 }

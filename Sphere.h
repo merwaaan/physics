@@ -19,9 +19,12 @@ class Sphere : public RigidBody
     void integrate(double t);
     void draw();
 
-    Contact* isCollidingWith(RigidBody* rb_p);
-    Contact* isCollidingWith(Sphere* s_p);
-    Contact* isCollidingWith(CustomRigidBody* rb_p);
+    Contact* isCollidingWith(RigidBody* rb_p, double dt);
+
+    Contact* isCollidingWith(Sphere* s_p, double dt);
+    Contact* resolveInterPenetration(Sphere* s_p, double dt);
+    
+    Contact* isCollidingWith(CustomRigidBody* rb_p, double dt);
 };
 
 #endif

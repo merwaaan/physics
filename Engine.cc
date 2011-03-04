@@ -41,28 +41,17 @@ void Engine::update()
         // bounding boxes test
         if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
         {
-          std::cout << "TESTING " << i << " " << j << std::endl;
+          std::cout << "TESTING " << i << " AND " << j << std::endl;
 
           // accurate test
           Contact* contact_p = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
         
           if(contact_p != NULL)
           {
-            std::cout << contact_p->position << contact_p->normal << std::endl;
-            Vector3 p = contact_p->position;
-            Vector3 n = contact_p->normal;
+            Vector3 impulse = this->computeImpulse(*contact_p);
 
-            double relativeVelocity = n * (contact_p->a->getVelocity() - contact_p->b->getVelocity());
-
-            double t1 = contact_p->a->inverseMass + contact_p->b->inverseMass;
-            double t2 = n * ((contact_p->a->inverseInertiaTensor * (p ^ n)) ^ p);
-            double t3 = n * ((contact_p->b->inverseInertiaTensor * (p ^ n)) ^ p);
-
-            double restitution = this->timeStep > 0 ? 0.8 : 1.25;
-            double impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t2);
-            std::cout << impulse * contact_p->normal << std::endl;
-            bodies_p[j]->applyCenterForce(impulse * contact_p->normal);
-            bodies_p[i]->applyCenterForce(-impulse * contact_p->normal);
+            bodies_p[j]->applyCenterForce(impulse);
+            bodies_p[i]->applyCenterForce(-1 * impulse);
 
             delete contact_p;
           }
@@ -89,6 +78,23 @@ void Engine::update()
     this->simulationTime = 0;
     this->reverseTime();
   }
+}
+
+Vector3 Engine::computeImpulse(Contact contact)
+{
+  Vector3 p = contact.position;
+  Vector3 n = contact.normal;
+
+  double relativeVelocity = n * (contact.a->getVelocity() - contact.b->getVelocity());
+
+  double t1 = contact.a->inverseMass + contact.b->inverseMass;
+  double t2 = n * ((contact.a->inverseInertiaTensor * (p ^ n)) ^ p);
+  double t3 = n * ((contact.b->inverseInertiaTensor * (p ^ n)) ^ p);
+
+  double restitution = this->timeStep > 0 ? 0.8 : 1.25;
+  double impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t2);
+  
+  return impulse * contact.normal;
 }
 
 void Engine::reverseTime()

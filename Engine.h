@@ -33,6 +33,7 @@ class Engine
 
     void run();
     void update();
+    Vector3 computeImpulse(Contact contact);
 
     void reverseTime();
 

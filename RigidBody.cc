@@ -76,10 +76,14 @@ BoundingBox RigidBody::getBoundingBox()
   return this->boundingBox;
 }
 
-
 void RigidBody::setPosition(Vector3 position)
 {
   this->position = position;
+}
+
+void RigidBody::setPosition(int x, int y, int z)
+{
+  this->position = Vector3(x, y, z);
 }
 
 void RigidBody::setOrientation(Matrix3 orientation)

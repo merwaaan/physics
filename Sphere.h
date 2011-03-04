@@ -22,7 +22,7 @@ class Sphere : public RigidBody
     Contact* isCollidingWith(RigidBody* rb_p, double dt);
 
     Contact* isCollidingWith(Sphere* s_p, double dt);
-    Contact* resolveInterPenetration(Sphere* s_p, double dt);
+    Contact* resolveInterPenetration(Sphere* s_p, double dt, double tolerance);
     
     Contact* isCollidingWith(CustomRigidBody* rb_p, double dt);
 };

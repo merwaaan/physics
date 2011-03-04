@@ -81,7 +81,7 @@ void RigidBody::setPosition(Vector3 position)
   this->position = position;
 }
 
-void RigidBody::setPosition(int x, int y, int z)
+void RigidBody::setPosition(double x, double y, double z)
 {
   this->position = Vector3(x, y, z);
 }

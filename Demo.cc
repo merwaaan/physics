@@ -22,14 +22,14 @@ int main(int argc, char** argv)
   e->addRigidBody_p(c);*/
  
   Sphere* s = new Sphere(1);
-  s->setPosition(0, 5, 0);
+  s->setPosition(1.8, 5, 0);
   e->addRigidBody_p(s);
   
   Sphere* s2 = new Sphere(1);
   s2->setPosition(0, 0, 0);
   s2->setFixed(true);
   e->addRigidBody_p(s2);
- 
+
   /*Box* plane = new Box(10, 1, 10);
   plane->setPosition(Vector3(0, -6, 0));
   plane->setFixed(true);

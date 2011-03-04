@@ -83,7 +83,7 @@ bool Display::areBoundingBoxesDrawn()
 void update()
 {
   Engine* engine_p = display_pg->engine_p;
-  if(display_pg->getLocalTime() > display_pg->lastUpdateTime + 0.016) // ~60 FPS
+  if(display_pg->getLocalTime() > display_pg->lastUpdateTime + 0.01666) // ~60 FPS
   {
     // update the simulation
 	  engine_p->update();

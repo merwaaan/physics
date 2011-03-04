@@ -56,7 +56,7 @@ class RigidBody
     virtual Contact* isCollidingWith(CustomRigidBody* rb_p, double dt) = 0;
 
     void setPosition(Vector3 position);
-    void setPosition(int x, int y, int z);
+    void setPosition(double x, double y, double z);
     
     void setOrientation(Matrix3 orientation);
     void setFixed(bool fixed);

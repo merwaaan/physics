@@ -29,6 +29,8 @@ void Sphere::prepare()
     this->inverseMass = 1;
     this->computeInverseInertiaTensor();
   }
+
+  this->computeBoundingBox();
 }
 
 void Sphere::computeInverseInertiaTensor()
@@ -48,10 +50,10 @@ void Sphere::computeBoundingBox()
   this->boundingBox.b = this->position + Vector3(this->radius, this->radius, this->radius);
 }
 
-void Sphere::integrate(double t)
+void Sphere::integrate(double dt)
 {
-  RigidBody::integrate(t);
-
+  RigidBody::integrate(dt);
+  
   this->computeBoundingBox();
 }
 
@@ -78,7 +80,7 @@ Contact* Sphere::isCollidingWith(Sphere* s_p, double dt)
 {
   double distance = (this->position - s_p->position).length();
   double radii = this->radius + s_p->radius;
-  double tolerance = 0.3;
+  double tolerance = 0.01;
  
   if(distance > radii + tolerance)
   {
@@ -87,7 +89,7 @@ Contact* Sphere::isCollidingWith(Sphere* s_p, double dt)
     return NULL;
   }
   else
-    return this->resolveInterPenetration(s_p, dt / 2, tolerance);
+    return this->resolveInterPenetration(s_p, dt, tolerance);
 }
 
 Contact* Sphere::resolveInterPenetration(Sphere* s_p, double dt, double tolerance)
@@ -97,25 +99,25 @@ Contact* Sphere::resolveInterPenetration(Sphere* s_p, double dt, double toleranc
  
   if(distance > radii + tolerance)
   {
-    std::cout << "OUTSIDE (going on " << dt << ")" << std::endl;
+    std::cout << "OUTSIDE (going on " << dt / 10 << ")" << std::endl;
     std::cout << this->position << this->linearMomentum << std::endl;
     
-    this->integrate(dt);
-    s_p->integrate(dt);
+    this->integrate(dt / 10);
+    s_p->integrate(dt / 10);
 
-    return this->resolveInterPenetration(s_p, dt / 2, tolerance);
+    return this->resolveInterPenetration(s_p, dt, tolerance);
   }
   else if(distance < radii - tolerance)
   {
-    std::cout << "INSIDE (going back " << dt << ")" << std::endl;
+    std::cout << "INSIDE (going back " << dt / 10 << ")" << std::endl;
     std::cout << this->position << this->linearMomentum << std::endl;
 
     engine_pg->reverseTime();
-    this->integrate(-dt);
-    s_p->integrate(-dt);
+    this->integrate(-dt / 10);
+    s_p->integrate(-dt / 10);
     engine_pg->reverseTime();
 
-    return this->resolveInterPenetration(s_p, dt / 2, tolerance);
+    return this->resolveInterPenetration(s_p, dt, tolerance);
   }
 
   std::cout << "SURFACE CONTACT" << std::endl;

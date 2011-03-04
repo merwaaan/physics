@@ -16,7 +16,7 @@ class Sphere : public RigidBody
     void computeInverseInertiaTensor();
     void computeBoundingBox();
 
-    void integrate(double t);
+    void integrate(double dt);
     void draw();
 
     Contact* isCollidingWith(RigidBody* rb_p, double dt);

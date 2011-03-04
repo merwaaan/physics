@@ -50,8 +50,8 @@ void Engine::update()
           {
             Vector3 impulse = this->computeImpulse(*contact_p);
 
-            bodies_p[j]->applyCenterForce(impulse);
-            bodies_p[i]->applyCenterForce(-1 * impulse);
+            this->bodies_p[j]->applyCenterForce(impulse);
+            this->bodies_p[i]->applyCenterForce(-1 * impulse);
 
             delete contact_p;
           }

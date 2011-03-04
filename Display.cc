@@ -12,7 +12,7 @@ Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
   engine_p(engine_p)
 {
   glutInit(argc, argv);
-  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE);
+  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
   glutInitWindowSize(w, h);
   glutCreateWindow("Demo");
 
@@ -29,17 +29,17 @@ Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
 
   GLfloat lightSpecular[] = {0.5, 0.5, 0.5, 1.0};
   glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
- 
+  
   GLfloat lightAmbient[] = {170.0/255, 162.0/255, 113.0/255, 1.0};
   glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
-
-  GLfloat lightPosition[] = {0.0, -3.0, 0.0, 1.0};
+ 
+  GLfloat lightPosition[] = {5, 10, 0.0, 1.0};
   glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
-
+  
   glutDisplayFunc(&update);
   glutPassiveMotionFunc(&mouse);
 
-  this->camera.radius = 10;
+  this->camera.radius = 20;
   this->camera.angle = 45;
 
   display_pg = this;
@@ -86,12 +86,13 @@ void update()
   if(display_pg->getLocalTime() > display_pg->lastUpdateTime + 0.016) // ~60 FPS
   {
     // update the simulation
-    engine_p->update();
+	  engine_p->update();
 
     // clear all
     glClearColor(1.0, 1.0, 1.0, 1.0);
+    glClearDepth(1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
+ 
     // set an orthogonal perspective
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
@@ -103,17 +104,15 @@ void update()
     Camera* cam_p = &display_pg->camera;
     gluLookAt(
       cam_p->radius * cos(cam_p->angle),
-      4,
+      6,
       cam_p->radius * sin(cam_p->angle),
       0, 0, 0,
       0, 1, 0);
-
-    glColor3f(0.0, 0.0, 0.0);
-
+    
     // draw each rigid body
     for(int i = 0; i < engine_p->getBodyCount(); ++i)
-      engine_p->getBody_p(i)->draw();
-
+	    engine_p->getBody_p(i)->draw();
+    
     glutSwapBuffers();
 
     display_pg->lastUpdateTime = display_pg->getLocalTime();

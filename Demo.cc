@@ -23,24 +23,24 @@ int main(int argc, char** argv)
   /*c = new Cube(3);
   c->setPosition(Vector3(-3, 0, 0));
   e->addRigidBody_p(c);*/
-  
-  //for(int i = -5; i < 5; i += 4)
-    //for(int j = -5; j < 5; j += 4)
+ 
+  for(int i = -5; i < 5; i += 4)
+    for(int j = -5; j < 5; j += 4)
     {
       Sphere* s2 = new Sphere(1);
-      s2->setPosition(Vector3(0, 5, 0));
+      s2->setPosition(Vector3(i + 0.1 * j, 5, j + 0.1 * i));
       e->addRigidBody_p(s2);
     } 
   
-  //for(int i = -5; i < 5; i += 3)
-    //for(int j = -5; j < 5; j += 3)
+  for(int i = -5; i < 5; i += 4)
+	  for(int j = -5; j < 5; j += 4)
     {
       Sphere* s2 = new Sphere(1);
-      s2->setPosition(Vector3(0, 0, 0));
+      s2->setPosition(Vector3(i, j, j));
       s2->setFixed(true);
       e->addRigidBody_p(s2);
-    }
-  
+      }
+ 
   /*Box* plane = new Box(10, 1, 10);
   plane->setPosition(Vector3(0, -6, 0));
   plane->setFixed(true);

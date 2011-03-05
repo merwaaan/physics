@@ -85,6 +85,15 @@ Vector3 operator*(double k, const Vector3& v)
   return v * k;
 }
 
+Vector3& Vector3::operator*=(double k)
+{
+  this->X(this->x * k);
+  this->Y(this->y * k);
+  this->Z(this->z * k);
+
+  return *this;
+}
+
 Vector3 Vector3::operator/(double k) const
 {
   Vector3 result;

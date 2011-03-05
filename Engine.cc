@@ -61,17 +61,18 @@ void Engine::update()
     // integrate the rigid bodies states
     for(int i = 0; i < this->bodies_p.size(); ++i)
     {      
-      // apply the external forces
+          // apply the external forces
       for(int j = 0; j < this->forces_p.size(); ++j)
         this->forces_p[j]->apply(this->bodies_p[i]);
 
       this->bodies_p[i]->integrate(this->timeStep);
-    
-      // erase the forces from the last frame
+
+      // delete the forces from the last frame
       this->bodies_p[i]->clearAccumulators();
     }
 
     this->simulationTime += this->timeStep;
+    std::cout << *bodies_p[0] << std::endl;
   }
   else
   {
@@ -85,7 +86,7 @@ Vector3 Engine::computeImpulse(Contact contact)
   Vector3 p = contact.position;
   Vector3 n = contact.normal;
 
-  double relativeVelocity = n * (contact.a->getVelocity() - contact.b->getVelocity());
+  double relativeVelocity = n * (contact.a->getVelocity(this->timeStep) - contact.b->getVelocity(this->timeStep));
 
   double t1 = contact.a->inverseMass + contact.b->inverseMass;
   double t2 = n * ((contact.a->inverseInertiaTensor * (p ^ n)) ^ p);
@@ -99,6 +100,7 @@ Vector3 Engine::computeImpulse(Contact contact)
 
 void Engine::reverseTime()
 {
+  std::cout << "REVERSE TIME!!!" << std::endl;
   this->timeStep = -this->timeStep;
 
   for(int i = 0; i < this->bodies_p.size(); ++i)

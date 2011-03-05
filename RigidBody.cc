@@ -40,21 +40,58 @@ void RigidBody::applyOffCenterForce(Vector3 force, Vector3 poa)
   this->accumulatedTorques += poa ^ force;
 }
 
-void RigidBody::integrate(double t)
+void RigidBody::integrate(double dt)
 {
-  // linear movement
+  DerivativeState start;
+
+  DerivativeState k1 = this->evaluate(0, start);
+  DerivativeState k2 = this->evaluate(dt * 0.5, k1);
+  DerivativeState k3 = this->evaluate(dt * 0.5, k2);
+  DerivativeState k4 = this->evaluate(dt, k3);
+
+  this->position +=
+    (dt < 0 ? -1 : 1) *
+    dt / 6 *
+    (k1.deltaPosition + 2 * k2.deltaPosition + 2 * k3.deltaPosition + k4.deltaPosition);
+
+  this->linearMomentum +=
+    (dt < 0 ? -1 : 1) *
+    dt / 6 *
+    (k1.deltaLinearMomentum + 2 * k2.deltaLinearMomentum + 2 * k3.deltaLinearMomentum + k4.deltaLinearMomentum);
+
+  /*// linear movement
   this->linearMomentum += this->accumulatedForces;
-  Vector3 velocity = this->linearMomentum * this->inverseMass * t;
-  this->position += velocity * t;
+  Vector3 velocity = this->linearMomentum * this->inverseMass * dt;
+  this->position += velocity * dt;
 
   // angular movement
   this->angularMomentum += this->accumulatedTorques;
   Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
-  Vector3 angularVelocity = inverseInertia * this->angularMomentum * t;
-  this->orientation += (angularVelocity.toStarMatrix() * this->orientation) * t;
+  Vector3 angularVelocity = inverseInertia * this->angularMomentum * dt;
+  this->orientation += (angularVelocity.toStarMatrix() * this->orientation) * dt;
 
   // normalize the orientation matrix to avoid numerical drift
-  this->orientation = this->orientation.normalize();
+  this->orientation = this->orientation.normalize();*/
+}
+
+void RigidBody::integrate2(double dt)
+{
+  Vector3 velocity = this->linearMomentum * this->inverseMass * dt;
+  this->position += velocity * dt;
+  
+  this->linearMomentum += this->accumulatedForces;
+}
+
+DerivativeState RigidBody::evaluate(double dt, DerivativeState ds)
+{
+  // current rigid body state
+  Vector3 linearMomentum = this->linearMomentum + ds.deltaLinearMomentum * dt * (dt < 0 ? -1 : 1);
+
+  DerivativeState ds2;
+  ds2.deltaPosition = linearMomentum * this->inverseMass;
+  ds2.deltaLinearMomentum = this->accumulatedForces;
+
+  return ds2;
 }
 
 bool RigidBody::isBoundingBoxCollidingWith(RigidBody* rb_p)
@@ -96,8 +133,8 @@ void RigidBody::setFixed(bool fixed)
   this->fixed = fixed;
 }
 
-Vector3 RigidBody::getVelocity()
+Vector3 RigidBody::getVelocity(double dt)
 {
-  return this->linearMomentum * this->inverseMass;
+  return this->linearMomentum * this->inverseMass * dt;
 }
 

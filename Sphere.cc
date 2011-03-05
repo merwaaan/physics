@@ -53,6 +53,11 @@ void Sphere::computeBoundingBox()
 void Sphere::integrate(double dt)
 {
   RigidBody::integrate(dt);
+}
+
+void Sphere::integrate2(double dt)
+{
+  RigidBody::integrate2(dt);
   
   this->computeBoundingBox();
 }
@@ -112,7 +117,10 @@ Contact* Sphere::resolveInterPenetration(Sphere* s_p, double dt, double toleranc
     std::cout << "INSIDE (going back " << dt / 10 << ")" << std::endl;
     std::cout << this->position << this->linearMomentum << std::endl;
 
+    // integrate backward in time in order to determine the real contact point
     engine_pg->reverseTime();
+    //this->applyCenterForce(Vector3(0, -9.81/1000, 0));
+    //s_p->applyCenterForce(Vector3(0, -9.81/1000, 0));
     this->integrate(-dt / 10);
     s_p->integrate(-dt / 10);
     engine_pg->reverseTime();

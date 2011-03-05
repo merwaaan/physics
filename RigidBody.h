@@ -14,6 +14,12 @@ struct BoundingBox
   Vector3 b;
 };
 
+struct DerivativeState
+{
+  Vector3 deltaLinearMomentum;
+  Vector3 deltaPosition;
+};
+
 class RigidBody
 {
   public:
@@ -45,7 +51,10 @@ class RigidBody
     void clearAccumulators();
     void applyCenterForce(Vector3 force);
     void applyOffCenterForce(Vector3 force, Vector3 poa);
-    virtual void integrate(double t);
+    virtual void integrate(double dt);
+    virtual void integrate2(double dt);
+    DerivativeState evaluate(double dt, DerivativeState ds);
+
     virtual void draw() = 0;
 
     bool isBoundingBoxCollidingWith(RigidBody* rb_p);
@@ -61,7 +70,7 @@ class RigidBody
     void setOrientation(Matrix3 orientation);
     void setFixed(bool fixed);
 
-    Vector3 getVelocity();
+    Vector3 getVelocity(double dt);
 };
 
 #endif

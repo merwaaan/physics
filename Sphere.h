@@ -17,6 +17,7 @@ class Sphere : public RigidBody
     void computeBoundingBox();
 
     void integrate(double dt);
+    void integrate2(double dt);
     void draw();
 
     Contact* isCollidingWith(RigidBody* rb_p, double dt);

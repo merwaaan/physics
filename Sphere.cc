@@ -53,6 +53,8 @@ void Sphere::computeBoundingBox()
 void Sphere::integrate(double dt)
 {
   RigidBody::integrate(dt);
+
+  this->computeBoundingBox();
 }
 
 void Sphere::integrate2(double dt)
@@ -83,9 +85,10 @@ Contact* Sphere::isCollidingWith(RigidBody* rb_p, double dt)
 
 Contact* Sphere::isCollidingWith(Sphere* s_p, double dt)
 {
+  double tolerance = 0.01;
+
   double distance = (this->position - s_p->position).length();
   double radii = this->radius + s_p->radius;
-  double tolerance = 0.01;
  
   if(distance > radii + tolerance)
   {
@@ -105,38 +108,42 @@ Contact* Sphere::resolveInterPenetration(Sphere* s_p, double dt, double toleranc
   if(distance > radii + tolerance)
   {
     std::cout << "OUTSIDE (going on " << dt / 10 << ")" << std::endl;
-    std::cout << this->position << this->linearMomentum << std::endl;
-    
-    this->integrate(dt / 10);
-    s_p->integrate(dt / 10);
 
-    return this->resolveInterPenetration(s_p, dt, tolerance);
+    // integrate forward in time in order to determine the real contact point
+    this->applyCenterForce(Vector3(0, -9.81 * dt / engine_pg->getTimeStep(), 0));
+    s_p->applyCenterForce(Vector3(0, -9.81 * dt / engine_pg->getTimeStep(), 0));
+    this->integrate(dt / 2);
+    s_p->integrate(dt / 2);
+    this->clearAccumulators();
+    s_p->clearAccumulators();
+    
+    return this->resolveInterPenetration(s_p, dt / 2, tolerance);
   }
   else if(distance < radii - tolerance)
   {
     std::cout << "INSIDE (going back " << dt / 10 << ")" << std::endl;
-    std::cout << this->position << this->linearMomentum << std::endl;
 
     // integrate backward in time in order to determine the real contact point
+    this->applyCenterForce(Vector3(0, -9.81 * dt / engine_pg->getTimeStep(), 0));
+    s_p->applyCenterForce(Vector3(0, -9.81 * dt / engine_pg->getTimeStep(), 0));
     engine_pg->reverseTime();
-    //this->applyCenterForce(Vector3(0, -9.81/1000, 0));
-    //s_p->applyCenterForce(Vector3(0, -9.81/1000, 0));
-    this->integrate(-dt / 10);
-    s_p->integrate(-dt / 10);
+    this->integrate(-dt / 2);
+    s_p->integrate(-dt / 2);
+    this->clearAccumulators();
+    s_p->clearAccumulators();
     engine_pg->reverseTime();
 
-    return this->resolveInterPenetration(s_p, dt, tolerance);
+    return this->resolveInterPenetration(s_p, dt / 2, tolerance);
   }
 
   std::cout << "SURFACE CONTACT" << std::endl;
-  std::cout << this->position << this->linearMomentum << std::endl;
 
   Contact* contact_p = new Contact;
   contact_p->a = this;
   contact_p->b = s_p;
-  contact_p->position = this->position + (this->position - s_p->position) * (this->radius / radii);
+  contact_p->position = this->position + (s_p->position - this->position) * (this->radius / radii);
   contact_p->normal = (s_p->position - this->position).normalize();
-
+  std::cout << "cp " << contact_p->position << std::endl;
   return contact_p;
 }
 

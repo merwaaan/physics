@@ -69,8 +69,13 @@ int main(int argc, char** argv)
   //testTimeReversing();
 
   Sphere* s = new Sphere(1);
+  s->setPosition(0, 5, 0);
   e->addRigidBody_p(s);
- 
+
+  Sphere* s2 = new Sphere(1);
+  s2->setFixed(true);
+  e->addRigidBody_p(s2);
+  
   /*for(int i = 0; i < 10; i += 3)
   {
     Sphere* s2 = new Sphere(1);

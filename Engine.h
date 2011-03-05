@@ -36,6 +36,7 @@ class Engine
     Vector3 computeImpulse(Contact contact);
 
     void reverseTime();
+    double getTimeStep();
 
     void addRigidBody_p(RigidBody* rb_p);
     RigidBody* getBody_p(int i);

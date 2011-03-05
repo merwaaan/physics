@@ -49,9 +49,9 @@ void Engine::update()
           if(contact_p != NULL)
           {
             Vector3 impulse = this->computeImpulse(*contact_p);
-
-            this->bodies_p[j]->applyCenterForce(impulse);
+            std::cout << *bodies_p[j] << std::endl;
             this->bodies_p[i]->applyCenterForce(-1 * impulse);
+            this->bodies_p[j]->applyCenterForce(impulse);
 
             delete contact_p;
           }
@@ -61,18 +61,18 @@ void Engine::update()
     // integrate the rigid bodies states
     for(int i = 0; i < this->bodies_p.size(); ++i)
     {      
-          // apply the external forces
+      // apply the external forces
       for(int j = 0; j < this->forces_p.size(); ++j)
         this->forces_p[j]->apply(this->bodies_p[i]);
 
+      // integrate ach body state
       this->bodies_p[i]->integrate(this->timeStep);
 
-      // delete the forces from the last frame
+      // clear the forces accumulated during the last update
       this->bodies_p[i]->clearAccumulators();
     }
 
     this->simulationTime += this->timeStep;
-    std::cout << *bodies_p[0] << std::endl;
   }
   else
   {
@@ -100,11 +100,15 @@ Vector3 Engine::computeImpulse(Contact contact)
 
 void Engine::reverseTime()
 {
-  std::cout << "REVERSE TIME!!!" << std::endl;
   this->timeStep = -this->timeStep;
 
   for(int i = 0; i < this->bodies_p.size(); ++i)
     this->bodies_p[i]->linearMomentum = this->bodies_p[i]->linearMomentum * -1;
+}
+
+double Engine::getTimeStep()
+{
+  return this->timeStep;
 }
 
 void Engine::addRigidBody_p(RigidBody* rb_p)

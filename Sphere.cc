@@ -75,6 +75,10 @@ void Sphere::draw()
   if(display_pg->areBoundingBoxesDrawn())
     glutWireCube(this->radius * 2);
 
+  glBegin(GL_LINE);
+  glVertex3f(0, 0, 0);
+  glVertex3f(10, 10, 10);
+  glEnd();
   glPopMatrix();
 }
 

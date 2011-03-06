@@ -41,6 +41,7 @@ Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
 
   this->camera.radius = 20;
   this->camera.angle = 45;
+  this->camera.lastX = -1;
 
   display_pg = this;
 }
@@ -124,6 +125,9 @@ void update()
 void mouse(int x, int y)
 {
   Camera* cam_p = &display_pg->camera;
+  
+  if(cam_p->lastX < 0)
+    cam_p->lastX = x;
 
   cam_p->angle += 0.01 * (x - cam_p->lastX);
 

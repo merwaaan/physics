@@ -14,7 +14,7 @@ class Force
     Force(Vector3 force);
     ~Force();
 
-    virtual void apply(RigidBody* rb_p) = 0;
+    virtual void apply(RigidBody* rb_p, double dt) = 0;
 };
 
 class CenterForce : public Force
@@ -23,7 +23,7 @@ class CenterForce : public Force
     CenterForce(Vector3 force);
     ~CenterForce();
 
-    virtual void apply(RigidBody* rb_p);
+    virtual void apply(RigidBody* rb_p, double dt);
 };
 
 class OffCenterForce : public Force
@@ -35,7 +35,7 @@ class OffCenterForce : public Force
     OffCenterForce(Vector3 force, Vector3 poa);
     ~OffCenterForce();
 
-    virtual void apply(RigidBody* rb_p);
+    virtual void apply(RigidBody* rb_p, double dt);
 };
 
 #endif

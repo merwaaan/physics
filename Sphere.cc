@@ -75,12 +75,8 @@ void Sphere::draw()
   if(display_pg->areBoundingBoxesDrawn())
     glutWireCube(this->radius * 2);
 
-  glBegin(GL_LINE);
-  glVertex3f(0, 0, 0);
-  glVertex3f(10, 10, 10);
-  glEnd();
   glPopMatrix();
-}
+ }
 
 Contact* Sphere::isCollidingWith(RigidBody* rb_p, double dt)
 {
@@ -111,30 +107,26 @@ Contact* Sphere::resolveInterPenetration(Sphere* s_p, double dt, double toleranc
  
   if(distance > radii + tolerance)
   {
-    std::cout << "OUTSIDE (going on " << dt / 10 << ")" << std::endl;
+    std::cout << "OUTSIDE (going on " << dt / 2 << ")" << std::endl;
 
     // integrate forward in time in order to determine the real contact point
-    this->applyCenterForce(Vector3(0, -9.81 * dt / engine_pg->getTimeStep(), 0));
-    s_p->applyCenterForce(Vector3(0, -9.81 * dt / engine_pg->getTimeStep(), 0));
+    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
+    s_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
     this->integrate(dt / 2);
     s_p->integrate(dt / 2);
-    this->clearAccumulators();
-    s_p->clearAccumulators();
     
     return this->resolveInterPenetration(s_p, dt / 2, tolerance);
   }
   else if(distance < radii - tolerance)
   {
-    std::cout << "INSIDE (going back " << dt / 10 << ")" << std::endl;
+    std::cout << "INSIDE (going back " << dt / 2 << ")" << std::endl;
 
     // integrate backward in time in order to determine the real contact point
-    this->applyCenterForce(Vector3(0, -9.81 * dt / engine_pg->getTimeStep(), 0));
-    s_p->applyCenterForce(Vector3(0, -9.81 * dt / engine_pg->getTimeStep(), 0));
+    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
+    s_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
     engine_pg->reverseTime();
     this->integrate(-dt / 2);
     s_p->integrate(-dt / 2);
-    this->clearAccumulators();
-    s_p->clearAccumulators();
     engine_pg->reverseTime();
 
     return this->resolveInterPenetration(s_p, dt / 2, tolerance);
@@ -147,7 +139,7 @@ Contact* Sphere::resolveInterPenetration(Sphere* s_p, double dt, double toleranc
   contact_p->b = s_p;
   contact_p->position = this->position + (s_p->position - this->position) * (this->radius / radii);
   contact_p->normal = (s_p->position - this->position).normalize();
-  std::cout << "cp " << contact_p->position << std::endl;
+
   return contact_p;
 }
 

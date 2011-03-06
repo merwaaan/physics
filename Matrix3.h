@@ -39,6 +39,7 @@ class Matrix3
     Matrix3 normalize() const;
     
     void reset();
+    void identity();
 };
 
 #endif

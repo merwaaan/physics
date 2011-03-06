@@ -1,5 +1,9 @@
 #include "RigidBody.h"
 
+#include "Engine.h"
+
+extern Engine* engine_pg;
+
 RigidBody::RigidBody() :
   fixed(false)
 {
@@ -17,8 +21,8 @@ std::ostream& operator<<(std::ostream& os, const RigidBody& rb)
 {
   os << "position " << rb.position << std::endl;
   os << "linear momentum " << rb.linearMomentum << std::endl;
-  os << "orientation " << std::endl << rb.orientation;
-  os << "angular momentum " << rb.angularMomentum << std::endl;
+  //os << "orientation " << std::endl << rb.orientation;
+  //os << "angular momentum " << rb.angularMomentum << std::endl;
 
   return os;
 }
@@ -29,35 +33,41 @@ void RigidBody::clearAccumulators()
   this->accumulatedTorques.reset();
 }
 
-void RigidBody::applyCenterForce(Vector3 force)
+void RigidBody::applyCenterForce(Vector3 force, double dt)
 {
-  this->accumulatedForces += force;
+  this->accumulatedForces += force * dt;
 }
 
-void RigidBody::applyOffCenterForce(Vector3 force, Vector3 poa)
+void RigidBody::applyOffCenterForce(Vector3 force, double dt, Vector3 poa)
 {
-  this->accumulatedForces += force;
-  this->accumulatedTorques += poa ^ force;
+  this->accumulatedForces += force * dt;
+  this->accumulatedTorques += poa ^ (force * dt);
 }
 
 void RigidBody::integrate(double dt)
 {
+  // we don't need to integrate fixed bodies
+  if(this->inverseMass == 0)
+    return;
+
   DerivativeState start;
 
-  DerivativeState k1 = this->evaluate(0, start);
-  DerivativeState k2 = this->evaluate(dt * 0.5, k1);
-  DerivativeState k3 = this->evaluate(dt * 0.5, k2);
-  DerivativeState k4 = this->evaluate(dt, k3);
+  DerivativeState k1 = this->evaluate(dt, 0, start);
+  DerivativeState k2 = this->evaluate(dt, dt * 0.5, k1);
+  DerivativeState k3 = this->evaluate(dt, dt * 0.5, k2);
+  DerivativeState k4 = this->evaluate(dt, dt, k3);
 
   this->position +=
     (dt < 0 ? -1 : 1) *
-    dt / 6 *
+    1.0 / 6 *
     (k1.deltaPosition + 2 * k2.deltaPosition + 2 * k3.deltaPosition + k4.deltaPosition);
 
   this->linearMomentum +=
     (dt < 0 ? -1 : 1) *
-    dt / 6 *
+    1.0 / 6 *
     (k1.deltaLinearMomentum + 2 * k2.deltaLinearMomentum + 2 * k3.deltaLinearMomentum + k4.deltaLinearMomentum);
+
+  this->clearAccumulators();
 
   /*// linear movement
   this->linearMomentum += this->accumulatedForces;
@@ -80,15 +90,20 @@ void RigidBody::integrate2(double dt)
   this->position += velocity * dt;
   
   this->linearMomentum += this->accumulatedForces;
+
+  this->clearAccumulators();
 }
 
-DerivativeState RigidBody::evaluate(double dt, DerivativeState ds)
+DerivativeState RigidBody::evaluate(double dt, double sdt, DerivativeState ds)
 {
-  // current rigid body state
-  Vector3 linearMomentum = this->linearMomentum + ds.deltaLinearMomentum * dt * (dt < 0 ? -1 : 1);
+  Vector3 linearMomentum;
+  if(dt > 0)
+    linearMomentum = this->linearMomentum + ds.deltaLinearMomentum * (sdt / dt);
+  else
+    linearMomentum = this->linearMomentum + ds.deltaLinearMomentum * (1 - sdt / dt);
 
   DerivativeState ds2;
-  ds2.deltaPosition = linearMomentum * this->inverseMass;
+  ds2.deltaPosition = linearMomentum * this->inverseMass * sdt;
   ds2.deltaLinearMomentum = this->accumulatedForces;
 
   return ds2;
@@ -133,8 +148,8 @@ void RigidBody::setFixed(bool fixed)
   this->fixed = fixed;
 }
 
-Vector3 RigidBody::getVelocity(double dt)
+Vector3 RigidBody::getVelocity()
 {
-  return this->linearMomentum * this->inverseMass * dt;
+  return this->linearMomentum * this->inverseMass;
 }
 

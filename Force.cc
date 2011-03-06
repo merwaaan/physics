@@ -19,9 +19,9 @@ CenterForce::~CenterForce()
 {
 }
 
-void CenterForce::apply(RigidBody* rb_p)
+void CenterForce::apply(RigidBody* rb_p, double dt)
 {
-  rb_p->applyCenterForce(this->force);
+  rb_p->applyCenterForce(this->force, dt);
 }
 
 OffCenterForce::OffCenterForce(Vector3 force, Vector3 poa) :
@@ -34,8 +34,8 @@ OffCenterForce::~OffCenterForce()
 {
 }
 
-void OffCenterForce::apply(RigidBody* rb_p)
+void OffCenterForce::apply(RigidBody* rb_p, double dt)
 {
-  rb_p->applyOffCenterForce(this->force, this->pointOfApplication);
+  rb_p->applyOffCenterForce(this->force, dt, this->pointOfApplication);
 }
 

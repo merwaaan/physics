@@ -49,11 +49,11 @@ class RigidBody
     virtual void computeBoundingBox() = 0;
 
     void clearAccumulators();
-    void applyCenterForce(Vector3 force);
-    void applyOffCenterForce(Vector3 force, Vector3 poa);
+    void applyCenterForce(Vector3 force, double dt);
+    void applyOffCenterForce(Vector3 force, double dt, Vector3 poa);
     virtual void integrate(double dt);
     virtual void integrate2(double dt);
-    DerivativeState evaluate(double dt, DerivativeState ds);
+    DerivativeState evaluate(double dt, double sdt, DerivativeState ds);
 
     virtual void draw() = 0;
 
@@ -70,7 +70,7 @@ class RigidBody
     void setOrientation(Matrix3 orientation);
     void setFixed(bool fixed);
 
-    Vector3 getVelocity(double dt);
+    Vector3 getVelocity();
 };
 
 #endif

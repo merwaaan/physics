@@ -34,6 +34,10 @@ void Engine::update()
 {
   if(this->simulationTime >= 0)
   {
+    std::cout << "---------------------------------------" << std::endl;
+    std::cout << "Simulation time = " << this->simulationTime << "s" << std::endl;
+    std::cout << std::endl << "COLLISION" << std::endl;
+
     // check for collisions
     for(int i = 1; i < this->bodies_p.size(); ++i)
       for(int j = 0; j < i; ++j)
@@ -41,35 +45,38 @@ void Engine::update()
         // bounding boxes test
         if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
         {
-          std::cout << "TESTING " << i << " AND " << j << std::endl;
+          std::cout << "Bounding box collision between " << i << " and " << j << std::endl;
 
           // accurate test
           Contact* contact_p = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
         
           if(contact_p != NULL)
           {
+            std::cout << "Real collision between " << i << " and " << j << std::endl;
+
             Vector3 impulse = this->computeImpulse(*contact_p);
-            std::cout << *bodies_p[j] << std::endl;
-            this->bodies_p[i]->applyCenterForce(-1 * impulse);
-            this->bodies_p[j]->applyCenterForce(impulse);
+
+            this->bodies_p[i]->applyCenterForce(-1 * impulse, 1);
+            this->bodies_p[j]->applyCenterForce(impulse, 1);
 
             delete contact_p;
           }
         }
       }
 
+    std::cout << std::endl << "INTEGRATION" << std::endl;
+
     // integrate the rigid bodies states
     for(int i = 0; i < this->bodies_p.size(); ++i)
     {      
       // apply the external forces
       for(int j = 0; j < this->forces_p.size(); ++j)
-        this->forces_p[j]->apply(this->bodies_p[i]);
+        this->forces_p[j]->apply(this->bodies_p[i], this->timeStep);
 
       // integrate ach body state
       this->bodies_p[i]->integrate(this->timeStep);
 
-      // clear the forces accumulated during the last update
-      this->bodies_p[i]->clearAccumulators();
+      std::cout << "Body #" << i << std::endl << *bodies_p[i] << std::endl;
     }
 
     this->simulationTime += this->timeStep;
@@ -85,15 +92,23 @@ Vector3 Engine::computeImpulse(Contact contact)
 {
   Vector3 p = contact.position;
   Vector3 n = contact.normal;
+  std::cout << "contact point " << p << std::endl;
+  std::cout << "normal to the contact " << n << std::endl;
 
-  double relativeVelocity = n * (contact.a->getVelocity(this->timeStep) - contact.b->getVelocity(this->timeStep));
+  double relativeVelocity = n * (contact.a->getVelocity() - contact.b->getVelocity());
+
+  // displacements of the contact point with respect to the center of mass of each body
+  Vector3 da = p - contact.a->position;
+  Vector3 db = p - contact.b->position;
 
   double t1 = contact.a->inverseMass + contact.b->inverseMass;
-  double t2 = n * ((contact.a->inverseInertiaTensor * (p ^ n)) ^ p);
-  double t3 = n * ((contact.b->inverseInertiaTensor * (p ^ n)) ^ p);
+  double t2 = n * ((contact.a->inverseInertiaTensor * (da ^ n)) ^ da);
+  double t3 = n * ((contact.b->inverseInertiaTensor * (db ^ n)) ^ db);
 
   double restitution = this->timeStep > 0 ? 0.8 : 1.25;
   double impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t2);
+
+  std::cout << "impulse " << impulse << std::endl;
   
   return impulse * contact.normal;
 }

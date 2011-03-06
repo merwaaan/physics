@@ -196,3 +196,11 @@ void Matrix3::reset()
     this->values[i] = 0;
 }
 
+void Matrix3::identity()
+{
+  this->reset();
+
+  this->values[0] = 1;
+  this->values[4] = 1;
+  this->values[7] = 1;
+}

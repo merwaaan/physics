@@ -10,7 +10,9 @@ Engine* e;
 void input(unsigned char k, int x, int y)
 {
   if(k == 32)
-    e->reverseTime();
+    for(int i = 0; i < e->getBodyCount(); ++i)
+      e->getBody_p(i)->linearMomentum += Vector3(1, 0, 0);
+    //e->reverseTime();
 }
 
 void compareRK4ToEuler()
@@ -61,16 +63,18 @@ void testTimeReversing()
 
 void demoMultiBall()
 {
-  for(int i = -6; i < 5; i += 3)
-    for(int j = -6; j < 5; j += 3)
+  int q = 6;
+
+  for(int i = -q; i < q; i += 3)
+    for(int j = -q; j < q; j += 3)
     {
       Sphere* s = new Sphere(1);
       s->setPosition(i + 0.3 * i, 5, j * 0.1 + j);
       e->addRigidBody_p(s);
     }
 
-  for(int i = -6; i < 5; i += 3)
-    for(int j = -6; j < 5; j += 3)
+  for(int i = -q; i < q; i += 3)
+    for(int j = -q; j < q; j += 3)
     {
       Sphere* s = new Sphere(1);
       s->setPosition(i, 0, j);
@@ -87,6 +91,8 @@ void demoMultiBall()
 int main(int argc, char** argv)
 {
   e = new Engine(&argc, argv, 0.0166);
+  
+  glutKeyboardFunc(&input);
 
   /*Cube* c = new Cube(3);
   c->setPosition(Vector3(-3, 0, 0));
@@ -97,22 +103,6 @@ int main(int argc, char** argv)
 
   demoMultiBall();
   return 0;
-  
-  Sphere* s = new Sphere(1);
-  s->setPosition(0, 5, 0);
-  e->addRigidBody_p(s);
-
-  Sphere* s2 = new Sphere(1);
-  s2->setFixed(true);
-  e->addRigidBody_p(s2);
-
-  /*for(int i = 0; i < 10; i += 3)
-  {
-    Sphere* s2 = new Sphere(1);
-    s2->setPosition(i, 0, 0);
-    s2->setFixed(true);
-    e->addRigidBody_p(s2);
-  }*/
 
   /*Box* plane = new Box(10, 1, 10);
   plane->setPosition(Vector3(0, -6, 0));
@@ -121,8 +111,6 @@ int main(int argc, char** argv)
 
   Force* g = new CenterForce(Vector3(0, -9.81, 0));
   e->addForce_p(g);
-
-  glutKeyboardFunc(&input);
 
   e->run();
 

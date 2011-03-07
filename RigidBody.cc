@@ -19,10 +19,10 @@ RigidBody::~RigidBody()
 
 std::ostream& operator<<(std::ostream& os, const RigidBody& rb)
 {
-  os << "position " << rb.position << std::endl;
-  os << "linear momentum " << rb.linearMomentum << std::endl;
-  //os << "orientation " << std::endl << rb.orientation;
-  //os << "angular momentum " << rb.angularMomentum << std::endl;
+  os << "position : " << rb.position << std::endl;
+  os << "linear momentum : " << rb.linearMomentum << std::endl;
+  os << "orientation : " << std::endl << rb.orientation;
+  os << "angular momentum : " << rb.angularMomentum << std::endl;
 
   return os;
 }
@@ -61,12 +61,22 @@ void RigidBody::integrate(double dt)
     (dt < 0 ? -1 : 1) *
     1.0 / 6 *
     (k1.deltaPosition + 2 * k2.deltaPosition + 2 * k3.deltaPosition + k4.deltaPosition);
-
+  
   this->linearMomentum +=
     (dt < 0 ? -1 : 1) *
     1.0 / 6 *
     (k1.deltaLinearMomentum + 2 * k2.deltaLinearMomentum + 2 * k3.deltaLinearMomentum + k4.deltaLinearMomentum);
 
+  this->orientation +=
+    (dt < 0 ? -1 : 1) *
+    1.0 / 6 *
+	  (k1.deltaOrientation + 2 * k2.deltaOrientation + 2 * k3.deltaOrientation + k4.deltaOrientation);
+
+  this->angularMomentum +=
+    (dt < 0 ? -1 : 1) *
+    1.0 / 6 *
+    (k1.deltaAngularMomentum + 2 * k2.deltaAngularMomentum + 2 * k3.deltaAngularMomentum + k4.deltaAngularMomentum);
+  
   this->clearAccumulators();
 
   /*// linear movement
@@ -100,11 +110,27 @@ DerivativeState RigidBody::evaluate(double dt, double sdt, DerivativeState ds)
   if(dt > 0)
     linearMomentum = this->linearMomentum + ds.deltaLinearMomentum * (sdt / dt);
   else
-    linearMomentum = this->linearMomentum + ds.deltaLinearMomentum * (1 - sdt / dt);
+	  linearMomentum = this->linearMomentum + ds.deltaLinearMomentum * (1 - sdt / dt);
+
+  Vector3 angularMomentum;
+  if(dt > 0)
+	  angularMomentum= this->angularMomentum + ds.deltaAngularMomentum * (sdt / dt);
+  else
+	  angularMomentum= this->angularMomentum + ds.deltaAngularMomentum * (1 - sdt / dt);
 
   DerivativeState ds2;
-  ds2.deltaPosition = linearMomentum * this->inverseMass * sdt;
+
+  // linear component
+  Vector3 velocity = linearMomentum * this->inverseMass * sdt;
+  ds2.deltaPosition = velocity;
   ds2.deltaLinearMomentum = this->accumulatedForces;
+
+  // angular component
+  Matrix3 orientation = this->orientation + ds.deltaOrientation;
+  Matrix3 inverseInertia = orientation * this->inverseInertiaTensor * orientation.transpose();
+  Vector3 angularVelocity = inverseInertia * angularMomentum * sdt;
+  ds2.deltaOrientation = (angularVelocity.toStarMatrix() * this->orientation);
+  ds2.deltaAngularMomentum = this->accumulatedTorques;
 
   return ds2;
 }

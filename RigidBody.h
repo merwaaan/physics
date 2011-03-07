@@ -16,8 +16,11 @@ struct BoundingBox
 
 struct DerivativeState
 {
-  Vector3 deltaLinearMomentum;
   Vector3 deltaPosition;
+	Vector3 deltaLinearMomentum;
+
+	Matrix3 deltaOrientation;
+	Vector3 deltaAngularMomentum;
 };
 
 class RigidBody

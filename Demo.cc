@@ -11,8 +11,7 @@ void input(unsigned char k, int x, int y)
 {
   if(k == 32)
     for(int i = 0; i < e->getBodyCount(); ++i)
-      e->getBody_p(i)->linearMomentum += Vector3(1, 0, 0);
-    //e->reverseTime();
+	    e->reverseTime();
 }
 
 void compareRK4ToEuler()
@@ -61,6 +60,15 @@ void testTimeReversing()
   s->applyCenterForce(Vector3(0, -9.81, 0), -dt); s->integrate(-dt); std::cout << *s << std::endl;
 }
 
+void demoSimpleBox()
+{
+	Cube* c = new Cube(2);
+	c->applyOffCenterForce(Vector3(0, 1, 0), 1, Vector3(0, 1, 1));
+	e->addRigidBody_p(c);
+
+  e->run();
+}
+
 void demoMultiBall()
 {
   int q = 6;
@@ -94,15 +102,10 @@ int main(int argc, char** argv)
   
   glutKeyboardFunc(&input);
 
-  /*Cube* c = new Cube(3);
-  c->setPosition(Vector3(-3, 0, 0));
-  e->addRigidBody_p(c);*/
- 
+  demoSimpleBox();
   //compareRK4ToEuler();
   //testTimeReversing();
-
-  demoMultiBall();
-  return 0;
+  //demoMultiBall();
 
   /*Box* plane = new Box(10, 1, 10);
   plane->setPosition(Vector3(0, -6, 0));

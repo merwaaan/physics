@@ -39,10 +39,12 @@ class Matrix3
     Matrix3 normalize() const;
     Matrix3 orthogonalize() const;
     
-    Vector3 getRow(int i) const;
-    void setRow(int i, Vector3 v);
-    Vector3 getColumn(int i) const;
-    void setColumn(int i, Vector3 v);
+    double get(int c, int r) const;
+    void set(int c, int r, double v);
+    Vector3 getRow(int r) const;
+    void setRow(int r, Vector3 v);
+    Vector3 getColumn(int c) const;
+    void setColumn(int c, Vector3 v);
 
     void reset();
     void identity();

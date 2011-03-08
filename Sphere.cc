@@ -35,11 +35,12 @@ void Sphere::prepare()
 
 void Sphere::computeInverseInertiaTensor()
 {
-  Matrix3 inertiaTensor;
   double i = (2.0 / 5) * (1 / this->inverseMass) * this->radius * this->radius;
-  inertiaTensor(0, 0, i);
-  inertiaTensor(1, 1, i);
-  inertiaTensor(2, 2, i);
+  
+  Matrix3 inertiaTensor;
+  inertiaTensor.set(0, 0, i);
+  inertiaTensor.set(1, 1, i);
+  inertiaTensor.set(2, 2, i);
 
   this->inverseInertiaTensor = inertiaTensor.inverse();
 }

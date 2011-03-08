@@ -11,13 +11,6 @@ Vector3::Vector3() :
 {
 }
 
-Vector3::Vector3(int v) :
-  x(v),
-  y(v),
-  z(v)
-{
-}
-
 Vector3::Vector3(double x, double y, double z) :
   x(x),
   y(y),
@@ -33,18 +26,18 @@ Vector3 Vector3::operator+(const Vector3& v) const
 {
   Vector3 result;
 
-  result.X(this->x + v.X());
-  result.Y(this->y + v.Y());
-  result.Z(this->z + v.Z());
+  result.x = this->x + v.x;
+  result.y = this->y + v.y;
+  result.z = this->z + v.z;
 
   return result;
 }
 
 Vector3& Vector3::operator+=(const Vector3& v)
 {
-  this->X(this->x + v.X());
-  this->Y(this->y + v.Y());
-  this->Z(this->z + v.Z());
+  this->x += v.x;
+  this->y += v.y;
+  this->z += v.z;
 
   return *this;
 }
@@ -53,18 +46,18 @@ Vector3 Vector3::operator-(const Vector3& v) const
 {
   Vector3 result;
 
-  result.X(this->x - v.X());
-  result.Y(this->y - v.Y());
-  result.Z(this->z - v.Z());
+  result.x = this->x - v.x;
+  result.y = this->y - v.y;
+  result.z = this->z - v.z;
 
   return result;
 }
 
 Vector3& Vector3::operator-=(const Vector3& v)
 {
-  this->X(this->x - v.X());
-  this->Y(this->y - v.Y());
-  this->Z(this->z - v.Z());
+  this->x -= v.x;
+  this->y -= v.y;
+  this->z -= v.z;
 
   return *this;
 }
@@ -73,9 +66,9 @@ Vector3 Vector3::operator*(double k) const
 {
   Vector3 result;
 
-  result.X(this->x * k);
-  result.Y(this->y * k);
-  result.Z(this->z * k);
+  result.x = this->x * k;
+  result.y = this->y * k;
+  result.z = this->z * k;
 
   return result;
 }
@@ -87,9 +80,9 @@ Vector3 operator*(double k, const Vector3& v)
 
 Vector3& Vector3::operator*=(double k)
 {
-  this->X(this->x * k);
-  this->Y(this->y * k);
-  this->Z(this->z * k);
+  this->x *= k;
+  this->y *= k;
+  this->z *= k;
 
   return *this;
 }
@@ -98,9 +91,9 @@ Vector3 Vector3::operator/(double k) const
 {
   Vector3 result;
 
-  result.X(this->x / k);
-  result.Y(this->y / k);
-  result.Z(this->z / k);
+  result.x = this->x / k;
+  result.y = this->y / k;
+  result.z = this->z / k;
 
   return result;
 }
@@ -110,7 +103,7 @@ Vector3 Vector3::operator/(double k) const
  */
 double Vector3::operator*(const Vector3& v) const
 {
-  return this->x * v.X() + this->y * v.Y() + this->z * v.Z();
+  return this->x * v.x + this->y * v.y + this->z * v.z;
 }
 
 /**
@@ -120,16 +113,16 @@ Vector3 Vector3::operator^(const Vector3& v) const
 {
   Vector3 result;
 
-  result.X(this->y * v.Z() - this->z * v.Y());
-  result.Y(this->x * v.Z() - this->z * v.X());
-  result.Z(this->x * v.Y() - this->y * v.X());
+  result.x = this->y * v.z - this->z * v.y;
+  result.y = this->x * v.z - this->z * v.x;
+  result.z = this->x * v.y - this->y * v.x;
   
   return result;
 }
 
 std::ostream& operator<<(std::ostream& os, const Vector3& v)
 {
-  os << "(" << v.x << "," << v.y << "," << v.z << ")";
+  os << "[" << v.x << "," << v.y << "," << v.z << "]";
 
   return os;
 }
@@ -143,7 +136,7 @@ Vector3 Vector3::normalize() const
 {
   Vector3 result = *this;
   
-  result = result * (1 / result.length());
+  result *= (1 / result.length());
 
   return result;
 }
@@ -155,12 +148,12 @@ Matrix3 Vector3::toStarMatrix()
 {
   Matrix3 result;
 
-  result(0, 1, this->Z());
-  result(0, 2, -this->Y());
-  result(1, 0, -this->Z());
-  result(1, 2, this->X());
-  result(2, 0, this->Y());
-  result(2, 1, -this->X());
+  result.set(0, 1, this->z);
+  result.set(0, 2, -this->y);
+  result.set(1, 0, -this->z);
+  result.set(1, 2, this->x);
+  result.set(2, 0, this->y);
+  result.set(2, 1, -this->x);
 
   return result;
 }

@@ -29,9 +29,9 @@ Box::~Box()
 void Box::computeInverseInertiaTensor()
 {
   Matrix3 inertiaTensor;
-  inertiaTensor(0, 0, 1 / this->inverseMass / 12 * (this->height * this->height + this->depth * this->depth));
-  inertiaTensor(1, 1, 1 / this->inverseMass / 12 * (this->width * this->width + this->depth * this->depth));
-  inertiaTensor(2, 2, 1 / this->inverseMass / 12 * (this->width * this->width + this->height * this->height));
+  inertiaTensor.set(0, 0, 1 / this->inverseMass / 12 * (this->height * this->height + this->depth * this->depth));
+  inertiaTensor.set(1, 1, 1 / this->inverseMass / 12 * (this->width * this->width + this->depth * this->depth));
+  inertiaTensor.set(2, 2, 1 / this->inverseMass / 12 * (this->width * this->width + this->height * this->height));
 
   this->inverseInertiaTensor = inertiaTensor.inverse();
 }

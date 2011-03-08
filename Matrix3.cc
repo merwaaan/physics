@@ -15,32 +15,10 @@ Matrix3::~Matrix3()
   //delete this->values;
 }
 
-Vector3 Matrix3::operator()(int column) const
-{
-  return Vector3((*this)(column, 0), (*this)(column, 1), (*this)(column, 2));
-}
-
-void Matrix3::operator()(int column, const Vector3& v)
-{
-  (*this)(column, 0, v.X());
-  (*this)(column, 1, v.Y());
-  (*this)(column, 2, v.Z());
-}
-
-double Matrix3::operator()(int column, int row) const
-{
-  return this->values[3 * row + column];
-}
-
-void Matrix3::operator()(int column, int row, double value)
-{
-  this->values[3 * row + column] = value;
-}
-
 Matrix3& Matrix3::operator=(const Matrix3& m)
 {
   for(int i = 0; i < 9; ++i)
-    this->values[i] = m(i % 3, i / 3);
+    this->values[i] = m.values[i];
 
   return *this;
 }
@@ -49,18 +27,16 @@ Matrix3 Matrix3::operator+(const Matrix3& m) const
 {
   Matrix3 result;
 
-  for(int i = 0; i < 3; ++i)
-    for(int j = 0; j < 3; ++j)
-      result(j, i, (*this)(j, i) + m(j, i));
+  for(int i = 0; i < 9; ++i)
+    result.values[i] = this->values[i] + m.values[i];
 
   return result;
 }
 
 Matrix3& Matrix3::operator+=(const Matrix3& m)
 {
-  for(int i = 0; i < 3; ++i)
-    for(int j = 0; j < 3; ++j)
-      (*this)(j, i, (*this)(j, i) + m(j, i));
+  for(int i = 0; i < 9; ++i)
+    this->values[i] += m.values[i];
 
   return *this;
 }
@@ -69,18 +45,16 @@ Matrix3 Matrix3::operator-(const Matrix3& m) const
 {
   Matrix3 result;
 
-  for(int i = 0; i < 3; ++i)
-    for(int j = 0; j < 3; ++j)
-      result(j, i, (*this)(j, i) - m(j, i));
+  for(int i = 0; i < 9; ++i)
+    result.values[i] = this->values[i] - m.values[i];
 
   return result;
 }
 
 Matrix3& Matrix3::operator-=(const Matrix3& m)
 {
-  for(int i = 0; i < 3; ++i)
-    for(int j = 0; j < 3; ++j)
-      (*this)(j, i, (*this)(j, i) - m(j, i));
+  for(int i = 0; i < 9; ++i)
+    this->values[i] -= m.values[i];
 
   return *this;
 }
@@ -89,9 +63,8 @@ Matrix3 Matrix3::operator*(double k) const
 {
   Matrix3 result;
 
-  for(int i = 0; i < 3; ++i)
-    for(int j = 0; j < 3; ++j)
-      result(j, i, (*this)(j, i) * k);
+  for(int i = 0; i < 9; ++i)
+    result.values[i] = this->values[i] * k;
 
   return result;
 }
@@ -101,14 +74,13 @@ Matrix3 operator*(double k, const Matrix3& m)
   return m * k;
 }
 
-// TODO
 Matrix3 Matrix3::operator*(const Matrix3& m) const
 {
   Matrix3 result;
 
   for(int i = 0; i < 3; ++i)
     for(int j = 0; j < 3; ++j)
-      result(j, i, (*this)(0, i) * m(j, 0) + (*this)(1, i) * m(j, 1) + (*this)(2, i) * m(j, 2));
+      result.set(j, i, this->get(0, i) * m.get(j, 0) + this->get(1, i) * m.get(j, 1) + this->get(2, i) * m.get(j, 2));
 
   return result;
 }
@@ -117,9 +89,9 @@ Vector3 Matrix3::operator*(const Vector3& v) const
 {
   Vector3 result;
 
-  result.X((*this)(0, 0) * v.X() + (*this)(1, 0) * v.Y() + (*this)(2, 0) * v.Z());
-  result.Y((*this)(0, 1) * v.X() + (*this)(1, 1) * v.Y() + (*this)(2, 1) * v.Z());
-  result.Z((*this)(0, 2) * v.X() + (*this)(1, 2) * v.Y() + (*this)(2, 2) * v.Z());
+  result.X(this->get(0, 0) * v.X() + this->get(1, 0) * v.Y() + this->get(2, 0) * v.Z());
+  result.Y(this->get(0, 1) * v.X() + this->get(1, 1) * v.Y() + this->get(2, 1) * v.Z());
+  result.Z(this->get(0, 2) * v.X() + this->get(1, 2) * v.Y() + this->get(2, 2) * v.Z());
 
   return result;
 }
@@ -128,8 +100,10 @@ std::ostream& operator<<(std::ostream& os, const Matrix3& m)
 {
   for(int i = 0; i < 3; ++i)
   {
+    os << "| ";
+
     for(int j = 0; j < 3; ++j)
-      os << m(j, i) << " ";
+      os << m.get(j, i) << " ";
 
     os << std::endl;
   }
@@ -143,7 +117,7 @@ Matrix3 Matrix3::transpose() const
 
   for(int i = 0; i < 3; ++i)
     for(int j = 0; j <  3; ++j)
-      result(j, i, (*this)(i, j));
+      result.set(j, i, this->get(i, j));
 
   return result;
 }
@@ -154,28 +128,28 @@ Matrix3 Matrix3::inverse() const
 
   // find the determinant
   double d =
-    t(0, 0) * (t(1, 1) * t(2, 2) - t(1, 2) * t(2, 1)) -
-    t(1, 0) * (t(0, 1) * t(2, 2) - t(0, 2) * t(2, 1)) +
-    t(2, 0) * (t(0, 1) * t(1, 2) - t(0, 2) * t(1, 1));
+    t.get(0, 0) * (t.get(1, 1) * t.get(2, 2) - t.get(1, 2) * t.get(2, 1)) -
+    t.get(1, 0) * (t.get(0, 1) * t.get(2, 2) - t.get(0, 2) * t.get(2, 1)) +
+    t.get(2, 0) * (t.get(0, 1) * t.get(1, 2) - t.get(0, 2) * t.get(1, 1));
   
   // find the matrix of cofactors
   Matrix3 result;
   t = t.transpose();
-  result(0, 0, t(1, 1) * t(2, 2) - t(1, 2) * t(2, 1));
-  result(0, 1, t(1, 0) * t(2, 2) - t(1, 2) * t(2, 0));
-  result(0, 2, t(1, 0) * t(2, 1) - t(1, 1) * t(2, 0));
-  result(1, 0, t(0, 1) * t(2, 2) - t(0, 2) * t(2, 1));
-  result(1, 1, t(0, 0) * t(2, 2) - t(0, 2) * t(2, 0));
-  result(1, 2, t(0, 0) * t(2, 1) - t(0, 1) * t(2, 0));
-  result(2, 0, t(0, 1) * t(1, 2) - t(0, 2) * t(1, 1));
-  result(2, 1, t(0, 0) * t(1, 2) - t(0, 2) * t(1, 0));
-  result(2, 2, t(0, 0) * t(1, 1) - t(0, 1) * t(1, 0));
+  result.set(0, 0, t.get(1, 1) * t.get(2, 2) - t.get(1, 2) * t.get(2, 1));
+  result.set(0, 1, t.get(1, 0) * t.get(2, 2) - t.get(1, 2) * t.get(2, 0));
+  result.set(0, 2, t.get(1, 0) * t.get(2, 1) - t.get(1, 1) * t.get(2, 0));
+  result.set(1, 0, t.get(0, 1) * t.get(2, 2) - t.get(0, 2) * t.get(2, 1));
+  result.set(1, 1, t.get(0, 0) * t.get(2, 2) - t.get(0, 2) * t.get(2, 0));
+  result.set(1, 2, t.get(0, 0) * t.get(2, 1) - t.get(0, 1) * t.get(2, 0));
+  result.set(2, 0, t.get(0, 1) * t.get(1, 2) - t.get(0, 2) * t.get(1, 1));
+  result.set(2, 1, t.get(0, 0) * t.get(1, 2) - t.get(0, 2) * t.get(1, 0));
+  result.set(2, 2, t.get(0, 0) * t.get(1, 1) - t.get(0, 1) * t.get(1, 0));
 
   // apply sign changes
-  result(0, 1, -result(0, 1));
-  result(1, 0, -result(1, 0));
-  result(1, 2, -result(1, 2));
-  result(2, 1, -result(2, 1));
+  result.set(0, 1, -result.get(0, 1));
+  result.set(1, 0, -result.get(1, 0));
+  result.set(1, 2, -result.get(1, 2));
+  result.set(2, 1, -result.get(2, 1));
   
   return result * (1 / d);
 }
@@ -184,8 +158,8 @@ Matrix3 Matrix3::normalize() const
 {
   Matrix3 result = *this;
 
-  for(int i = 0; i < 3; ++i)
-    result(i, result(i).normalize());
+  for(int c = 0; c < 3; ++c)
+    result.setColumn(c, result.getColumn(c).normalize());
 
   return result;
 }
@@ -228,32 +202,42 @@ Matrix3 Matrix3::orthogonalize() const
   return result;
 }
 
-Vector3 Matrix3::getRow(int i) const
+double Matrix3::get(int c, int r) const
 {
-  int start = i * 3;
+  return this->values[r * 3 + c];
+}
+
+void Matrix3::set(int c, int r, double v)
+{
+  this->values[r * 3 + c] = v;
+}
+
+Vector3 Matrix3::getRow(int r) const
+{
+  int start = r * 3;
 
   return Vector3(this->values[start], this->values[start + 1], this->values[start + 2]);
 }
 
-void Matrix3::setRow(int i, Vector3 v)
+void Matrix3::setRow(int r, Vector3 v)
 {
-  int start = i * 3;
+  int start = r * 3;
 
   this->values[start] = v.get(0);
   this->values[start + 1] = v.get(1);
   this->values[start + 2] = v.get(2);
 }
 
-Vector3 Matrix3::getColumn(int i) const
+Vector3 Matrix3::getColumn(int c) const
 {
-  return Vector3(this->values[i], this->values[i + 3], this->values[i + 6]);
+  return Vector3(this->values[c], this->values[c + 3], this->values[c + 6]);
 }
 
-void Matrix3::setColumn(int i, Vector3 v)
+void Matrix3::setColumn(int c, Vector3 v)
 {
-  this->values[i] = v.get(0);
-  this->values[i + 3] = v.get(1);
-  this->values[i + 6] = v.get(2);
+  this->values[c] = v.get(0);
+  this->values[c + 3] = v.get(1);
+  this->values[c + 6] = v.get(2);
 }
 
 void Matrix3::reset()

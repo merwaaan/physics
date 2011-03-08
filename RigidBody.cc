@@ -8,9 +8,9 @@ RigidBody::RigidBody() :
   fixed(false)
 {
   // initial orientation (aligned with the axis)
-  this->orientation(0, 0, 1);
-  this->orientation(1, 1, 1);
-  this->orientation(2, 2, 1);
+  this->orientation.set(0, 0, 1);
+  this->orientation.set(1, 1, 1);
+  this->orientation.set(2, 2, 1);
 }
 
 RigidBody::~RigidBody()

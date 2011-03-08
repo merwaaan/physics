@@ -103,20 +103,10 @@ int main(int argc, char** argv)
   
   glutKeyboardFunc(&input);
 
-  demoSimpleBox();
+  //demoSimpleBox();
   //compareRK4ToEuler();
   //testTimeReversing();
-  //demoMultiBall();
-
-  /*Box* plane = new Box(10, 1, 10);
-  plane->setPosition(Vector3(0, -6, 0));
-  plane->setFixed(true);
-  e->addRigidBody_p(plane);*/
-
-  Force* g = new CenterForce(Vector3(0, -9.81, 0));
-  e->addForce_p(g);
-
-  e->run();
+  demoMultiBall();
 
   return 0;
 }

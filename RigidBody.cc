@@ -47,7 +47,7 @@ void RigidBody::applyOffCenterForce(Vector3 force, double dt, Vector3 poa)
 void RigidBody::integrate(double dt)
 {
   // we don't need to integrate fixed bodies
-  if(this->inverseMass == 0)
+  if(this->fixed)
     return;
 
   DerivativeState start;

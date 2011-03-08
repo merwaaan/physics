@@ -5,6 +5,17 @@
 
 #include "RigidBody.h"
 
+struct SeparationPlane
+{
+  Vector3 point;
+  Vector3 normal;
+
+  double getDistanceFromPoint(Vector3 p)
+  {
+    return -(normal * (point - p)) / normal.length();
+  }
+};
+
 struct Vertex
 {
   int id;
@@ -24,6 +35,16 @@ struct Polygon
     Vector3 v2 = vertices_p[1]->absPosition - vertices_p[2]->absPosition;
 
     return (v1 ^ v2).normalize();
+  }
+
+  SeparationPlane getSeparationPlane()
+  {
+    SeparationPlane sp;
+
+    sp.point = vertices_p[0]->absPosition;
+    sp.normal = getNormal();
+
+    return sp;
   }
 };
 
@@ -54,8 +75,11 @@ class CustomRigidBody : public RigidBody
     void computeVerticesAbsolutePositions();
  
     Contact* isCollidingWith(RigidBody* rb_p, double dt);
+
     Contact* isCollidingWith(Sphere* s_p, double dt);
+    
     Contact* isCollidingWith(CustomRigidBody* rb_p, double dt);
+    bool findSeparationPlane(CustomRigidBody* rb_p);
 
     Vertex* getVertexById_p(int id);
     int getPolyCount();

@@ -16,7 +16,7 @@ Box::Box(double width, double height, double depth) :
   
   this->addPolygon(4, (int[]){0, 1, 2, 3}); // front
   this->addPolygon(4, (int[]){7, 6, 5, 4}); // back
-  this->addPolygon(4, (int[]){0, 3, 7, 4}); // top
+  this->addPolygon(4, (int[]){4, 7, 3, 0}); // top
   this->addPolygon(4, (int[]){1, 2, 6, 5}); // bottom
   this->addPolygon(4, (int[]){4, 5, 1, 0}); // left
   this->addPolygon(4, (int[]){7, 3, 2, 6}); // right

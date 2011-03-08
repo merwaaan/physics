@@ -170,12 +170,46 @@ Contact* CustomRigidBody::isCollidingWith(RigidBody* rb_p, double dt)
 
 Contact* CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
 {
-  return s_p->isCollidingWith(this, dt);
+  return NULL;
 }
 
 Contact* CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
+  // if at least one separation plane exists, there is no collision
+  if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
+    return NULL;
+
+  std::cout << "COLLISION DETECTED" << std::endl;
   return NULL;
+}
+
+bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
+{
+  // compute a separation plane along each polygon of the first body
+  for(int i = 0; i < this->structure.polygons.size(); ++i)
+  {
+    SeparationPlane sp = this->structure.polygons[i].getSeparationPlane();
+
+    // check if all the vertices of the second body are outside of the separation plane
+    for(int j = 0; j < rb_p->structure.vertices.size(); ++j)
+    {
+      double dis = sp.getDistanceFromPoint(rb_p->structure.vertices[j].absPosition);
+      std::cout << i << " " << j << std::endl;
+      std::cout << sp.point << sp.normal << std::endl;
+      std::cout << rb_p->structure.vertices[j].absPosition << std::endl;
+      std::cout << dis << std::endl;
+
+      if(dis <= 0)
+        break;
+      else if(j == rb_p->structure.vertices.size() - 1)
+      {
+        std::cout << "separation plane found" << std::endl;
+        return true;
+      }
+    }
+  }
+
+  return false;
 }
 
 Vertex* CustomRigidBody::getVertexById_p(int id)

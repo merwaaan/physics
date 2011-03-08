@@ -12,7 +12,7 @@ OBJ= \
 	Vector3.o
 
 $(EXEC): $(OBJ)
-	g++ -g $^ -lglut -lGLU -ggdb -o $(EXEC)
+	g++ -g -Wall $^ -lglut -lGLU -ggdb -o $(EXEC)
 
 %.o: %.cc
 	g++ -o $@ -c $^

@@ -60,16 +60,6 @@ void testTimeReversing()
   s->applyCenterForce(Vector3(0, -9.81, 0), -dt); s->integrate(-dt); std::cout << *s << std::endl;
 }
 
-void demoSimpleBox()
-{
-	Cube* c = new Cube(2);
-	//c->applyOffCenterForce(Vector3(0, 10, 5), 1, Vector3(1, 1, 1));
-  c->angularMomentum = Vector3(0, 100, 100);
-  e->addRigidBody_p(c);
-
-  e->run();
-}
-
 void demoMultiBall()
 {
   int q = 6;
@@ -97,16 +87,43 @@ void demoMultiBall()
   e->run();
 }
 
+void demoSimpleBox()
+{
+	Cube* c = new Cube(2);
+	c->applyOffCenterForce(Vector3(0, 10, 5), 1, Vector3(1, 1, 1));
+  e->addRigidBody_p(c);
+
+  e->run();
+}
+
+void demoMultiBox()
+{
+	Cube* c = new Cube(2);
+  c->setPosition(1, 3, 0);
+  e->addRigidBody_p(c);
+
+	Cube* c2 = new Cube(2);
+  c2->setFixed(true);
+  e->addRigidBody_p(c2);
+
+  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  e->addForce_p(g);
+
+  e->run();
+}
+
 int main(int argc, char** argv)
 {
   e = new Engine(&argc, argv, 0.0166);
   
   glutKeyboardFunc(&input);
-
-  //demoSimpleBox();
+  
   //compareRK4ToEuler();
   //testTimeReversing();
-  demoMultiBall();
+
+  //demoSimpleBox();
+  demoMultiBox();
+  //demoMultiBall();
 
   return 0;
 }

@@ -76,10 +76,16 @@ void RigidBody::integrate(double dt)
     (dt < 0 ? -1 : 1) *
     1.0 / 6 *
     (k1.deltaAngularMomentum + 2 * k2.deltaAngularMomentum + 2 * k3.deltaAngularMomentum + k4.deltaAngularMomentum);
-  
+
+  // reorthogonalize and normalize the orientation matrix to avoid numerical drift
+  this->orientation = this->orientation.orthogonalize();
+  this->orientation = this->orientation.normalize();
+
+  // clear the forces accumulated during the last frame
   this->clearAccumulators();
 
-  /*// linear movement
+/*
+  // linear movement
   this->linearMomentum += this->accumulatedForces;
   Vector3 velocity = this->linearMomentum * this->inverseMass * dt;
   this->position += velocity * dt;
@@ -89,9 +95,7 @@ void RigidBody::integrate(double dt)
   Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
   Vector3 angularVelocity = inverseInertia * this->angularMomentum * dt;
   this->orientation += (angularVelocity.toStarMatrix() * this->orientation) * dt;
-
-  // normalize the orientation matrix to avoid numerical drift
-  this->orientation = this->orientation.normalize();*/
+*/
 }
 
 void RigidBody::integrate2(double dt)
@@ -106,17 +110,8 @@ void RigidBody::integrate2(double dt)
 
 DerivativeState RigidBody::evaluate(double dt, double sdt, DerivativeState ds)
 {
-  Vector3 linearMomentum;
-  if(dt > 0)
-    linearMomentum = this->linearMomentum + ds.deltaLinearMomentum * (sdt / dt);
-  else
-	  linearMomentum = this->linearMomentum + ds.deltaLinearMomentum * (1 - sdt / dt);
-
-  Vector3 angularMomentum;
-  if(dt > 0)
-	  angularMomentum= this->angularMomentum + ds.deltaAngularMomentum * (sdt / dt);
-  else
-	  angularMomentum= this->angularMomentum + ds.deltaAngularMomentum * (1 - sdt / dt);
+  Vector3 linearMomentum = this->linearMomentum + ds.deltaLinearMomentum * (dt >= 0 ? sdt / dt : 1 - sdt / dt);
+  Vector3 angularMomentum = this->angularMomentum + ds.deltaAngularMomentum * (dt >= 0 ? sdt / dt : 1 - sdt / dt);
 
   DerivativeState ds2;
 
@@ -129,7 +124,7 @@ DerivativeState RigidBody::evaluate(double dt, double sdt, DerivativeState ds)
   Matrix3 orientation = this->orientation + ds.deltaOrientation;
   Matrix3 inverseInertia = orientation * this->inverseInertiaTensor * orientation.transpose();
   Vector3 angularVelocity = inverseInertia * angularMomentum * sdt;
-  ds2.deltaOrientation = (angularVelocity.toStarMatrix() * this->orientation);
+  ds2.deltaOrientation = angularVelocity.toStarMatrix() * this->orientation;
   ds2.deltaAngularMomentum = this->accumulatedTorques;
 
   return ds2;

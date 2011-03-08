@@ -190,6 +190,72 @@ Matrix3 Matrix3::normalize() const
   return result;
 }
 
+/**
+ * Iteratively orthonalize a matrix using the Gram-Schmidt algorithm
+ */
+Matrix3 Matrix3::orthogonalize() const
+{
+  int iterations = 10;
+  double k = 0.25;
+
+  Vector3 r1 = this->getRow(0);
+  Vector3 r2 = this->getRow(1);
+  Vector3 r3 = this->getRow(2);
+
+  // iterative orthogonalization
+  Vector3 r1b, r2b, r3b;
+  for(int i = 0; i < iterations; ++i)
+  {
+    r1b = r1 - k * ((r1 * r2) / (r2 * r2)) * r2 - k * ((r1 * r3) / (r3 * r3)) * r3;
+    r2b = r2 - k * ((r2 * r1) / (r1 * r1)) * r1 - k * ((r2 * r3) / (r3 * r3)) * r3;
+    r3b = r3 - k * ((r3 * r2) / (r2 * r2)) * r1 - k * ((r3 * r2) / (r2 * r2)) * r2;
+
+    r1 = r1b;
+    r2 = r2b;
+    r3 = r3b;
+  }
+
+  // final step
+  r1b = r1;
+  r2b = r2 - ((r2 * r1b) / (r1b * r1b)) * r1b;
+  r3b = r3 - ((r3 * r1b) / (r1b * r1b)) * r1b - ((r3 * r2b) / (r2b * r2b)) * r2b;
+
+  Matrix3 result;
+  result.setRow(0, r1b);
+  result.setRow(1, r2b);
+  result.setRow(2, r3b);
+
+  return result;
+}
+
+Vector3 Matrix3::getRow(int i) const
+{
+  int start = i * 3;
+
+  return Vector3(this->values[start], this->values[start + 1], this->values[start + 2]);
+}
+
+void Matrix3::setRow(int i, Vector3 v)
+{
+  int start = i * 3;
+
+  this->values[start] = v.get(0);
+  this->values[start + 1] = v.get(1);
+  this->values[start + 2] = v.get(2);
+}
+
+Vector3 Matrix3::getColumn(int i) const
+{
+  return Vector3(this->values[i], this->values[i + 3], this->values[i + 6]);
+}
+
+void Matrix3::setColumn(int i, Vector3 v)
+{
+  this->values[i] = v.get(0);
+  this->values[i + 3] = v.get(1);
+  this->values[i + 6] = v.get(2);
+}
+
 void Matrix3::reset()
 {
   for(int i = 0; i < 9; ++i)

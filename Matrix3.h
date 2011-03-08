@@ -37,7 +37,13 @@ class Matrix3
     Matrix3 transpose() const;
     Matrix3 inverse() const;
     Matrix3 normalize() const;
+    Matrix3 orthogonalize() const;
     
+    Vector3 getRow(int i) const;
+    void setRow(int i, Vector3 v);
+    Vector3 getColumn(int i) const;
+    void setColumn(int i, Vector3 v);
+
     void reset();
     void identity();
 };

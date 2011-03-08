@@ -40,11 +40,13 @@ class Vector3
     double X() const;
     double Y() const;
     double Z() const;
+    double get(int i) const;
 
-		void reset();
     void X(double x);
     void Y(double y);
     void Z(double z);
+    void set(int i, double v);
+		void reset();
 };
 
 #endif

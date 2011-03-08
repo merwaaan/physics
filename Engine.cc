@@ -118,7 +118,10 @@ void Engine::reverseTime()
   this->timeStep = -this->timeStep;
 
   for(int i = 0; i < this->bodies_p.size(); ++i)
-    this->bodies_p[i]->linearMomentum = this->bodies_p[i]->linearMomentum * -1;
+  {
+    this->bodies_p[i]->linearMomentum *= -1;
+    this->bodies_p[i]->angularMomentum *= -1;
+  }
 }
 
 double Engine::getTimeStep()

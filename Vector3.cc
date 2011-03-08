@@ -180,11 +180,16 @@ double Vector3::Z() const
   return this->z;
 }
 
-void Vector3::reset()
+double Vector3::get(int i) const
 {
-	this->x = this->y = this->z = 0.0;
+  if(i == 0)
+    return this->x;
+  
+  if(i == 1)
+    return this->y;
+  
+  return this->z;
 }
-
 void Vector3::X(double x)
 {
   this->x = x;
@@ -198,5 +203,20 @@ void Vector3::Y(double y)
 void Vector3::Z(double z)
 {
   this->z = z;
+}
+
+void Vector3::set(int i, double v)
+{
+  if(i == 0)
+    this->x = v;
+  else if(i == 1)
+    this->y = v;
+  else
+    this->z = v;
+}
+
+void Vector3::reset()
+{
+	this->x = this->y = this->z = 0.0;
 }
 

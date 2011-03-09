@@ -99,7 +99,8 @@ void demoSimpleBox()
 void demoMultiBox()
 {
 	Cube* c = new Cube(2);
-  c->setPosition(1, 3, 0);
+  c->setPosition(0, 3, -2);
+  c->angularMomentum.X(3);
   e->addRigidBody_p(c);
 
 	Cube* c2 = new Cube(2);

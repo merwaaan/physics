@@ -1,0 +1,160 @@
+\documentclass[twocolumn]{article}
+
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+
+\title{Titre}
+\author{Merwan Achibet}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Introduction}
+
+\subsection{Applications}
+
+Dans de nombreux domaines liés à l'informatique, la reproduction réaliste de phénomènes physiques du monde réel est recherchée. blabla
+
+Les simulations physiques sont présentes dans de nombreux systèmes complexes. Parfois mises sur le devant de la scène, au c\oe ur d'applications dont l'utilité directe est de les étudier, ou parfois tenant un rôle de fond plus discret mais néanmoins nécessaire à l'atteinte d'un certain réalisme. Certaines simulations industrielles se doivent par exemple de reproduire fidèlement des situations réelles et sont supposées pouvoir prédire de manière précise l'évolution d'un environnement. Dans ce cadre, on souhaite obtenir des résultats réalistes. Dans d'autres contextes, comme la réalité virtuelle ou le jeu vidéo, l'obtention d'une simulation comparable à celle du monde physique est attendue mais les enjeux étant moins importants, certains écarts peuvent être acceptés. On préferera ici bénéficier d'une vitesse d'éxécution confortable que de résultats absolument exactes.
+
+Le champ de la simulation physique est vaste et de nombreuses approches sont reconnues. Le choix quant à la direction à prendre dans la conception d'un moteur physique dépend naturellement du type de simulation que l'on espère produire. Les simulations précises ne s'embarassent pasde la contrainte de la vitesse et peuvent se permettre d'employer des techniques d'analyse linéaire complexes. La détermination de l'évolution d'un environnement peuplé par des corps interagissant physiquement entre eux est alors réduite à la résolution de système linéaires. Ces systèmes peuvent se réveler extrêmement complexes et forcent à l'utilisation d'outils mathématiques de pointes, l'analyse quadratique par exemple.
+
+Par opposition aux simulations précises, on trouve les simulations temps-réel, dont la contrainte principale est l'obtention de résultats acceptables en respectant une certaine limite de temps. L'une des branches de l'informatique utilisant ce type de moteurs physique est celle de l'informatique de loisir, notamment le jeu vidéo. Les mondes virtuels créés dans le cadre de ces productions étant de plus en proche de la réalité, que ce soit au niveau des graphismes ou de la gestion du son, qu'il est attendu que la partie physique soit assurée avec le même panache. blabla
+
+\subsection{Travail à accomplir}
+
+Le but de ce projet est de concevoir un moteur physique de base permettant de reproduire de la manière la plus réaliste possible les comportements d'objets évoluant dans l'espace et soumis à différents types de forces, telles que la gravité ou la friction. L'appelation de moteur physique est large, il nous faut avant préciser l'étendue du travail à accomplir.
+
+La contrainte principale sera le temps. On veut concevoir une simulation pouvant être éxecuté en temps réel de telle façon que si l'utilisateur modifie l'environnement de la simulation à un instant quelconque, une réaction à cette interaction soit immédiatement générée. Pour cette raison, certains raccourcis dans les calculs ainsi que plusieurs approximations seront tolérées. Le fonctionnement du moteur se base néanmoins sur des formules de la physique dite de Newton et ses résultats ne devront pas trop s'éloigner de ceux que l'on retrouverait dans la réalité. On s'impose le limiter nos simulations aux corps rigides et convexes. Le fait qu'un corps soit rigide, ou indéformable, dénote l'impossibilité d'altérer sa structure. Dans notre simulation, si un objet de cinq tonnes est posé sur une minuscule objet de trois grammes, il ne sera ni aplati, ni endommagé. On choisit aussi de se limiter aux objets convexes car il est plus aisé de gérer leurs interactions. On proposera néanmoins une piste pour étendre notre simulations aux corps concaves dans la dernière partie.
+
+La simulation devra reproduire tous les phénomènes réels que l'on veut imiter mais si dans le monde physique toute la progression menant à la chute d'un objet soumis à la gravité semble naturellement continue, plusieurs phases devront être traversées avant chaque pas de la simulation. En premier lieu, il faudra faire évoluer les quantités entrant en jeu dans l'action dynamiques d'un objet, on pense par exemple au changement de position en fonction d'une certaine vitesse ou d'une accélération.  blabla
+
+Ensuite, on greffera au moteur une gestion de l'aspect kinétique, c'est à dire du comportement d'objets indépendants et soumis à des forces externes. blabla
+
+Une fois que nos solides disposeront d'un comportement réaliste en tant qu'entités, nous les ferons réagir entre eux. Concrètement cette partie sera divisée en deux sections. Tout d'abord, on veut déterminer si deux objets sont en contact, puis l'on va provoquer des réactions collisionnelles proportionnelles à leur vitesse relative.
+
+\section{Dynamique} 
+
+\subsection{La composante linéaire du mouvement}
+
+Pour cette première section, nous allons nous concentrer sur l'aspect cinématique d'un corps rigide, c'est à dire son mouvement lorsqu'il n'est soumis à aucune force. Nous allons pour l'instant réduire les corps que nous voulons simuler à de simples particules. Les figures présentées sont en deux dimensions pour des raisons de clarté mais le principe reste similaire lorsqu'il est étendu à la troisième dimension.
+
+La cinématique est l'étude de l'évolution des quantités qui influent sur le déplacement d'un objet dans l'espace. La quantité d'un objet la plus perceptible visuellement pour un spectateur est sa position $p$ et c'est cette valeur à tout instant de la simulation que l'on veut déterminer. Un solide dispose aussi d'une vitesse $v$, qui correspond à sa variation de position en une unité de temps. On note cette relation sous la forme dérivée :
+
+\[v = \frac{\delta p}{\delta t}\]
+
+De la même façon, l'accéleration $a$ correspond au taux de variation de la vitesse par rapport au temps. Par transitivité, la position est dépendantes de l'accélération.
+
+\[a = \frac{\delta v}{\delta t} = \frac{\delta^2 p}{\delta t}\]
+
+Chacun des corps rigides dont l'on veut simuler l'évolution possède ces trois quantités sous forme de vecteurs et l'une des tâches de base du moteur physique sera de déterminer comment elles varieront en fonction de leurs valeurs initiales et de l'avancement du temps. On sait qu'elles entretiennent des relations de dérivation, il faudra donc procéder par intégration pour calculer la position d'un objet. Différentes méthodes d'intégration seront proposées dans la partie suivante mais avant toute chose il reste un détail à régler. On sait que l'accélération est la quantité dont dépend indirectement la position, mais comment peut-on la déterminer ?
+
+Pour répondre, nous allons nous diriger vers le principe fondamental de la mécanique Newtonienne qui énonce la relation entre l'accélération $a$ d'un objet, sa masse $m$ et les forces $F_i$ qu'il subit.
+
+\[\sum F_i = m a\]
+
+\[a = \frac{\sum F_i}{m}\]
+
+En appliquant des forces à un objet, son accélération varie en fonction de sa masse. Nous bénéficions maintenant d'une valeur de départ à intégrer jusqu'à obtenir la nouvelle position d'un objet.
+
+\subsection{Intégration}
+
+Dans la sous-section précédente, les différentes quantités physiques entrant en jeu dans les mouvement linéaires ont été présentées. Voyons maintenant de façon plus concrète quels calculs sèmeront le chemin menant à une simulation réaliste.
+
+Les phénomènes physiques du monde réel évoluent de façon continue mais notre simulation ne peut pas s'autoriser ce luxe puisque la rapidité d'éxécution est l'une des principales contraintes imposées. Le modèle du moteur physique sera donc discret et avancera par pas de temps fixe. Des intégrations successives doivent être réalisées pour déterminer le changement d'état d'un corps d'un instant $t_n$ à un instant $t_{n+1}$ mais pour la même raison, nous devrons nous contenter d'approximations de ces intégrales.
+
+Parmi les méthodes classiques d'intégration approximative, on trouve l'intégration d'Euler. Cette méthode part du principe que l'on dispose de la valeur initiale $x_0$ de la quantité que l'on souhaite faire évoluer ainsi que de son taux de changement $x'$ et de la variation de temps par rapport à l'état précédent.
+
+\[x_{n+1} = x_{n} + x' * t\]
+
+Si l'on adapte cette idée à notre problème, on obtient la succession de calculs suivante :
+
+\[a_{n+1} = \frac{\sum F}{m}\]
+\[v_{n+1} = v_n + a_{n+1} t\]
+\[p_{n+1} = p_n + v_{n+1} t\]
+
+Cette méthode peut suffire dans le cadre de variations linéaires mais il faut prévoir que notre simulation comprendra de nombreuses variations fortes, des accélérations soudaines ou des transferts d'énergie kinétique par exemple. On préférera donc se diriger vers une seconde méthode, l'intégration de Runge-Kutta de degré 4, ou RK4. Ce procédé se base sur l'intégration d'Euler mais affine son résultat en subdivisant le pas de temps en plusieurs intervalles.
+
+\[x_{n+1} = 1 / 6 * (k_1 + 2 * k_2 + 2 * k_3 + k_4)\]
+\[k_1 = f(x_n, 0)\]
+\[k_2 = f(k_1, \frac{t}{2})\]
+\[k_3 = f(k_2, \frac{t}{2})\]
+\[k_4 = f(k_3, t)\]
+
+Plus de détails
+
+Une des lois des base de la physique de Newton dicte qu'un corps doté d'une accélération constante se déplacera de $ $ en $t$ secondes. Nous allons utiliser ce postulat pour comparer les résultats de l'intégration d'Euler aux résultats de l'intégration Runge-Kutta de degré 4.
+
+GRAPHE
+
+\subsection{Modélisation d'un corps rigide}
+
+Nous avons décrit dans la partie précédente les quantités régissant le mouvement linéaire d'une particule mais le moteur physique que l'on conçoit à pour visée de simuler les interactions entre des corps rigides de dimension trois. Comment peut-on étendre les principes énoncés plus haut à ce modèle ?
+
+On pourrait en premier lieu penser représenter de tels corps par des listes de particules, chacune placée à un coin de l'objet en question. On pourrait ensuite faire évoluer chaque particule indépendement en lui appliquant des contraintes de cohésion avec ses voisines. Cette méthode est envisageable mais elle présente plusieurs désavantages. Premièrement, les règles de cohésion à mettre en place nécessiteraient des traitements supplémentaires, et donc un temps de calcul plus long. Deuxièmement, cela alourdirait l'ensemble du moteur physique puisqu'il existe une solution plus simple et plus élégante qui permet de réduire les mouvements d'un corps rigide à ceux d'une unique particule.
+
+Nous devons tout d'abord introduire la notion de repères absolu et local. Le repère absolu est le référentiel orthogonal dont l'origine sert de centre à l'environnement de notre simulation. Un repère local est un référentiel qui est unique à chaque corps et dont le centre se situe à l'intérieur même de cet objet. Sa position exacte dépend de la position des particules qui forment l'objet mais il ne s'agit pas d'un simple centre géométrique puisque la masse de chaque particule est aussi un facteur déterminant. Cette position se nomme le centre de masse, ou barycentre, et sera calculée une fois la structure du corps définie par l'équation suivante, o\`u $M$ représente la masse totale des particules, $m_i$ la masse de la particule $i$ et $p_i$ la position de la particule dans le repère absolu.
+
+\begin{equation}
+  C = \frac{1}{M} \sum m_i p_i
+\end{equation}
+
+La position locale de chacune des particules d'un corps peut être calculée par :
+
+\begin{equation}
+  r_i = p_i - C
+\end{equation}
+
+Une fois la position du centre de masse déterminée, on peut l'utiliser pour réduire un corps à cette position précise. Pareillement, la vitesse et l'accélération du corps correpondront à la vitesse et à l'accélération de cette particule. Pour l'instant, le fait de n'utiliser qu'un particule par corps rigide allège la charge de travail du moteur physique mais les avantages majeurs de cette décision sont présentés dans la partie suivante.
+
+DESSIN
+
+\subsection{La composante angulaire du mouvement}
+
+Le modèle que nous avons défini est encore incomplet puisqu'il ne prend pas en compte la composante rotationnelle des mouvements dont l'on peut être témoin dans un environnement réel. Les particules étant de simples points flottants dans l'espace, cela ne posait pas de problème précédemment mais le moteur physique que l'on conçoit doit gérer des corps rigiques plus complexes. Imaginons une boîte cubique que l'on lancerait en l'air, si aucune rotation n'apparaît (si la base de la boîte reste parallèle au sol), l'illusion de réalisme que l'on veut créer risque de vite disparaître.
+
+Les quantités physiques entrant en jeu dans la décomposition angulaire d'un déplacement sont analogues à celle que nous avons vues dans la partie linéaire. De la même façon que la position représentait visuellement l'état d'un corps au sein de la composante linéaire, un corps doit posséder une orientation. En deux dimensions, un nombre flottant représentant l'angle du corps par rapport à un axe fixe suffirait à décrire l'orientation d'un objet mais pas dans notre environnement en trois dimensions. Le repère local d'un corps a été introduit dans la partie précédente et se résumait à un centre de masse faisant office d'origine, mais un repère possède aussi des axes et ceux du repère local ne sont pas nécessairement alignés avec ceux du repère absolu ! Pour représenter la direction des axes du repère local, on utilisera une matrice de dimension trois au sein de laquelle chaque vecteur colonne correspondra à un des axes du repère local. Pour illustrer ces propos, analysons la matrice d'orientation d'un objet aligné avec le repère absolu.
+
+matrice id décomposée en trois
+
+Il nous faut désormais représenter le taux de variation de l'orientation d'un corps, la vitesse angulaire. L'orientation est une matrice mais la vitesse angulaire sera un vecteur dont la direction correspondra à l'axe autour duquel le corps effectuera sa rotation et dont la magnitude représentera le nombre de rotations à effectuer en une unité de temps.
+
+
+\section{Gestion des collisions}
+
+\subsection{Le cas des sphères}
+
+\subsubsection{Détection d'une collision}
+
+\subsubsection{Détection du point de contact}
+
+\subsubsection{Réponse à une collision}
+
+\subsection{Le cas général des corps rigides}
+
+\subsubsection{Détection d'une collision}
+
+\subsubsection{Détection du point de contact}
+
+\subsubsection{Réponse à une collision}
+
+\section{Améliorations}
+
+\subsection{Partitionnement de l'espace}
+
+\subsection{Extension aux objets concaves}
+
+\section{Conclusion}
+
+\begin{equation}
+  \frac{dv}{dt} = \frac{d^2p}{dt^2} = a 
+\end{equation}
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}
+

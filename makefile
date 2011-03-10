@@ -6,6 +6,7 @@ OBJ= \
 	Display.o \
 	Engine.o \
 	Force.o \
+	Geometry.o \
 	Matrix3.o \
 	RigidBody.o \
 	Sphere.o \

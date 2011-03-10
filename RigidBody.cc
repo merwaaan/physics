@@ -169,7 +169,12 @@ void RigidBody::setFixed(bool fixed)
   this->fixed = fixed;
 }
 
-Vector3 RigidBody::getVelocity()
+Vector3 RigidBody::getPosition() const
+{
+  return this->position;
+}
+
+Vector3 RigidBody::getVelocity() const
 {
   return this->linearMomentum * this->inverseMass;
 }

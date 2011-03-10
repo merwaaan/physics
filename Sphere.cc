@@ -2,6 +2,7 @@
 
 #include <GL/glut.h>
 
+#include "CustomRigidBody.h"
 #include "Display.h"
 #include "Engine.h"
 
@@ -146,6 +147,11 @@ Contact* Sphere::resolveInterPenetration(Sphere* s_p, double dt, double toleranc
 
 Contact* Sphere::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
-  return NULL;
+  return rb_p->isCollidingWith(this, dt);
+}
+
+double Sphere::getRadius() const
+{
+  return this->radius;
 }
 

@@ -26,6 +26,8 @@ class Sphere : public RigidBody
     Contact* resolveInterPenetration(Sphere* s_p, double dt, double tolerance);
     
     Contact* isCollidingWith(CustomRigidBody* rb_p, double dt);
+
+    double getRadius() const;
 };
 
 #endif

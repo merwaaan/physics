@@ -77,13 +77,12 @@ class CustomRigidBody : public RigidBody
     Contact* isCollidingWith(RigidBody* rb_p, double dt);
 
     Contact* isCollidingWith(Sphere* s_p, double dt);
-    
+
     Contact* isCollidingWith(CustomRigidBody* rb_p, double dt);
     bool findSeparationPlane(CustomRigidBody* rb_p);
 
     Vertex* getVertexById_p(int id);
     int getPolyCount();
-    Structure* getStructure_p();
 };
 
 #endif

@@ -73,7 +73,8 @@ class RigidBody
     void setOrientation(Matrix3 orientation);
     void setFixed(bool fixed);
 
-    Vector3 getVelocity();
+    Vector3 getPosition() const;
+    Vector3 getVelocity() const;
 };
 
 #endif

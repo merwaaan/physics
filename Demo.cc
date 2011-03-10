@@ -1,8 +1,9 @@
 #include <iostream>
 #include <GL/glut.h>
 
-#include "Engine.h"
 #include "Box.h"
+#include "Engine.h"
+#include "Geometry.h"
 #include "Sphere.h"
 
 Engine* e;
@@ -12,6 +13,24 @@ void input(unsigned char k, int x, int y)
   if(k == 32)
     for(int i = 0; i < e->getBodyCount(); ++i)
 	    e->reverseTime();
+}
+
+void testGeometry()
+{
+  Segment se = {Vector3(-1,0,0), Vector3(2,0,0)};
+  std::cout << Geometry::closestPointOfSegment(Vector3(0,0,0), se) << std::endl;
+  std::cout << Geometry::closestPointOfSegment(Vector3(0,4,0), se) << std::endl;
+  std::cout << Geometry::closestPointOfSegment(Vector3(1,2,3), se) << std::endl;
+
+  Plane p = {Vector3(0,0,0), Vector3(0,1,0)};
+  std::cout << Geometry::closestPointOfPlane(Vector3(10,0,0), p) << std::endl;
+  std::cout << Geometry::closestPointOfPlane(Vector3(0,10,0), p) << std::endl;
+  std::cout << Geometry::closestPointOfPlane(Vector3(3,3,3), p) << std::endl;
+
+  Sphere s(3);
+  std::cout << Geometry::closestPointOfSphere(Vector3(10,0,0), s) << std::endl;
+  std::cout << Geometry::closestPointOfSphere(Vector3(-10,0,0), s) << std::endl;
+  std::cout << Geometry::closestPointOfSphere(Vector3(3,3,0), s) << std::endl;
 }
 
 void compareRK4ToEuler()
@@ -119,12 +138,15 @@ int main(int argc, char** argv)
   
   glutKeyboardFunc(&input);
   
-  //compareRK4ToEuler();
+  testGeometry();
   //testTimeReversing();
+  //compareRK4ToEuler();
 
   //demoSimpleBox();
-  demoMultiBox();
+  //demoMultiBox();
   //demoMultiBall();
+
+  delete e;
 
   return 0;
 }

@@ -179,6 +179,7 @@ Contact* CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
     return NULL;
 
+  // else we have a collision
   std::cout << "COLLISION DETECTED" << std::endl;
   return NULL;
 }
@@ -194,23 +195,17 @@ bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
     for(int j = 0; j < rb_p->structure.vertices.size(); ++j)
     {
       double dis = sp.getDistanceFromPoint(rb_p->structure.vertices[j].absPosition);
-      std::cout << i << " " << j << std::endl;
-      std::cout << sp.point << sp.normal << std::endl;
-      std::cout << rb_p->structure.vertices[j].absPosition << std::endl;
-      std::cout << dis << std::endl;
 
       if(dis <= 0)
         break;
       else if(j == rb_p->structure.vertices.size() - 1)
-      {
-        std::cout << "separation plane found" << std::endl;
         return true;
-      }
     }
   }
 
   return false;
 }
+
 
 Vertex* CustomRigidBody::getVertexById_p(int id)
 {

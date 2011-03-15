@@ -4,9 +4,11 @@
 #include <limits>
 
 #include "Display.h"
+#include "Engine.h"
 #include "Sphere.h"
 
 extern Display* display_pg;
+extern Engine* engine_pg;
 
 CustomRigidBody::CustomRigidBody()
 {
@@ -20,7 +22,7 @@ CustomRigidBody::~CustomRigidBody()
 
 void CustomRigidBody::addVertex(int id, double x, double y, double z, double m)
 {
-  Vertex v;
+  CustomVertex v;
   v.id = id;
   v.localPosition = Vector3(x, y, z);
   v.mass = m;
@@ -30,9 +32,9 @@ void CustomRigidBody::addVertex(int id, double x, double y, double z, double m)
 
 void CustomRigidBody::addPolygon(int count, int* ids)
 {
-  Polygon p;
+  CustomPolygon p;
   p.size = count;
-  p.vertices_p = new Vertex*[count];
+  p.vertices_p = new CustomVertex*[count];
 
   // link all referenced vertices with a polygon
   for(int i = 0; i < count; ++i)
@@ -62,7 +64,7 @@ void CustomRigidBody::computeCenterOfMass()
 
   for(int i = 0; i < this->structure.vertices.size(); ++i)
   {
-    Vertex* v_p = &this->structure.vertices[i];
+    CustomVertex* v_p = &this->structure.vertices[i];
 
     centerOfMass += v_p->localPosition * v_p->mass;  
     totalMass += v_p->mass;
@@ -175,13 +177,17 @@ Contact* CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
 
 Contact* CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
+  double tolerance = 0.01;
+
   // if at least one separation plane exists, there is no collision
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
+  {
+    std::cout << "separation plane found" << std::endl;
     return NULL;
+  }
 
-  // else we have a collision
-  std::cout << "COLLISION DETECTED" << std::endl;
-  return NULL;
+  std::cout << "no separation plane" << std::endl;
+  return this->resolveInterPenetration(rb_p, dt, tolerance);
 }
 
 bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
@@ -189,12 +195,14 @@ bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
   // compute a separation plane along each polygon of the first body
   for(int i = 0; i < this->structure.polygons.size(); ++i)
   {
-    SeparationPlane sp = this->structure.polygons[i].getSeparationPlane();
+    Plane sp = this->structure.polygons[i].getPlane();
 
     // check if all the vertices of the second body are outside of the separation plane
     for(int j = 0; j < rb_p->structure.vertices.size(); ++j)
     {
-      double dis = sp.getDistanceFromPoint(rb_p->structure.vertices[j].absPosition);
+      double dis;
+      Geometry::closestPointOfPlane(rb_p->structure.vertices[j].absPosition, sp, &dis);
+      std::cout << "distance from sp " << i << " " << j << " " << dis << std::endl;
 
       if(dis <= 0)
         break;
@@ -206,8 +214,49 @@ bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
   return false;
 }
 
+Contact* CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double dt, double tolerance)
+{
+  // find the contacting vertices
+  std::vector<CustomVertex> contactingVertices = Geometry::getContactingVertices(this, rb_p, tolerance);
+  std::cout << contactingVertices.size() << " contacting vertices" << std::endl;
 
-Vertex* CustomRigidBody::getVertexById_p(int id)
+  // if the bodies are too far apart, integrate forward in time
+  if(contactingVertices.size() == 0)
+  {
+    std::cout << "going forward" << std::endl;
+    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
+    rb_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
+    this->integrate(dt / 2);
+    rb_p->integrate(dt / 2);
+    
+    return this->resolveInterPenetration(rb_p, dt / 2, tolerance);
+  }
+  // else if the bodies are inter-penetrating, integrate backward in time
+  else if(!this->findSeparationPlane(rb_p) && !rb_p->findSeparationPlane(this))
+  {
+    std::cout << "going backward" << std::endl;
+    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
+    rb_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
+    engine_pg->reverseTime();
+    this->integrate(-dt / 2);
+    rb_p->integrate(-dt / 2);
+    engine_pg->reverseTime();
+
+    return this->resolveInterPenetration(rb_p, dt / 2, tolerance);
+  }
+  // else if bodies are within the tolerance zone, compute the real contact points
+  else
+  {
+    std::cout << "OK!" << std::endl;
+    Contact* contact_p = new Contact;
+    contact_p->a = this;
+    contact_p->b = rb_p;
+    contact_p->position = contactingVertices[0].absPosition;
+    contact_p->normal = (rb_p->position - contactingVertices[0].absPosition).normalize();
+  }
+}
+
+CustomVertex* CustomRigidBody::getVertexById_p(int id)
 {
   for(int i = 0; i < this->structure.vertices.size(); ++i)
     if(this->structure.vertices[i].id == id)

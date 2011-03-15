@@ -98,8 +98,8 @@ Contact* Sphere::isCollidingWith(Sphere* s_p, double dt)
 
     return NULL;
   }
-  else
-    return this->resolveInterPenetration(s_p, dt, tolerance);
+   
+  return this->resolveInterPenetration(s_p, dt, tolerance);
 }
 
 Contact* Sphere::resolveInterPenetration(Sphere* s_p, double dt, double tolerance)

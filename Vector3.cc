@@ -144,7 +144,7 @@ Vector3 Vector3::normalize() const
 /**
  * Transforms a Vector3 into a special kind of Matrix3 used in the simulation
  */
-Matrix3 Vector3::toStarMatrix()
+Matrix3 Vector3::toStarMatrix() const
 {
   Matrix3 result;
 

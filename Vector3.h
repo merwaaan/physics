@@ -34,7 +34,7 @@ class Vector3
 
     double length() const;
     Vector3 normalize() const;
-    Matrix3 toStarMatrix();
+    Matrix3 toStarMatrix() const;
 
     double X() const;
     double Y() const;

@@ -9,6 +9,7 @@ OBJ= \
 	Geometry.o \
 	Matrix3.o \
 	RigidBody.o \
+	Simplex.o \
 	Sphere.o \
 	Vector3.o
 

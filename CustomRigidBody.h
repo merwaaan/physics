@@ -3,60 +3,18 @@
 
 #include <vector>
 
+#include "Geometry.h"
 #include "RigidBody.h"
-
-struct SeparationPlane
-{
-  Vector3 point;
-  Vector3 normal;
-
-  double getDistanceFromPoint(Vector3 p)
-  {
-    return -(normal * (point - p)) / normal.length();
-  }
-};
-
-struct Vertex
-{
-  int id;
-  Vector3 localPosition;
-  Vector3 absPosition;
-  double mass;
-};
-
-struct Polygon
-{
-  int size;
-  Vertex** vertices_p;
-
-  Vector3 getNormal()
-  {
-    Vector3 v1 = vertices_p[0]->absPosition - vertices_p[1]->absPosition;
-    Vector3 v2 = vertices_p[1]->absPosition - vertices_p[2]->absPosition;
-
-    return (v1 ^ v2).normalize();
-  }
-
-  SeparationPlane getSeparationPlane()
-  {
-    SeparationPlane sp;
-
-    sp.point = vertices_p[0]->absPosition;
-    sp.normal = getNormal();
-
-    return sp;
-  }
-};
 
 struct Structure
 {
-  std::vector<Vertex> vertices;
-  std::vector<Polygon> polygons;
+  std::vector<CustomVertex> vertices;
+  std::vector<CustomPolygon> polygons;
 };
 
 class CustomRigidBody : public RigidBody
 {
-  protected:
+  public:
     Structure structure;
 
   public:
@@ -80,8 +38,9 @@ class CustomRigidBody : public RigidBody
 
     Contact* isCollidingWith(CustomRigidBody* rb_p, double dt);
     bool findSeparationPlane(CustomRigidBody* rb_p);
+    Contact* resolveInterPenetration(CustomRigidBody* rb_p, double dt, double tolerance);
 
-    Vertex* getVertexById_p(int id);
+    CustomVertex* getVertexById_p(int id);
     int getPolyCount();
 };
 

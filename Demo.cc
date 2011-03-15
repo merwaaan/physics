@@ -17,10 +17,10 @@ void input(unsigned char k, int x, int y)
 
 void testGeometry()
 {
-  Segment se = {Vector3(-1,0,0), Vector3(2,0,0)};
-  std::cout << Geometry::closestPointOfSegment(Vector3(0,0,0), se) << std::endl;
-  std::cout << Geometry::closestPointOfSegment(Vector3(0,4,0), se) << std::endl;
-  std::cout << Geometry::closestPointOfSegment(Vector3(1,2,3), se) << std::endl;
+  Edge se = {Vector3(-1,0,0), Vector3(2,0,0)};
+  std::cout << Geometry::closestPointOfEdge(Vector3(0,0,0), se) << std::endl;
+  std::cout << Geometry::closestPointOfEdge(Vector3(0,4,0), se) << std::endl;
+  std::cout << Geometry::closestPointOfEdge(Vector3(-4,2,3), se) << std::endl;
 
   Plane p = {Vector3(0,0,0), Vector3(0,1,0)};
   std::cout << Geometry::closestPointOfPlane(Vector3(10,0,0), p) << std::endl;
@@ -118,11 +118,11 @@ void demoSimpleBox()
 void demoMultiBox()
 {
 	Cube* c = new Cube(2);
-  c->setPosition(0, 3, -2);
-  c->angularMomentum.X(3);
+  c->angularMomentum = Vector3(3, 3, 0);
+  c->setPosition(0, 5, 0);
   e->addRigidBody_p(c);
 
-	Cube* c2 = new Cube(2);
+	Cube* c2 = new Cube(4);
   c2->setFixed(true);
   e->addRigidBody_p(c2);
 
@@ -138,12 +138,12 @@ int main(int argc, char** argv)
   
   glutKeyboardFunc(&input);
   
-  testGeometry();
+  //testGeometry();
   //testTimeReversing();
   //compareRK4ToEuler();
 
   //demoSimpleBox();
-  //demoMultiBox();
+  demoMultiBox();
   //demoMultiBall();
 
   delete e;

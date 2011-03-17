@@ -10,18 +10,6 @@ class CustomRigidBody;
 class Sphere;
 
 /**
- * PLANE
- * 
- * - point : vector to the reference point
- * - normal : normalized vector which origin is point
- */
-struct Plane
-{
-  Vector3 point;
-  Vector3 normal;
-};
-
-/**
  * EDGE
  *
  * - a : starting point
@@ -34,6 +22,18 @@ struct Edge
 };
 
 /**
+ * PLANE
+ * 
+ * - point : vector to the reference point
+ * - normal : normalized vector which origin is point
+ */
+struct Plane
+{
+  Vector3 point;
+  Vector3 normal;
+};
+
+/**
  * POLYGON
  *
  * - size : number of vertices forming the polygon
@@ -42,7 +42,30 @@ struct Edge
 struct Polygon
 {
   int size;
-  Vector3 point;
+  std::vector<Vector3> points;
+};
+
+/**
+ * TRIANGLE
+ * - a, b, c : vertices forming the triangle
+ */
+struct Triangle
+{
+  Vector3 a;
+  Vector3 b;
+  Vector3 c;
+};
+
+/**
+ * TETRAHEDRON
+ * - a, b, c : triangles forming the tetrahedron
+ */
+struct Tetrahedron
+{
+  Triangle a;
+  Triangle b;
+  Triangle c;
+  Triangle d;
 };
 
 /**
@@ -79,9 +102,14 @@ struct CustomPolygon
 
 namespace Geometry
 {
-  Vector3 closestPointOfEdge(Vector3 p, Edge edge, double* distance_p = NULL);
-  Vector3 closestPointOfPlane(Vector3 p, Plane plane, double* distance_p = NULL);
-  Vector3 closestPointOfPolygon(Vector3 p, Polygon polygon, double* distance_p = NULL);
+  bool areOnTheSameSide(Vector3 p1, Vector3 p2, Vector3 a, Vector3 b);
+  bool isInsideTriangle(Vector3 point, Triangle triangle);
+
+  Vector3 closestPointOfEdge(Vector3 point, Edge edge, double* distance_p = NULL);
+  Vector3 closestPointOfPlane(Vector3 point, Plane plane, double* distance_p = NULL);
+  Vector3 closestPointOfTriangle(Vector3 point, Triangle, double* distance_p = NULL);
+  Vector3 closestPointOfPolygon(Vector3 point, Polygon polygon, double* distance = NULL);
+  Vector3 closestPointOfTetrahedron(Vector3 point, Tetrahedron tetrahedron, double* distance = NULL);
   Vector3 closestPointOfSphere(Vector3 p, Sphere sphere, double* distance_p = NULL);
 
   Vector3 supportPoint(std::vector<Vector3> points, Vector3 direction);

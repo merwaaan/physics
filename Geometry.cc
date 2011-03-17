@@ -6,6 +6,26 @@
 #include "Simplex.h"
 
 /**
+ * Return true if the two points are on the same side of an edge
+ */
+bool Geometry::areOnTheSameSide(Vector3 p1, Vector3 p2, Vector3 a, Vector3 b)
+{
+  return ((b - a) ^ (p1 - a)) * ((b - a) ^ (p2 - a)) >= 0;
+}
+
+/**
+ * Return true if a point lies inside a triangle
+ */
+bool Geometry::isInsideTriangle(Vector3 point, Triangle triangle)
+{
+  // check if the point lies inside the positive half-spaces of each edges
+  return
+    Geometry::areOnTheSameSide(point, triangle.a, triangle.b, triangle.c) &&
+    Geometry::areOnTheSameSide(point, triangle.b, triangle.a, triangle.c) &&
+    Geometry::areOnTheSameSide(point, triangle.c, triangle.b, triangle.a);
+}
+
+/**
  * Return a list of the edges forming the polygon perimeter
  */
 std::vector<Edge> CustomPolygon::getEdges() const
@@ -38,7 +58,7 @@ Plane CustomPolygon::getPlane() const
 }
 
 /**
- * Return the normal of the polygon
+ * Return the normal of the polygon (outside-oriented)
  */
 Vector3 CustomPolygon::getNormal() const
 {
@@ -49,90 +69,115 @@ Vector3 CustomPolygon::getNormal() const
 }
 
 /**
- * Return the closest point of a edge from an arbitrary point p
+ * Return the closest point of an edge from a point point p
  */
-Vector3 Geometry::closestPointOfEdge(Vector3 p, Edge edge, double* distance_p)
+Vector3 Geometry::closestPointOfEdge(Vector3 point, Edge edge, double* distance_p)
 {
-  std::cout << "edge test " << p << std::endl;
   Vector3 length = edge.b - edge.a;
   Vector3 normal = length.normalize();
-  std::cout << length << normal << std::endl;
-  double t = ((p - edge.a) * normal) / length.length();
+
+  double t = ((point - edge.a) * normal) / length.length();
   t = t < 0 ? 0 : t;
   t = t > 1 ? 1 : t;
-  std::cout << t << std::endl;
 
   if(distance_p != NULL)
-    *distance_p = ((edge.a + t * length) - p).length();
+    *distance_p = ((edge.a + t * length) - point).length();
 
   return edge.a + t * length;
 }
 
 /**
- * Return the closest point of a plane to an arbitrary point p
+ * Return the closest point of a plane to a point point p
  */
-Vector3 Geometry::closestPointOfPlane(Vector3 p, Plane plane, double* distance_p)
+Vector3 Geometry::closestPointOfPlane(Vector3 point, Plane plane, double* distance_p)
 {
-  if(distance_p != NULL)
-    *distance_p = -(plane.normal * (plane.point - p)) / plane.normal.length();
+  Vector3 closest = point - plane.normal * (plane.normal * (point - plane.point));
 
-  return p - plane.normal * (plane.normal * (p - plane.point));
+  if(distance_p != NULL)
+    *distance_p = (closest - point).length();
+    //*distance_p = -(plane.normal * (plane.point - p)) / plane.normal.length();
+
+  return closest;
 }
 
 /**
- * Return the closest point of a polygon to an arbitrary point p
+ * Return the closest point of a triangle to a point p
  */
-Vector3 Geometry::closestPointOfPolygon(Vector3 p, Polygon polygon, double* distance_p)
+Vector3 Geometry::closestPointOfTriangle(Vector3 point, Triangle triangle, double* distance_p)
 {
-  /*uble d;
+  // project the point onto the plane extending the triangle
+  Plane plane = {triangle.a, ((triangle.a - triangle.b) ^ (triangle.b - triangle.c)).normalize()};
+  Vector3 projection = Geometry::closestPointOfPlane(point, plane);
 
-  // project the point onto the plane of the polygon
-  Plane polygonPlane = polygon.getPlane();
-  Vector3 projection = Geometry::closestPointOfPlane(p, polygonPlane, &d);
-  std::cout << "projection " << projection << std::endl;
+  // if the projection lies within the triangle border, the closest point is the projection
+  if(Geometry::isInsideTriangle(projection, triangle))
+    return projection;
 
-  // if the projected point lies within the polygon, we just found the closest point
-  if(Geometry::isPointInsidePolygon(projection, polygon))
+  // else the closest point lies on one of the edges
+  Edge ab = {triangle.a, triangle.b};
+  Edge bc = {triangle.b, triangle.c};
+  Edge ca = {triangle.c, triangle.a};
+  double dab, dbc, dca;
+
+  Vector3 pab = Geometry::closestPointOfEdge(point, ab, &dab);
+  Vector3 pbc = Geometry::closestPointOfEdge(point, bc, &dbc);
+  Vector3 pca = Geometry::closestPointOfEdge(point, ca, &dca);
+
+  Vector3 closest;
+  double closestDistance;
+  if(dab < dbc)
+  {
+    closest = pab;
+    closestDistance = dab;
+  }
+ 
+  return dca < closestDistance ? pca : closest;
+}
+
+/**
+ * Return the closest point of a polygon to a point p
+ */
+Vector3 Geometry::closestPointOfPolygon(Vector3 point, Polygon polygon, double* distance_p)
+{
+  
+}
+
+/**
+ * Return the closest point of a tetrahedron to a point p
+ */
+Vector3 Geometry::closestPointOfTetrahedron(Vector3 point, Tetrahedron tetra, double* distance_p)
+{
+  
+}
+
+/**
+ * Return the closest point of a sphere to a point p
+ */
+Vector3 Geometry::closestPointOfSphere(Vector3 point, Sphere sphere, double* distance_p)
+{
+  Vector3 centerDistance = point - sphere.getPosition();
+
+  // if the point is inside the sphere, it is already the closest point
+  if(centerDistance.length() < sphere.getRadius())
   {
     if(distance_p != NULL)
-      *distance_p = d;
+      *distance_p = centerDistance.length();
 
-    return projection;
+    return point;
   }
 
-  std::cout << "point not inside!" << std::endl;
+  // else we hav to find the surface point the closest to the point
+  Vector3 closest = sphere.getPosition() + centerDistance.normalize() * sphere.getRadius();
 
-  // else find the closest point of the edges
-  std::vector<Edge> edges = polygon.getEdges();
-
-  std::vector<Vector3> points(edges.size());
-  std::vector<double> distances(edges.size());
-
-  for(int i = 0; i < edges.size(); ++i)
-    points[i] = Geometry::closestPointOfEdge(projection, edges[i], &distances[i]);
-
-  double closestIndex = 0;
-  for(int i = 1; i < points.size(); ++i)
-    if(distances[i] < distances[closestIndex])
-      closestIndex = i;
-  
-  std::cout << "smallest distance " << distances[closestIndex] << std::endl;
   if(distance_p != NULL)
-    *distance_p = distances[closestIndex];
+    *distance_p = (closest - sphere.getPosition()).length();
 
-  return points[closestIndex];
-*/}
-
-/**
- * Return the closest point of the surface of a sphere to an abitrary point p
- */
-Vector3 Geometry::closestPointOfSphere(Vector3 p, Sphere sphere, double* distance_p)
-{
-  Vector3 distance = p - sphere.getPosition();
-  
-  return sphere.getPosition() + distance.normalize() * sphere.getRadius();
+  return closest;
 }
 
+/**
+ * Return a support point by choosing the farthest in a specified direction
+ */
 Vector3 Geometry::supportPoint(std::vector<Vector3> points, Vector3 direction)
 {
   int bestIndex = 0;
@@ -156,7 +201,7 @@ Vector3 Geometry::supportPoint(std::vector<Vector3> points, Vector3 direction)
  * Return a set of points describing the convex hull of the Minkowski difference
  * between two bodies
  */
-std::vector<Vector3> minkowskiDifference(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p)
+std::vector<Vector3> Geometry::minkowskiDifference(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p)
 {
   // compute all the points of the Minkowski difference
   std::vector<Vector3> points;
@@ -164,24 +209,26 @@ std::vector<Vector3> minkowskiDifference(CustomRigidBody* rb1_p, CustomRigidBody
     for(int j = 0; j < rb2_p->structure.vertices.size(); ++j)
       points.push_back(rb2_p->structure.vertices[j].absPosition - rb1_p->structure.vertices[i].absPosition);
 
-  // compute the center of the set of points
+  // compute the center of this set of points
   Vector3 center;
   for(int i = 0; i < points.size(); ++i)
     center += points[i];
   center = center / points.size();
-  
+
   // compute the convex hull by only keeping extrem points
   std::vector<int> pointsToBeRemoved;
   for(int i = 0; i < points.size(); ++i)
   {
-    Vector3 direction = center - points[i];
+    Vector3 direction = points[i] - center;
 
     for(int j = 0; j < points.size(); ++j)
-      if(i != j && (points[i] * direction).length() < (points[j] * direction).length())
+    {
+      if(i != j && points[i] * direction <= points[j] * direction)
       {
         pointsToBeRemoved.push_back(i);
         break;
-      } 
+      }
+    }
   }
 
   for(int i = 0; i < pointsToBeRemoved.size(); ++i)
@@ -199,11 +246,24 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
   Simplex simplex; 
   simplex.points.push_back(minkowski[0]);
 
-  // find the closest point to the origin
-  Vector3 closest = simplex.closestPointToOrigin();
+  while(true)
+  {
+    // find the closest point to the origin and a support point along its direction to the origin
+    Vector3 closest = simplex.closestPointToOrigin();
+    Vector3 directionToOrigin = Vector3(0, 0, 0) - closest;
+    Vector3 support = Geometry::supportPoint(minkowski, directionToOrigin);
 
-  // find a support point (most extrem point along the direction to the origin)
-  Vector3 directionToOrigin = Vector3(0, 0, 0) - closest;
-  simplex.addSupportPoint(Geometry::supportPoint(minkowski, directionToOrigin));
+    // terminate when the support point is already contained within the simplex
+    for(int i = 0; i < simplex.points.size(); ++i)
+      if(simplex.points[i] == support)
+        return directionToOrigin;
+
+    // add the support point to the simplex
+    simplex.points.push_back(support);
+
+    // reduce the simplex to a minimum simplex by getting rid of the vertices which
+    // are not part of the definition of the new support point
+    simplex.reduce(closest);
+  }
 }
 

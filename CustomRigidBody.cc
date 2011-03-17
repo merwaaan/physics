@@ -73,6 +73,8 @@ void CustomRigidBody::prepare()
     this->computeCenterOfMass();
     this->computeInverseInertiaTensor();
   }
+
+  this->computeVerticesAbsolutePositions();
 }
 
 void CustomRigidBody::computeCenterOfMass()

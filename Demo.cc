@@ -17,17 +17,26 @@ void input(unsigned char k, int x, int y)
 
 void testGeometry()
 {
-  Edge se = {Vector3(-1,0,0), Vector3(2,0,0)};
-  std::cout << Geometry::closestPointOfEdge(Vector3(0,0,0), se) << std::endl;
-  std::cout << Geometry::closestPointOfEdge(Vector3(0,4,0), se) << std::endl;
-  std::cout << Geometry::closestPointOfEdge(Vector3(-4,2,3), se) << std::endl;
+  Edge e = {Vector3(-1,0,0), Vector3(2,0,0)};
+  std::cout << "CLOSEST OF EDGE" << std::endl;
+  std::cout << Geometry::closestPointOfEdge(Vector3(0,0,0), e) << std::endl;
+  std::cout << Geometry::closestPointOfEdge(Vector3(1,4,0), e) << std::endl;
+  std::cout << Geometry::closestPointOfEdge(Vector3(-4,2,3), e) << std::endl;
 
   Plane p = {Vector3(0,0,0), Vector3(0,1,0)};
+  std::cout << "CLOSEST OF PLANE" << std::endl;
   std::cout << Geometry::closestPointOfPlane(Vector3(10,0,0), p) << std::endl;
   std::cout << Geometry::closestPointOfPlane(Vector3(0,10,0), p) << std::endl;
   std::cout << Geometry::closestPointOfPlane(Vector3(3,3,3), p) << std::endl;
 
+  Triangle t = {Vector3(-1,0,0), Vector3(1,0,0), Vector3(0,0,1)};
+  std::cout << "CLOSEST OF TRIANGLE" << std::endl;
+  std::cout << Geometry::closestPointOfTriangle(Vector3(0,3,0), t) << std::endl;
+  std::cout << Geometry::closestPointOfTriangle(Vector3(-3,0,0), t) << std::endl;
+  std::cout << Geometry::closestPointOfTriangle(Vector3(-1,0, 0.5), t) << std::endl;
+
   Sphere s(3);
+  std::cout << "CLOSEST OF SPHERE" << std::endl;
   std::cout << Geometry::closestPointOfSphere(Vector3(10,0,0), s) << std::endl;
   std::cout << Geometry::closestPointOfSphere(Vector3(-10,0,0), s) << std::endl;
   std::cout << Geometry::closestPointOfSphere(Vector3(3,3,0), s) << std::endl;
@@ -36,8 +45,15 @@ void testGeometry()
 void testGJK()
 {
   Cube* c1 = new Cube(2);
+  c1->prepare();
+
   Cube* c2 = new Cube(2);
   c2->setPosition(5, 0, 0);
+  c2->prepare();
+  
+  std::vector<Vector3> m = Geometry::minkowskiDifference(c1, c2);
+  for(int i = 0; i < m.size(); ++i)
+    std::cout << m[i] << std::endl;
 
   std::cout << Geometry::gjkDistanceBetweenPolyhedra(c1, c2) << std::endl;
 }
@@ -148,11 +164,12 @@ int main(int argc, char** argv)
   glutKeyboardFunc(&input);
   
   //testGeometry();
+  testGJK();
   //testTimeReversing();
   //compareRK4ToEuler();
 
   //demoSimpleBox();
-  demoMultiBox();
+  //demoMultiBox();
   //demoMultiBall();
 
   delete e;

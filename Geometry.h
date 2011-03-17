@@ -9,24 +9,50 @@
 class CustomRigidBody;
 class Sphere;
 
+/**
+ * PLANE
+ * 
+ * - point : vector to the reference point
+ * - normal : normalized vector which origin is point
+ */
 struct Plane
 {
   Vector3 point;
   Vector3 normal;
 };
 
+/**
+ * EDGE
+ *
+ * - a : starting point
+ * - b : ending point
+ */
 struct Edge
 {
   Vector3 a;
   Vector3 b;
 };
 
+/**
+ * POLYGON
+ *
+ * - size : number of vertices forming the polygon
+ * - points : array of points ordered clockwise
+ */
 struct Polygon
 {
   int size;
-  Vector3* points;
+  Vector3 point;
 };
 
+/**
+ * CUSTOM VERTEX
+ *
+ * - id : unique key within a custom rigid body
+ * - localPosition : vector from the center of mass of the body
+ * - absPosition : vector from the origin of the simulation world
+ * - mass : mass of the vertex
+ */
 struct CustomVertex
 {
   int id;
@@ -35,54 +61,20 @@ struct CustomVertex
   double mass;
 };
 
+/**
+ * CUSTOM POLYGON
+ *
+ * - size : number of vertices forming the polygon
+ * - vertices_p : array of pointers to vertices ordered clowise
+ */
 struct CustomPolygon
 {
   int size;
   CustomVertex** vertices_p;
 
-  std::vector<Edge> getEdges()
-  {
-    std::vector<Edge> edges;
-
-    for(int i = 0; i < size - 1; ++i)
-    {
-      Edge s = {vertices_p[i]->absPosition, vertices_p[i + 1]->absPosition};
-      edges.push_back(s);
-    }
-
-    Edge s = {vertices_p[size - 1]->absPosition, vertices_p[0]->absPosition};
-    edges.push_back(s);
-
-    return edges;
-  }
-
-  Vector3 getNormal()
-  {
-    Vector3 v1 = vertices_p[0]->absPosition - vertices_p[1]->absPosition;
-    Vector3 v2 = vertices_p[1]->absPosition - vertices_p[2]->absPosition;
-
-    return (v1 ^ v2).normalize();
-  }
-
-  Plane getPlane()
-  {
-    Plane sp;
-
-    sp.point = vertices_p[0]->absPosition;
-    sp.normal = getNormal();
-
-    return sp;
-  }
-
-  Vector3 getCenter()
-  {
-    Vector3 center;
-
-    for(int i = 0; i < size; ++i)
-      center += vertices_p[i]->absPosition;
-
-    return center / size;
-  }
+  std::vector<Edge> getEdges() const;
+  Plane getPlane() const;
+  Vector3 getNormal() const;
 };
 
 namespace Geometry
@@ -92,9 +84,9 @@ namespace Geometry
   Vector3 closestPointOfPolygon(Vector3 p, Polygon polygon, double* distance_p = NULL);
   Vector3 closestPointOfSphere(Vector3 p, Sphere sphere, double* distance_p = NULL);
 
-  Vector3 closestPoints(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
-
-  std::vector<CustomVertex> getContactingVertices(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance);
+  Vector3 supportPoint(std::vector<Vector3> points, Vector3 direction);
+  std::vector<Vector3> minkowskiDifference(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
+  Vector3 gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
 };
 
 #endif

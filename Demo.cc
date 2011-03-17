@@ -33,6 +33,15 @@ void testGeometry()
   std::cout << Geometry::closestPointOfSphere(Vector3(3,3,0), s) << std::endl;
 }
 
+void testGJK()
+{
+  Cube* c1 = new Cube(2);
+  Cube* c2 = new Cube(2);
+  c2->setPosition(5, 0, 0);
+
+  std::cout << Geometry::gjkDistanceBetweenPolyhedra(c1, c2) << std::endl;
+}
+
 void compareRK4ToEuler()
 {
   double dt = 0.0166;

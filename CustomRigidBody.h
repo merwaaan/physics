@@ -10,6 +10,8 @@ struct Structure
 {
   std::vector<CustomVertex> vertices;
   std::vector<CustomPolygon> polygons;
+
+  Vector3 getSupportPoint(Vector3 direction) const;
 };
 
 class CustomRigidBody : public RigidBody

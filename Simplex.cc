@@ -12,26 +12,8 @@ Simplex::~Simplex()
 {
 }
 
-void Simplex::addSupportPoint(CustomRigidBody* rb_p, Vector3 point)
+void Simplex::addSupportPoint(Vector3 support)
 {
-  Vector3 direction = Vector3(0, 0, 0) - point; 
-
-  Vector3 support;
-  Vector3 distance;
-
-  for(int i = 0; i < rb_p->structure.vertices.size(); ++i)
-  {
-    Vector3 projection = (rb_p->structure.vertices[i].absPosition, direction);
-
-    if(projection.length() > distance.length())
-    {
-      distance = projection;
-      support = projection;
-    }
-  }
-
-  this->reduce(support);
-
   this->points.push_back(support);
 }
 

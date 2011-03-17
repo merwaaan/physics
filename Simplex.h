@@ -16,10 +16,9 @@ class Simplex
     Simplex();
     ~Simplex();
 
-    void addSupportPoint(CustomRigidBody* rb_p, Vector3 direction);
+    void addSupportPoint(Vector3 support);
     void reduce(Vector3 point);
-
-    Vector3 closestPointFromOrigin() const;
+    Vector3 closestPointToOrigin() const;
 
     Vector3 getPoint() const;
     Edge getEdge() const;

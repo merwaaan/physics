@@ -10,6 +10,24 @@
 extern Display* display_pg;
 extern Engine* engine_pg;
 
+/**
+ * Return the best support point along a direction
+ */
+Vector3 Structure::getSupportPoint(Vector3 direction) const
+{
+  int bestIndex = 0;
+  double bestLength = this->vertices[0].absPosition * direction;
+
+  for(int i = 1; i < this->vertices.size(); ++i)
+    if(this->vertices[i].absPosition * direction > bestLength)
+    {
+      bestIndex = i;
+      bestLength = this->vertices[i].absPosition * direction;
+    }
+
+  return this->vertices[bestIndex].absPosition;
+}
+
 CustomRigidBody::CustomRigidBody()
 {
 }
@@ -216,12 +234,11 @@ bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
 
 Contact* CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double dt, double tolerance)
 {
-  // find the contacting vertices
-  std::vector<CustomVertex> contactingVertices = Geometry::getContactingVertices(this, rb_p, tolerance);
-  std::cout << contactingVertices.size() << " contacting vertices" << std::endl;
-
+  // find the distance between the two bodies
+  Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
+/*
   // if the bodies are too far apart, integrate forward in time
-  if(contactingVertices.size() == 0)
+  if(distance.length() > tolerance)
   {
     std::cout << "going forward" << std::endl;
     this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
@@ -232,7 +249,7 @@ Contact* CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double 
     return this->resolveInterPenetration(rb_p, dt / 2, tolerance);
   }
   // else if the bodies are inter-penetrating, integrate backward in time
-  else if(!this->findSeparationPlane(rb_p) && !rb_p->findSeparationPlane(this))
+  else if(distance.length() < tolerance)
   {
     std::cout << "going backward" << std::endl;
     this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
@@ -249,11 +266,14 @@ Contact* CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double 
   {
     std::cout << "OK!" << std::endl;
     Contact* contact_p = new Contact;
+
     contact_p->a = this;
     contact_p->b = rb_p;
     contact_p->position = contactingVertices[0].absPosition;
     contact_p->normal = (rb_p->position - contactingVertices[0].absPosition).normalize();
-  }
+
+    return contact_p;
+  }*/
 }
 
 CustomVertex* CustomRigidBody::getVertexById_p(int id)

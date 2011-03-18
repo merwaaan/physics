@@ -17,6 +17,7 @@ class Vector3
     Vector3(double x, double y, double z);
     ~Vector3();
 
+    bool operator==(const Vector3& v) const;
     Vector3 operator+(const Vector3& v) const;
     Vector3& operator+=(const Vector3& v);
     Vector3 operator-(const Vector3& v) const;

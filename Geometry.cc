@@ -198,8 +198,38 @@ Vector3 Geometry::supportPoint(std::vector<Vector3> points, Vector3 direction)
 }
 
 /**
- * Return a set of points describing the convex hull of the Minkowski difference
- * between two bodies
+ * Return a set of points describing the convex hull of the original set of points
+ */
+std::vector<Vector3> Geometry::convexHull(std::vector<Vector3> points)
+{
+  // compute the center of the set of points
+  Vector3 center;
+  for(int i = 0; i < points.size(); ++i)
+    center += points[i];
+  center = center / points.size();
+
+  // compute the convex hull by only keeping extrem points
+  for(int i = 0; i < points.size(); ++i)
+  {
+	  Vector3 direction = center - points[i];
+
+    for(int j = 0; j < points.size(); ++j)
+    {
+	    std::cout << points[i] << points[j] << points[i] * direction << " " << points[j] * direction << std::endl;
+	    if(i != j && points[i] * direction <= points[j] * direction)
+      {
+	      points.erase(points.begin() + i--);
+	      std::cout << "ELIMINATED!" << std::endl;
+        break;
+      }
+    }
+  }
+
+  return points;
+}
+
+/**
+ * Return a set of points describing the Minkowski difference between two bodies
  */
 std::vector<Vector3> Geometry::minkowskiDifference(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p)
 {
@@ -209,32 +239,7 @@ std::vector<Vector3> Geometry::minkowskiDifference(CustomRigidBody* rb1_p, Custo
     for(int j = 0; j < rb2_p->structure.vertices.size(); ++j)
       points.push_back(rb2_p->structure.vertices[j].absPosition - rb1_p->structure.vertices[i].absPosition);
 
-  // compute the center of this set of points
-  Vector3 center;
-  for(int i = 0; i < points.size(); ++i)
-    center += points[i];
-  center = center / points.size();
-
-  // compute the convex hull by only keeping extrem points
-  std::vector<int> pointsToBeRemoved;
-  for(int i = 0; i < points.size(); ++i)
-  {
-    Vector3 direction = points[i] - center;
-
-    for(int j = 0; j < points.size(); ++j)
-    {
-      if(i != j && points[i] * direction <= points[j] * direction)
-      {
-        pointsToBeRemoved.push_back(i);
-        break;
-      }
-    }
-  }
-
-  for(int i = 0; i < pointsToBeRemoved.size(); ++i)
-    points.erase(points.begin() + pointsToBeRemoved[i]);
-
-  return points;
+  return Geometry::convexHull(points);
 }
 
 Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p)

@@ -2,14 +2,6 @@
 
 #include "CustomRigidBody.h"
 
-Simplex::Simplex()
-{
-}
-
-Simplex::~Simplex()
-{
-}
-
 void Simplex::reduce(Vector3 closest)
 {
   // the simplex only has one point : it is already in his minimal form
@@ -19,10 +11,8 @@ void Simplex::reduce(Vector3 closest)
   // the simplex has two points : the edge can de reduced to a single vertex
   if(this->points.size() == 2)
   {
-    if(this->points[0] == closest)
-      this->points.erase(this->points.begin() + 1);
-    else if(this->points[1] == closest)
-      this->points.erase(this->points.begin());
+    if(this->points[1] == closest)
+	    this->points.erase(this->points.begin());
   }
 
   // the simplex has three points : the face can de reduced to an edge
@@ -52,16 +42,15 @@ Vector3 Simplex::closestPointToOrigin() const
     return Geometry::closestPointOfEdge(Vector3(0, 0, 0), e);
   }
 
-  // the simplex has three points : find the closest point on the tetrahedron formed by theses vertices
+  // the simplex has three points : find the closest point on the triangle formed by theses vertices
   if(this->points.size() == 3)
   {
-    Polygon polygon;
-    polygon.size = 3; 
-    polygon.points.push_back(this->points[0]);
-    polygon.points.push_back(this->points[1]);
-    polygon.points.push_back(this->points[2]);
+	  Triangle triangle;
+	  triangle.a = this->points[0];
+	  triangle.b = this->points[1];
+    triangle.c = this->points[2];
 
-    return Geometry::closestPointOfPolygon(Vector3(0, 0, 0), polygon);
+    return Geometry::closestPointOfTriangle(Vector3(0, 0, 0), triangle);
   }
   
   // the simplex has four points : find the closest point on the tetrahedron formed by these vertices

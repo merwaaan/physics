@@ -22,6 +22,13 @@ Vector3::~Vector3()
 {
 }
 
+bool Vector3::operator==(const Vector3& v) const
+{
+	double tolerance = 0.001;
+
+	return (*this - v).length() < tolerance;
+}
+
 Vector3 Vector3::operator+(const Vector3& v) const
 {
   Vector3 result;

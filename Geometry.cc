@@ -208,22 +208,26 @@ std::vector<Vector3> Geometry::convexHull(std::vector<Vector3> points)
     center += points[i];
   center = center / points.size();
 
+  // center the points around the origin
+  for(int i = 0; i < points.size(); ++i)
+    points[i] -= center;
+
   // compute the convex hull by only keeping extrem points
   for(int i = 0; i < points.size(); ++i)
   {
-	  Vector3 direction = center - points[i];
-
     for(int j = 0; j < points.size(); ++j)
     {
-	    std::cout << points[i] << points[j] << points[i] * direction << " " << points[j] * direction << std::endl;
-	    if(i != j && points[i] * direction <= points[j] * direction)
+	    if(i != j && points[i] * points[i] <= points[i] * points[j])
       {
 	      points.erase(points.begin() + i--);
-	      std::cout << "ELIMINATED!" << std::endl;
         break;
       }
     }
   }
+
+  // put back the remaining points to their original positions
+  for(int i = 0; i < points.size(); ++i)
+    points[i] += center;
 
   return points;
 }

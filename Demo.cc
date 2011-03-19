@@ -56,7 +56,7 @@ void testGJK()
   for(int i = 0; i < m.size(); ++i)
     std::cout << m[i] << std::endl;
 
-  std::cout << "DISTANCE : " << Geometry::gjkDistanceBetweenPolyhedra(c1, c2) << std::endl;
+  std::cout << "DISTANCE" << Geometry::gjkDistanceBetweenPolyhedra(c1, c2) << std::endl;
 }
 
 void compareRK4ToEuler()

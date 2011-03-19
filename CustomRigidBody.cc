@@ -203,10 +203,12 @@ Contact* CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
   {
     std::cout << "separation plane found" << std::endl;
+    usleep(1000000);
     return NULL;
   }
 
   std::cout << "no separation plane" << std::endl;
+    usleep(1000000);
   return this->resolveInterPenetration(rb_p, dt, tolerance);
 }
 
@@ -220,14 +222,16 @@ bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
     // check if all the vertices of the second body are outside of the separation plane
     for(int j = 0; j < rb_p->structure.vertices.size(); ++j)
     {
-      double dis;
-      Geometry::closestPointOfPlane(rb_p->structure.vertices[j].absPosition, sp, &dis);
-      std::cout << "distance from sp " << i << " " << j << " " << dis << std::endl;
-
-      if(dis <= 0)
+      double distance;
+      Geometry::closestPointOfPlane(rb_p->structure.vertices[j].absPosition, sp, &distance);
+      std::cout << i << " " << distance << std::endl;
+      if(distance <= 0)
         break;
       else if(j == rb_p->structure.vertices.size() - 1)
+      {
+        std::cout << sp.point << sp.normal << std::endl;
         return true;
+      }
     }
   }
 
@@ -238,7 +242,8 @@ Contact* CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double 
 {
   // find the distance between the two bodies
   Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
-/*
+  std::cout << distance.length() << tolerance << std::endl;
+  usleep(1000000);
   // if the bodies are too far apart, integrate forward in time
   if(distance.length() > tolerance)
   {
@@ -271,11 +276,11 @@ Contact* CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double 
 
     contact_p->a = this;
     contact_p->b = rb_p;
-    contact_p->position = contactingVertices[0].absPosition;
-    contact_p->normal = (rb_p->position - contactingVertices[0].absPosition).normalize();
+    contact_p->position = Vector3(0,2,0);//contactingVertices[0].absPosition;
+    contact_p->normal = Vector3(0,1,0);//(rb_p->position - contactingVertices[0].absPosition).normalize();
 
     return contact_p;
-  }*/
+  }
 }
 
 CustomVertex* CustomRigidBody::getVertexById_p(int id)

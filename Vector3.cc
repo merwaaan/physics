@@ -121,9 +121,9 @@ Vector3 Vector3::operator^(const Vector3& v) const
   Vector3 result;
 
   result.x = this->y * v.z - this->z * v.y;
-  result.y = this->x * v.z - this->z * v.x;
+  result.y = this->z * v.x - this->x * v.z;
   result.z = this->x * v.y - this->y * v.x;
-  
+
   return result;
 }
 

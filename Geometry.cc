@@ -91,11 +91,11 @@ Vector3 Geometry::closestPointOfEdge(Vector3 point, Edge edge, double* distance_
  */
 Vector3 Geometry::closestPointOfPlane(Vector3 point, Plane plane, double* distance_p)
 {
-  Vector3 closest = point - plane.normal * (plane.normal * (point - plane.point));
+  double t = plane.normal * (point - plane.point);
+  Vector3 closest = point - (t * plane.normal);
 
   if(distance_p != NULL)
-    *distance_p = (closest - point).length();
-    //*distance_p = -(plane.normal * (plane.point - p)) / plane.normal.length();
+    *distance_p = t;
 
   return closest;
 }
@@ -106,7 +106,7 @@ Vector3 Geometry::closestPointOfPlane(Vector3 point, Plane plane, double* distan
 Vector3 Geometry::closestPointOfTriangle(Vector3 point, Triangle triangle, double* distance_p)
 {
   // project the point onto the plane extending the triangle
-  Plane plane = {triangle.a, ((triangle.a - triangle.b) ^ (triangle.b - triangle.c)).normalize()};
+  Plane plane = {triangle.a, ((triangle.b - triangle.a) ^ (triangle.c - triangle.a)).normalize()};
   Vector3 projection = Geometry::closestPointOfPlane(point, plane);
 
   // if the projection lies within the triangle border, the closest point is the projection
@@ -123,15 +123,17 @@ Vector3 Geometry::closestPointOfTriangle(Vector3 point, Triangle triangle, doubl
   Vector3 pbc = Geometry::closestPointOfEdge(point, bc, &dbc);
   Vector3 pca = Geometry::closestPointOfEdge(point, ca, &dca);
 
-  Vector3 closest;
-  double closestDistance;
-  if(dab < dbc)
+  Vector3 closest = pab;
+  double closestDistance = dab;
+  if(dbc < closestDistance)
   {
-    closest = pab;
-    closestDistance = dab;
+    closest = pbc;
+    closestDistance = dbc;
   }
- 
-  return dca < closestDistance ? pca : closest;
+  if(dca < closestDistance)
+    closest = pca;
+
+  return closest;
 }
 
 /**
@@ -251,14 +253,15 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
   // compute the convex hull of the Minkowski difference
   std::vector<Vector3> minkowski = Geometry::minkowskiDifference(rb1_p, rb2_p);
 
-  // initialize the simplex to a random point
+  // initialize the simplex to a random point and start the search from it
   Simplex simplex; 
   simplex.points.push_back(minkowski[0]);
 
+  Vector3 closest = simplex.points[0];
+  
   while(true)
   {
     // find the closest point to the origin and a support point along its direction to the origin
-    Vector3 closest = simplex.closestPointToOrigin();
     Vector3 directionToOrigin = Vector3(0, 0, 0) - closest;
     Vector3 support = Geometry::supportPoint(minkowski, directionToOrigin);
 
@@ -269,6 +272,8 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
 
     // add the support point to the simplex
     simplex.points.push_back(support);
+
+    closest = simplex.closestPointToOrigin();
 
     // reduce the simplex to a minimum simplex by getting rid of the vertices which
     // are not part of the definition of the new support point

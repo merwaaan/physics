@@ -165,12 +165,12 @@ int main(int argc, char** argv)
   glutKeyboardFunc(&input);
   
   //testGeometry();
-  testGJK();
+  //testGJK();
   //testTimeReversing();
   //compareRK4ToEuler();
 
   //demoSimpleBox();
-  //demoMultiBox();
+  demoMultiBox();
   //demoMultiBall();
 
   delete e;

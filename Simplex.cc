@@ -18,7 +18,13 @@ void Simplex::reduce(Vector3 closest)
   // the simplex has three points : the face can de reduced to an edge
   if(this->points.size() == 3)
   {
+    double distance;
+    Edge edge = {this->points[1], this->points[2]};
+    Geometry::closestPointOfEdge(closest, edge, &distance);
 
+    if(distance < 0.01)
+      this->points.erase(this->points.begin());
+    std::cout << distance << std::endl;
   }
 
   // the simplex has four points : the tetrahedron can be reduced to a face
@@ -37,18 +43,15 @@ Vector3 Simplex::closestPointToOrigin() const
   // the simplex has two points : find the closest point on the edge formed by these vertices
   if(this->points.size() == 2)
   {
-    Edge e = {this->points[0], this->points[1]};
+    Edge edge = {this->points[0], this->points[1]};
 
-    return Geometry::closestPointOfEdge(Vector3(0, 0, 0), e);
+    return Geometry::closestPointOfEdge(Vector3(0, 0, 0), edge);
   }
 
   // the simplex has three points : find the closest point on the triangle formed by theses vertices
   if(this->points.size() == 3)
   {
-	  Triangle triangle;
-	  triangle.a = this->points[0];
-	  triangle.b = this->points[1];
-    triangle.c = this->points[2];
+	  Triangle triangle = {this->points[0], this->points[1], this->points[2]};
 
     return Geometry::closestPointOfTriangle(Vector3(0, 0, 0), triangle);
   }
@@ -56,15 +59,11 @@ Vector3 Simplex::closestPointToOrigin() const
   // the simplex has four points : find the closest point on the tetrahedron formed by these vertices
   if(this->points.size() == 4)
   {
-    Tetrahedron tetrahedron;
     Triangle a = {this->points[0], this->points[1], this->points[2]};
     Triangle b = {this->points[0], this->points[1], this->points[3]};
     Triangle c = {this->points[0], this->points[2], this->points[3]};
     Triangle d = {this->points[1], this->points[2], this->points[3]};
-    tetrahedron.a = a;
-    tetrahedron.b = b;
-    tetrahedron.c = c;
-    tetrahedron.d = d;
+    Tetrahedron tetrahedron = {a, b, c, d};
 
     return Geometry::closestPointOfTetrahedron(Vector3(0, 0, 0), tetrahedron);
   }

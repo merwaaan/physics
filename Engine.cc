@@ -36,13 +36,14 @@ void Engine::update()
   {
     std::cout << "---------------------------------------" << std::endl;
     std::cout << "Simulation time = " << this->simulationTime << "s" << std::endl;
+
     std::cout << std::endl << "COLLISION" << std::endl;
 
     // check for collisions
     for(int i = 1; i < this->bodies_p.size(); ++i)
       for(int j = 0; j < i; ++j)
       {
-        // bounding boxes test
+        // broad-phase test
         if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
         {
           std::cout << "Bounding box collision between " << i << " and " << j << std::endl;

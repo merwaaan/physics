@@ -44,7 +44,17 @@ void testGeometry()
 
 void testGJK()
 {
-  Cube* c1 = new Cube(2);
+  std::vector<Vector3> points;
+  points.push_back(Vector3(2,-2,2));
+  points.push_back(Vector3(-2,-2,2));
+  points.push_back(Vector3(0,2,2));
+  points.push_back(Vector3(0,0,-2));
+
+  std::cout << Geometry::isInsideConvexHull(Vector3(0,0,0), points) << std::endl;
+  std::cout << Geometry::isInsideConvexHull(Vector3(0, 0, 4), points) << std::endl;
+  std::cout << Geometry::isInsideConvexHull(Vector3(), points) << std::endl;
+
+  /*  Cube* c1 = new Cube(2);
   c1->prepare();
 
   Cube* c2 = new Cube(2);
@@ -57,7 +67,7 @@ void testGJK()
     std::cout << m[i] << std::endl;
 
   std::cout << "DISTANCE" << Geometry::gjkDistanceBetweenPolyhedra(c1, c2) << std::endl;
-}
+*/}
 
 void compareRK4ToEuler()
 {
@@ -144,7 +154,7 @@ void demoSimpleBox()
 void demoMultiBox()
 {
 	Cube* c = new Cube(2);
-  c->angularMomentum = Vector3(3, 3, 0);
+  //c->angularMomentum = Vector3(3, 3, 0);
   c->setPosition(0, 5, 0);
   e->addRigidBody_p(c);
 
@@ -165,12 +175,12 @@ int main(int argc, char** argv)
   glutKeyboardFunc(&input);
   
   //testGeometry();
-  //testGJK();
+  testGJK();
   //testTimeReversing();
   //compareRK4ToEuler();
 
   //demoSimpleBox();
-  demoMultiBox();
+  //demoMultiBox();
   //demoMultiBall();
 
   delete e;

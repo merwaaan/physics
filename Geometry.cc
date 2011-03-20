@@ -14,6 +14,21 @@ bool Geometry::areOnTheSameSide(Vector3 p1, Vector3 p2, Vector3 a, Vector3 b)
 }
 
 /**
+ * Return the position of the center of a given set of points
+ */
+Vector3 Geometry::centerOfPoints(std::vector<Vector3> points)
+{
+  Vector3 center;
+
+  for(int i = 0; i < points.size(); ++i)
+    center += points[i];
+  
+  center = center / points.size();
+
+  return center;
+}
+
+/**
  * Return true if a point lies inside a triangle
  */
 bool Geometry::isInsideTriangle(Vector3 point, Triangle triangle)
@@ -23,6 +38,40 @@ bool Geometry::isInsideTriangle(Vector3 point, Triangle triangle)
     Geometry::areOnTheSameSide(point, triangle.a, triangle.b, triangle.c) &&
     Geometry::areOnTheSameSide(point, triangle.b, triangle.a, triangle.c) &&
     Geometry::areOnTheSameSide(point, triangle.c, triangle.b, triangle.a);
+}
+
+/**
+ * Return true if a point lies inside the convex hull given by a set of points
+ */
+bool Geometry::isInsideConvexHull(Vector3 point, std::vector<Vector3> hull)
+{
+  Vector3 center = Geometry::centerOfPoints(hull);
+
+  // center the points around the origin
+  for(int i = 0; i < hull.size(); ++i)
+    hull[i] -= center;
+  point -= center;
+  std::cout << "center " << center << std::endl;
+
+  for(int i = 0; i < hull.size(); ++i)
+  {
+    std::cout << point << hull[i] << hull[i] * point << " " << hull[i] * hull[i] << std::endl;
+
+	  if(hull[i] * point > hull[i] * hull[i])
+    {
+      // put back the remaining points to their original positions
+      for(int i = 0; i < hull.size(); ++i)
+        hull[i] += center;
+      point += center;
+      return false;
+    }
+  }
+
+  // put back the remaining points to their original positions
+  for(int i = 0; i < hull.size(); ++i)
+    hull[i] += center;
+  point += center;
+  return true;
 }
 
 /**
@@ -87,7 +136,7 @@ Vector3 Geometry::closestPointOfEdge(Vector3 point, Edge edge, double* distance_
 }
 
 /**
- * Return the closest point of a plane to a point point p
+ * Return the closest point of a plane to a point p
  */
 Vector3 Geometry::closestPointOfPlane(Vector3 point, Plane plane, double* distance_p)
 {
@@ -205,10 +254,7 @@ Vector3 Geometry::supportPoint(std::vector<Vector3> points, Vector3 direction)
 std::vector<Vector3> Geometry::convexHull(std::vector<Vector3> points)
 {
   // compute the center of the set of points
-  Vector3 center;
-  for(int i = 0; i < points.size(); ++i)
-    center += points[i];
-  center = center / points.size();
+  Vector3 center = Geometry::centerOfPoints(points);
 
   // center the points around the origin
   for(int i = 0; i < points.size(); ++i)
@@ -248,23 +294,29 @@ std::vector<Vector3> Geometry::minkowskiDifference(CustomRigidBody* rb1_p, Custo
   return Geometry::convexHull(points);
 }
 
-Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p)
+Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool* interPenetration_p)
 {
   // compute the convex hull of the Minkowski difference
   std::vector<Vector3> minkowski = Geometry::minkowskiDifference(rb1_p, rb2_p);
+
+  // if the origin lies inside the convex hull of the Minkowski difference, the
+  // two bodies are inter-penetrating
+  if(interPenetration_p != NULL)
+    *interPenetration_p = Geometry::isInsideConvexHull(Vector3(0, 0, 0), minkowski) ? true : false;
 
   // initialize the simplex to a random point and start the search from it
   Simplex simplex; 
   simplex.points.push_back(minkowski[0]);
 
   Vector3 closest = simplex.points[0];
-  
+  //std::cout << "start " << closest << std::endl; 
   while(true)
   {
     // find the closest point to the origin and a support point along its direction to the origin
     Vector3 directionToOrigin = Vector3(0, 0, 0) - closest;
     Vector3 support = Geometry::supportPoint(minkowski, directionToOrigin);
-
+    //std::cout << "direction " << directionToOrigin << std::endl;
+    //std::cout << "support " << support << std::endl;
     // terminate when the support point is already contained within the simplex
     for(int i = 0; i < simplex.points.size(); ++i)
       if(simplex.points[i] == support)
@@ -274,10 +326,13 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
     simplex.points.push_back(support);
 
     closest = simplex.closestPointToOrigin();
+    //std::cout << "closest " << closest << std::endl;
 
     // reduce the simplex to a minimum simplex by getting rid of the vertices which
     // are not part of the definition of the new support point
+    //std::cout << "b " << simplex.points.size() << std::endl;
     simplex.reduce(closest);
+    //std::cout << "a " << simplex.points.size() << std::endl;
   }
 }
 

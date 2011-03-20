@@ -113,9 +113,9 @@ void update()
     // draw each rigid body
     for(int i = 0; i < engine_p->getBodyCount(); ++i)
 	    engine_p->getBody_p(i)->draw();
-    
-    glutSwapBuffers();
 
+    glutSwapBuffers();
+    
     display_pg->lastUpdateTime = display_pg->getLocalTime();
   }
 

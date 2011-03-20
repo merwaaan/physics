@@ -11,7 +11,7 @@ extern Display* display_pg;
 extern Engine* engine_pg;
 
 /**
- * Return the best support point along a direction
+ * Return the best support point along a given direction
  */
 Vector3 Structure::getSupportPoint(Vector3 direction) const
 {
@@ -38,6 +38,9 @@ CustomRigidBody::~CustomRigidBody()
     delete[] this->structure.polygons[i].vertices_p;
 }
 
+/**
+ * Add a vertex to the structure of the rigid body
+ */
 void CustomRigidBody::addVertex(int id, double x, double y, double z, double m)
 {
   CustomVertex v;
@@ -48,6 +51,9 @@ void CustomRigidBody::addVertex(int id, double x, double y, double z, double m)
   this->structure.vertices.push_back(v);
 }
 
+/**
+ * Add a polygon to the structure of the rigid body
+ */
 void CustomRigidBody::addPolygon(int count, int* ids)
 {
   CustomPolygon p;
@@ -61,6 +67,9 @@ void CustomRigidBody::addPolygon(int count, int* ids)
   this->structure.polygons.push_back(p);
 }
 
+/**
+ * Prepare the rigid body for the simulation by precomputing some variables
+ */
 void CustomRigidBody::prepare()
 {
   if(this->fixed)
@@ -75,8 +84,13 @@ void CustomRigidBody::prepare()
   }
 
   this->computeVerticesAbsolutePositions();
+  this->computeBoundingBox();
 }
 
+/**
+ * Compute the position of the center of mass with respect to the vertices positions and
+ * to their mass
+ */
 void CustomRigidBody::computeCenterOfMass()
 {
   double totalMass = 0;
@@ -99,9 +113,13 @@ void CustomRigidBody::computeInverseInertiaTensor()
   // TODO
 }
 
+/**
+ * Compute the axis-aligned bounding box
+ */
 void CustomRigidBody::computeBoundingBox()
 {
   double minx, miny, minz, maxx, maxy, maxz;
+
   minx = miny = minz = std::numeric_limits<double>::max();
   maxx = maxy = maxz = -minx;
 
@@ -125,18 +143,24 @@ void CustomRigidBody::computeBoundingBox()
       maxz = pos.Z();
   }
 
-  this->boundingBox.a = Vector3(minx, miny, minz);
-  this->boundingBox.b = Vector3(maxx, maxy, maxz);
+  this->boundingBox.a = Vector3(minx - 1, miny - 1, minz - 1);
+  this->boundingBox.b = Vector3(maxx + 1, maxy + 1, maxz + 1);
 }
 
-void CustomRigidBody::integrate(double t)
+/**
+ * Integrate the state of the rigid body
+ */
+void CustomRigidBody::integrate(double dt)
 {
-  RigidBody::integrate(t);
+  RigidBody::integrate(dt);
 
   this->computeVerticesAbsolutePositions();
   this->computeBoundingBox();
 }
 
+/**
+ * Draw the body
+ */
 void CustomRigidBody::draw()
 {
   // draw each polygon
@@ -179,39 +203,57 @@ void CustomRigidBody::draw()
   }
 }
 
+/**
+ * Compute the vertices absolute positions with respect to their local positions and to
+ * the position of the center of mass and the orientation of the body
+ */
 void CustomRigidBody::computeVerticesAbsolutePositions()
 {
   for(int i = 0; i < this->structure.vertices.size(); ++i)
     this->structure.vertices[i].absPosition = this->orientation * this->structure.vertices[i].localPosition + this->position;
 }
 
+/**
+ * Double-dispatch
+ */
 Contact* CustomRigidBody::isCollidingWith(RigidBody* rb_p, double dt)
 {
   return rb_p->isCollidingWith(this, dt);
 }
 
+/**
+ * Check for a collision with a sphere
+ */
 Contact* CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
 {
   return NULL;
 }
 
+/**
+ * Check for a collision with a custom rigid body
+ */
 Contact* CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
+  Vector3 d = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
+  std::cout << "DIST " << d <<" " << d.length() <<  std::endl;
   double tolerance = 0.01;
 
   // if at least one separation plane exists, there is no collision
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
   {
     std::cout << "separation plane found" << std::endl;
-    usleep(1000000);
+
     return NULL;
   }
 
   std::cout << "no separation plane" << std::endl;
-    usleep(1000000);
+
   return this->resolveInterPenetration(rb_p, dt, tolerance);
 }
 
+/**
+ * Return true if a separation plane exists between the two bodies
+ */
 bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
 {
   // compute a separation plane along each polygon of the first body
@@ -224,28 +266,42 @@ bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
     {
       double distance;
       Geometry::closestPointOfPlane(rb_p->structure.vertices[j].absPosition, sp, &distance);
-      std::cout << i << " " << distance << std::endl;
-      if(distance <= 0)
+
+      if(distance < 0)
         break;
       else if(j == rb_p->structure.vertices.size() - 1)
-      {
-        std::cout << sp.point << sp.normal << std::endl;
         return true;
-      }
     }
   }
 
   return false;
 }
 
+/**
+ * Determine the exact contact point by integrating backward in time
+ */
 Contact* CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double dt, double tolerance)
 {
   // find the distance between the two bodies
+  bool interPenetration = !this->findSeparationPlane(rb_p) && !rb_p->findSeparationPlane(this);
   Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
-  std::cout << distance.length() << tolerance << std::endl;
-  usleep(1000000);
+
+  std::cout << "p=" << interPenetration << " d=" << distance.length() << " t=" << tolerance << " dt=" << dt << std::endl;
+
+  // if bodies are within the tolerance area, compute the real contact points
+  if(distance.length() < tolerance)
+  {
+    Contact* contact_p = new Contact;
+
+    contact_p->a = this;
+    contact_p->b = rb_p;
+    contact_p->position = Vector3(0,2,0);//contactingVertices[0].absPosition;
+    contact_p->normal = Vector3(0,1,0);//(rb_p->position - contactingVertices[0].absPosition).normalize();
+
+    return contact_p;
+  }
   // if the bodies are too far apart, integrate forward in time
-  if(distance.length() > tolerance)
+  else if(!interPenetration)
   {
     std::cout << "going forward" << std::endl;
     this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
@@ -256,7 +312,7 @@ Contact* CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double 
     return this->resolveInterPenetration(rb_p, dt / 2, tolerance);
   }
   // else if the bodies are inter-penetrating, integrate backward in time
-  else if(distance.length() < tolerance)
+  else
   {
     std::cout << "going backward" << std::endl;
     this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
@@ -268,21 +324,11 @@ Contact* CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double 
 
     return this->resolveInterPenetration(rb_p, dt / 2, tolerance);
   }
-  // else if bodies are within the tolerance zone, compute the real contact points
-  else
-  {
-    std::cout << "OK!" << std::endl;
-    Contact* contact_p = new Contact;
-
-    contact_p->a = this;
-    contact_p->b = rb_p;
-    contact_p->position = Vector3(0,2,0);//contactingVertices[0].absPosition;
-    contact_p->normal = Vector3(0,1,0);//(rb_p->position - contactingVertices[0].absPosition).normalize();
-
-    return contact_p;
-  }
 }
 
+/**
+ * Return the vertex with the given key
+ */
 CustomVertex* CustomRigidBody::getVertexById_p(int id)
 {
   for(int i = 0; i < this->structure.vertices.size(); ++i)

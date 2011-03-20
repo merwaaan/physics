@@ -4,7 +4,7 @@
 
 void Simplex::reduce(Vector3 closest)
 {
-  // the simplex only has one point : it is already in his minimal form
+  // the simplex only has one point : it is already in his minimum form
   if(this->points.size() == 1)
     return;
 
@@ -18,13 +18,18 @@ void Simplex::reduce(Vector3 closest)
   // the simplex has three points : the face can de reduced to an edge
   if(this->points.size() == 3)
   {
-    double distance;
     Edge edge = {this->points[1], this->points[2]};
+
+    double distance;
     Geometry::closestPointOfEdge(closest, edge, &distance);
 
     if(distance < 0.01)
+    {
       this->points.erase(this->points.begin());
-    std::cout << distance << std::endl;
+
+      // recursively call the reduction method so that the previous cases can be tested
+      this->reduce(closest);
+    }
   }
 
   // the simplex has four points : the tetrahedron can be reduced to a face

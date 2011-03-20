@@ -34,6 +34,9 @@ void Sphere::prepare()
   this->computeBoundingBox();
 }
 
+/**
+ * Compute the inverse inertia tensor
+ */
 void Sphere::computeInverseInertiaTensor()
 {
   double i = (2.0 / 5) * (1 / this->inverseMass) * this->radius * this->radius;
@@ -46,6 +49,9 @@ void Sphere::computeInverseInertiaTensor()
   this->inverseInertiaTensor = inertiaTensor.inverse();
 }
 
+/**
+ * Compute the bounding box
+ */
 void Sphere::computeBoundingBox()
 {
   this->boundingBox.a = this->position + Vector3(-this->radius, -this->radius, -this->radius);
@@ -78,8 +84,11 @@ void Sphere::draw()
     glutWireCube(this->radius * 2);
 
   glPopMatrix();
- }
+}
 
+/**
+ * Double-dispatch
+ */
 Contact* Sphere::isCollidingWith(RigidBody* rb_p, double dt)
 {
   return rb_p->isCollidingWith(this, dt);
@@ -150,6 +159,9 @@ Contact* Sphere::isCollidingWith(CustomRigidBody* rb_p, double dt)
   return rb_p->isCollidingWith(this, dt);
 }
 
+/**
+ * Return the radius of the sphere
+ */
 double Sphere::getRadius() const
 {
   return this->radius;

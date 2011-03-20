@@ -58,7 +58,7 @@ struct Triangle
 
 /**
  * TETRAHEDRON
- * - a, b, c : triangles forming the tetrahedron
+ * - a, b, c, d : triangles forming the tetrahedron
  */
 struct Tetrahedron
 {
@@ -103,7 +103,10 @@ struct CustomPolygon
 namespace Geometry
 {
   bool areOnTheSameSide(Vector3 p1, Vector3 p2, Vector3 a, Vector3 b);
+  Vector3 centerOfPoints(std::vector<Vector3> points);
+  
   bool isInsideTriangle(Vector3 point, Triangle triangle);
+  bool isInsideConvexHull(Vector3 point, std::vector<Vector3> hull);
 
   Vector3 closestPointOfEdge(Vector3 point, Edge edge, double* distance_p = NULL);
   Vector3 closestPointOfPlane(Vector3 point, Plane plane, double* distance_p = NULL);
@@ -116,7 +119,7 @@ namespace Geometry
 
   std::vector<Vector3> convexHull(std::vector<Vector3> points);
   std::vector<Vector3> minkowskiDifference(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
-  Vector3 gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
+  Vector3 gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool* interPenetration_p = NULL);
 };
 
 #endif

@@ -36,12 +36,10 @@ struct Plane
 /**
  * POLYGON
  *
- * - size : number of vertices forming the polygon
  * - points : array of points ordered clockwise
  */
 struct Polygon
 {
-  int size;
   std::vector<Vector3> points;
 };
 
@@ -96,8 +94,18 @@ struct CustomPolygon
   CustomVertex** vertices_p;
 
   std::vector<Edge> getEdges() const;
+  Polygon getPolygon() const;
   Plane getPlane() const;
   Vector3 getNormal() const;
+};
+
+struct Contact
+{
+  RigidBody* a;
+  RigidBody* b;
+
+  Vector3 position;
+  Vector3 normal;
 };
 
 namespace Geometry
@@ -120,6 +128,9 @@ namespace Geometry
   std::vector<Vector3> convexHull(std::vector<Vector3> points);
   std::vector<Vector3> minkowskiDifference(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
   Vector3 gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool* interPenetration_p = NULL);
+
+  std::vector<Contact> vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance);
+  std::vector<Contact> edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance);
 };
 
 #endif

@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <sys/time.h>
 
+#include "Geometry.h"
+
 Engine* engine_pg = NULL;
 
 Engine::Engine(int* argc, char** argv, double timeStep) :
@@ -49,18 +51,19 @@ void Engine::update()
           std::cout << "Bounding box collision between " << i << " and " << j << std::endl;
 
           // accurate test
-          Contact* contact_p = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
+          std::vector<Contact> contacts = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
         
-          if(contact_p != NULL)
+          if(contacts.size() > 0)
           {
             std::cout << "Real collision between " << i << " and " << j << std::endl;
 
-            Vector3 impulse = this->computeImpulse(*contact_p);
+            for(int i = 0; i < contacts.size(); ++i)
+            {
+              Vector3 impulse = this->computeImpulse(contacts[i]);
 
-            this->bodies_p[i]->applyCenterForce(-1 * impulse, 1);
-            this->bodies_p[j]->applyCenterForce(impulse, 1);
-
-            delete contact_p;
+              this->bodies_p[i]->applyCenterForce(-1 * impulse, 1);
+              this->bodies_p[j]->applyCenterForce(impulse, 1);
+            }
           }
         }
       }

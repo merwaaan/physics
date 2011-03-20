@@ -1,12 +1,14 @@
 #ifndef RIGIDBODY_H
 #define RIGIDBODY_H
 
-#include "Vector3.h"
-#include "Matrix3.h"
+#include <vector>
 
-class Sphere;
-class CustomRigidBody;
+#include "Matrix3.h"
+#include "Vector3.h"
+
 class Contact;
+class CustomRigidBody;
+class Sphere;
 
 struct BoundingBox
 {
@@ -63,9 +65,9 @@ class RigidBody
     bool isBoundingBoxCollidingWith(RigidBody* rb_p);
     BoundingBox getBoundingBox();
     
-    virtual Contact* isCollidingWith(RigidBody* rb_p, double dt) = 0;
-    virtual Contact* isCollidingWith(Sphere* s_p, double dt) = 0;
-    virtual Contact* isCollidingWith(CustomRigidBody* rb_p, double dt) = 0;
+    virtual std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt) = 0;
+    virtual std::vector<Contact> isCollidingWith(Sphere* s_p, double dt) = 0;
+    virtual std::vector<Contact> isCollidingWith(CustomRigidBody* rb_p, double dt) = 0;
 
     void setPosition(Vector3 position);
     void setPosition(double x, double y, double z);

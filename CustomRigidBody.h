@@ -34,13 +34,13 @@ class CustomRigidBody : public RigidBody
     void draw();
     void computeVerticesAbsolutePositions();
  
-    Contact* isCollidingWith(RigidBody* rb_p, double dt);
+    std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt);
 
-    Contact* isCollidingWith(Sphere* s_p, double dt);
+    std::vector<Contact> isCollidingWith(Sphere* s_p, double dt);
 
-    Contact* isCollidingWith(CustomRigidBody* rb_p, double dt);
+    std::vector<Contact> isCollidingWith(CustomRigidBody* rb_p, double dt);
     bool findSeparationPlane(CustomRigidBody* rb_p);
-    Contact* resolveInterPenetration(CustomRigidBody* rb_p, double dt, double tolerance);
+    std::vector<Contact> resolveInterPenetration(CustomRigidBody* rb_p, double dt, double tolerance);
 
     CustomVertex* getVertexById_p(int id);
     int getPolyCount();

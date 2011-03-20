@@ -6,6 +6,59 @@
 #include "Simplex.h"
 
 /**
+ * Return a list of the edges forming the polygon perimeter
+ */
+std::vector<Edge> CustomPolygon::getEdges() const
+{
+  std::vector<Edge> edges;
+
+  for(int i = 0; i < size - 1; ++i)
+  {
+    Edge s = {this->vertices_p[i]->absPosition, this->vertices_p[i + 1]->absPosition};
+    edges.push_back(s);
+  }
+
+  Edge s = {this->vertices_p[size - 1]->absPosition, this->vertices_p[0]->absPosition};
+  edges.push_back(s);
+
+  return edges;
+}
+
+Polygon CustomPolygon::getPolygon() const
+{
+  Polygon polygon;
+
+  for(int i = 0; i < this->size; ++i)
+    polygon.points.push_back(this->vertices_p[i]->absPosition);
+
+  return polygon;
+}
+
+/**
+  * Return the plane extending the polygon
+  */
+Plane CustomPolygon::getPlane() const
+{
+  Plane sp;
+
+  sp.point = this->vertices_p[0]->absPosition;
+  sp.normal = this->getNormal();
+
+  return sp;
+}
+
+/**
+ * Return the normal of the polygon (outside-oriented)
+ */
+Vector3 CustomPolygon::getNormal() const
+{
+  Vector3 v1 = this->vertices_p[0]->absPosition - this->vertices_p[1]->absPosition;
+  Vector3 v2 = this->vertices_p[1]->absPosition - this->vertices_p[2]->absPosition;
+
+  return (v1 ^ v2).normalize();
+}
+
+/**
  * Return true if the two points are on the same side of an edge
  */
 bool Geometry::areOnTheSameSide(Vector3 p1, Vector3 p2, Vector3 a, Vector3 b)
@@ -72,49 +125,6 @@ bool Geometry::isInsideConvexHull(Vector3 point, std::vector<Vector3> hull)
     hull[i] += center;
   point += center;
   return true;
-}
-
-/**
- * Return a list of the edges forming the polygon perimeter
- */
-std::vector<Edge> CustomPolygon::getEdges() const
-{
-  std::vector<Edge> edges;
-
-  for(int i = 0; i < size - 1; ++i)
-  {
-    Edge s = {this->vertices_p[i]->absPosition, this->vertices_p[i + 1]->absPosition};
-    edges.push_back(s);
-  }
-
-  Edge s = {this->vertices_p[size - 1]->absPosition, this->vertices_p[0]->absPosition};
-  edges.push_back(s);
-
-  return edges;
-}
-
-/**
-  * Return the plane extending the polygon
-  */
-Plane CustomPolygon::getPlane() const
-{
-  Plane sp;
-
-  sp.point = this->vertices_p[0]->absPosition;
-  sp.normal = this->getNormal();
-
-  return sp;
-}
-
-/**
- * Return the normal of the polygon (outside-oriented)
- */
-Vector3 CustomPolygon::getNormal() const
-{
-  Vector3 v1 = this->vertices_p[0]->absPosition - this->vertices_p[1]->absPosition;
-  Vector3 v2 = this->vertices_p[1]->absPosition - this->vertices_p[2]->absPosition;
-
-  return (v1 ^ v2).normalize();
 }
 
 /**
@@ -190,7 +200,7 @@ Vector3 Geometry::closestPointOfTriangle(Vector3 point, Triangle triangle, doubl
  */
 Vector3 Geometry::closestPointOfPolygon(Vector3 point, Polygon polygon, double* distance_p)
 {
-  
+
 }
 
 /**
@@ -299,24 +309,18 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
   // compute the convex hull of the Minkowski difference
   std::vector<Vector3> minkowski = Geometry::minkowskiDifference(rb1_p, rb2_p);
 
-  // if the origin lies inside the convex hull of the Minkowski difference, the
-  // two bodies are inter-penetrating
-  if(interPenetration_p != NULL)
-    *interPenetration_p = Geometry::isInsideConvexHull(Vector3(0, 0, 0), minkowski) ? true : false;
-
   // initialize the simplex to a random point and start the search from it
   Simplex simplex; 
   simplex.points.push_back(minkowski[0]);
 
   Vector3 closest = simplex.points[0];
-  //std::cout << "start " << closest << std::endl; 
+
   while(true)
   {
     // find the closest point to the origin and a support point along its direction to the origin
     Vector3 directionToOrigin = Vector3(0, 0, 0) - closest;
     Vector3 support = Geometry::supportPoint(minkowski, directionToOrigin);
-    //std::cout << "direction " << directionToOrigin << std::endl;
-    //std::cout << "support " << support << std::endl;
+
     // terminate when the support point is already contained within the simplex
     for(int i = 0; i < simplex.points.size(); ++i)
       if(simplex.points[i] == support)
@@ -326,13 +330,44 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
     simplex.points.push_back(support);
 
     closest = simplex.closestPointToOrigin();
-    //std::cout << "closest " << closest << std::endl;
 
     // reduce the simplex to a minimum simplex by getting rid of the vertices which
     // are not part of the definition of the new support point
-    //std::cout << "b " << simplex.points.size() << std::endl;
     simplex.reduce(closest);
-    //std::cout << "a " << simplex.points.size() << std::endl;
   }
 }
 
+std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance)
+{
+  std::vector<Contact> contacts;
+
+  for(int i = 0; i < rb1_p->structure.vertices.size(); ++i)
+    for(int j = 0; j < rb2_p->structure.polygons.size(); ++j)
+    {
+      Vector3 vertex = rb1_p->structure.vertices[i].absPosition;
+      Polygon face = rb2_p->structure.polygons[i].getPolygon();
+
+      double distance;
+      Geometry::closestPointOfPolygon(vertex, face, &distance);
+
+      if(distance < tolerance)
+      {
+        Contact contact;
+        contact.a = rb1_p;
+        contact.b = rb2_p;
+
+        contacts.push_back(contact);  
+      }
+    }
+}
+
+std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance)
+{
+  std::vector<Contact> contacts;
+
+  std::vector<Edge> edges1 = ;
+  std::vector<Edge> edges2 = ;
+
+  for(int i = 0; i < edges1.size(); ++i)
+    for(int j = 0; j < edges2.size() ++j)
+}

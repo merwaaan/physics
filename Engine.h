@@ -7,15 +7,6 @@
 #include "RigidBody.h"
 #include "Force.h"
 
-struct Contact
-{
-  RigidBody* a;
-  RigidBody* b;
-
-  Vector3 position;
-  Vector3 normal;
-};
-
 class Engine
 {
   private:

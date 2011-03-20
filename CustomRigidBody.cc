@@ -216,7 +216,7 @@ void CustomRigidBody::computeVerticesAbsolutePositions()
 /**
  * Double-dispatch
  */
-Contact* CustomRigidBody::isCollidingWith(RigidBody* rb_p, double dt)
+std::vector<Contact> CustomRigidBody::isCollidingWith(RigidBody* rb_p, double dt)
 {
   return rb_p->isCollidingWith(this, dt);
 }
@@ -224,15 +224,14 @@ Contact* CustomRigidBody::isCollidingWith(RigidBody* rb_p, double dt)
 /**
  * Check for a collision with a sphere
  */
-Contact* CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
+std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
 {
-  return NULL;
 }
 
 /**
  * Check for a collision with a custom rigid body
  */
-Contact* CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
+std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
   Vector3 d = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
   std::cout << "DIST " << d <<" " << d.length() <<  std::endl;
@@ -242,8 +241,9 @@ Contact* CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
   {
     std::cout << "separation plane found" << std::endl;
+    std::vector<Contact> contacts;
 
-    return NULL;
+    return contacts;
   }
 
   std::cout << "no separation plane" << std::endl;
@@ -280,49 +280,48 @@ bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
 /**
  * Determine the exact contact point by integrating backward in time
  */
-Contact* CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double dt, double tolerance)
+std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double dt, double tolerance)
 {
   // find the distance between the two bodies
-  bool interPenetration = !this->findSeparationPlane(rb_p) && !rb_p->findSeparationPlane(this);
   Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
+  bool interPenetration = (distance.length() == 0);
 
   std::cout << "p=" << interPenetration << " d=" << distance.length() << " t=" << tolerance << " dt=" << dt << std::endl;
-
+  std::cout << position << rb_p->position << std::endl;
   // if bodies are within the tolerance area, compute the real contact points
-  if(distance.length() < tolerance)
+  if(!interPenetration && distance.length() < tolerance)
   {
-    Contact* contact_p = new Contact;
+    std::vector<Contact> vfContacts = Geometry::vertexFaceContacts(this, rb_p, tolerance);
+    std::vector<Contact> eeContacts = Geometry::edgeEdgeContacts(this, rb_p, tolerance);
 
-    contact_p->a = this;
-    contact_p->b = rb_p;
-    contact_p->position = Vector3(0,2,0);//contactingVertices[0].absPosition;
-    contact_p->normal = Vector3(0,1,0);//(rb_p->position - contactingVertices[0].absPosition).normalize();
+    for(int i = 0; i < eeContacts.size(); ++i)
+      vfContacts.push_back(eeContacts[i]);
 
-    return contact_p;
+    return vfContacts;
   }
   // if the bodies are too far apart, integrate forward in time
   else if(!interPenetration)
   {
     std::cout << "going forward" << std::endl;
-    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
-    rb_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
-    this->integrate(dt / 2);
-    rb_p->integrate(dt / 2);
+    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
+    rb_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
+    this->integrate(dt / 100);
+    rb_p->integrate(dt / 100);
     
-    return this->resolveInterPenetration(rb_p, dt / 2, tolerance);
+    return this->resolveInterPenetration(rb_p, dt, tolerance);
   }
   // else if the bodies are inter-penetrating, integrate backward in time
   else
   {
     std::cout << "going backward" << std::endl;
-    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
-    rb_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
+    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
+    rb_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
     engine_pg->reverseTime();
-    this->integrate(-dt / 2);
-    rb_p->integrate(-dt / 2);
+    this->integrate(-dt / 100);
+    rb_p->integrate(-dt / 100);
     engine_pg->reverseTime();
 
-    return this->resolveInterPenetration(rb_p, dt / 2, tolerance);
+    return this->resolveInterPenetration(rb_p, dt, tolerance);
   }
 }
 

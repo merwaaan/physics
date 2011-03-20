@@ -89,12 +89,12 @@ void Sphere::draw()
 /**
  * Double-dispatch
  */
-Contact* Sphere::isCollidingWith(RigidBody* rb_p, double dt)
+std::vector<Contact> Sphere::isCollidingWith(RigidBody* rb_p, double dt)
 {
   return rb_p->isCollidingWith(this, dt);
 }
 
-Contact* Sphere::isCollidingWith(Sphere* s_p, double dt)
+std::vector<Contact> Sphere::isCollidingWith(Sphere* s_p, double dt)
 {
   double tolerance = 0.01;
 
@@ -104,14 +104,15 @@ Contact* Sphere::isCollidingWith(Sphere* s_p, double dt)
   if(distance > radii + tolerance)
   {
     std::cout << "NO CONTACT" << std::endl;
+    std::vector<Contact> contacts;
 
-    return NULL;
+    return contacts;
   }
    
   return this->resolveInterPenetration(s_p, dt, tolerance);
 }
 
-Contact* Sphere::resolveInterPenetration(Sphere* s_p, double dt, double tolerance)
+std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt, double tolerance)
 {
   double distance = (this->position - s_p->position).length();
   double radii = this->radius + s_p->radius;
@@ -145,16 +146,19 @@ Contact* Sphere::resolveInterPenetration(Sphere* s_p, double dt, double toleranc
 
   std::cout << "SURFACE CONTACT" << std::endl;
 
-  Contact* contact_p = new Contact;
-  contact_p->a = this;
-  contact_p->b = s_p;
-  contact_p->position = this->position + (s_p->position - this->position) * (this->radius / radii);
-  contact_p->normal = (s_p->position - this->position).normalize();
+  Contact contact;
+  contact.a = this;
+  contact.b = s_p;
+  contact.position = this->position + (s_p->position - this->position) * (this->radius / radii);
+  contact.normal = (s_p->position - this->position).normalize();
 
-  return contact_p;
+  std::vector<Contact> contacts;
+  contacts.push_back(contact);
+
+  return contacts;
 }
 
-Contact* Sphere::isCollidingWith(CustomRigidBody* rb_p, double dt)
+std::vector<Contact> Sphere::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
   return rb_p->isCollidingWith(this, dt);
 }

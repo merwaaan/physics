@@ -143,6 +143,12 @@ void demoSimpleBox()
 void demoMultiBox()
 {
 	Cube* c = new Cube(2);
+	c->prepare();
+	std::vector<Edge> edges = c->structure.getEdges();
+	for(int i = 0; i < edges.size(); ++i)
+		std::cout << edges[i].a << edges[i].b << std::endl;
+	return;
+
   c->angularMomentum = Vector3(3, 3, 0);
   c->setPosition(0, 5, 0);
   e->addRigidBody_p(c);

@@ -10,6 +10,39 @@
 extern Display* display_pg;
 extern Engine* engine_pg;
 
+std::vector<Edge> Structure::getEdges() const
+{
+	std::vector<Edge> edges;
+
+	// list all the edges
+	for(int i = 0; i < this->polygons.size(); ++i)
+	{
+		for(int j = 0; j < this->polygons[i].size - 1; ++j)
+		{
+			Vector3 v1 = this->polygons[i].vertices_p[j]->absPosition;
+			Vector3 v2 = this->polygons[i].vertices_p[j + 1]->absPosition;
+			edges.push_back((Edge){v1, v2});
+		}
+
+		// connect the last and the first vertex
+		Vector3 v1 = this->polygons[i].vertices_p[this->polygons[i].size - 1]->absPosition;
+		Vector3 v2 = this->polygons[i].vertices_p[0]->absPosition;
+		edges.push_back((Edge){v1, v2});
+	}
+ 
+	// remove redundant edges
+	for(int i = 0; i < edges.size(); ++i)
+		for(int j = i + 1; j < edges.size(); ++j)
+			if(edges[i].a == edges[j].a && edges[i].b == edges[j].b ||
+			   edges[i].a == edges[j].b && edges[i].b == edges[j].a)
+			{
+				edges.erase(edges.begin() + j);
+				--j;
+			}
+
+	return edges;
+}
+
 /**
  * Return the best support point along a given direction
  */

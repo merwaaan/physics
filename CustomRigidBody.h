@@ -11,6 +11,7 @@ struct Structure
   std::vector<CustomVertex> vertices;
   std::vector<CustomPolygon> polygons;
 
+	std::vector<Edge> getEdges() const;
   Vector3 getSupportPoint(Vector3 direction) const;
 };
 

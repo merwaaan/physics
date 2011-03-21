@@ -5,25 +5,6 @@
 #include "CustomRigidBody.h"
 #include "Simplex.h"
 
-/**
- * Return a list of the edges forming the polygon perimeter
- */
-std::vector<Edge> CustomPolygon::getEdges() const
-{
-  std::vector<Edge> edges;
-
-  for(int i = 0; i < size - 1; ++i)
-  {
-    Edge s = {this->vertices_p[i]->absPosition, this->vertices_p[i + 1]->absPosition};
-    edges.push_back(s);
-  }
-
-  Edge s = {this->vertices_p[size - 1]->absPosition, this->vertices_p[0]->absPosition};
-  edges.push_back(s);
-
-  return edges;
-}
-
 Polygon CustomPolygon::getPolygon() const
 {
   Polygon polygon;
@@ -125,6 +106,11 @@ bool Geometry::isInsideConvexHull(Vector3 point, std::vector<Vector3> hull)
     hull[i] += center;
   point += center;
   return true;
+}
+
+double Geometry::edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, Vector3* closest2_p)
+{
+
 }
 
 /**
@@ -355,6 +341,8 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
         Contact contact;
         contact.a = rb1_p;
         contact.b = rb2_p;
+        contact.position = Vector3(0, 4, 0);
+        contact.normal = Vector3(0, 1, 0);
 
         contacts.push_back(contact);  
       }
@@ -365,9 +353,29 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 {
   std::vector<Contact> contacts;
 
-  std::vector<Edge> edges1 = ;
-  std::vector<Edge> edges2 = ;
+  std::vector<Edge> edges1 = rb1_p->structure.getEdges();
+  std::vector<Edge> edges2 = rb2_p->structure.getEdges();
 
   for(int i = 0; i < edges1.size(); ++i)
-    for(int j = 0; j < edges2.size() ++j)
+	  for(int j = 0; j < edges2.size(); ++j)
+    {
+	    Vector3 closest1, closest2;
+	    double distance = Geometry::edgeEdgeDistance(edges1[i], edges2[j], &closest1, &closest2);
+
+	    if(distance < tolerance)
+	    {
+		    Contact contact;
+		    contact.a = rb1_p;
+		    contact.b = rb2_p;
+		    contact.position = (closest1 + closest2) / 2;
+
+		    Vector3 v1 = edges1[i].b - edges1[i].a;
+		    Vector3 v2 = edges2[j].b - edges2[j].a;
+		    contact.normal = v1 ^ v2;
+
+		    contacts.push_back(contact);
+	    }
+    }
+
+  return contacts;
 }

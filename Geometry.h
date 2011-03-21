@@ -93,12 +93,19 @@ struct CustomPolygon
   int size;
   CustomVertex** vertices_p;
 
-  std::vector<Edge> getEdges() const;
-  Polygon getPolygon() const;
+	Polygon getPolygon() const;
   Plane getPlane() const;
   Vector3 getNormal() const;
 };
 
+/**
+ * CONTACT
+ *
+ * - a : first rigid body
+ * - b : second rigid body
+ * - position : vector to the contact point
+ * - normal : normal to the contact
+ */
 struct Contact
 {
   RigidBody* a;
@@ -115,6 +122,8 @@ namespace Geometry
   
   bool isInsideTriangle(Vector3 point, Triangle triangle);
   bool isInsideConvexHull(Vector3 point, std::vector<Vector3> hull);
+
+  double edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, Vector3* closest2_p);
 
   Vector3 closestPointOfEdge(Vector3 point, Edge edge, double* distance_p = NULL);
   Vector3 closestPointOfPlane(Vector3 point, Plane plane, double* distance_p = NULL);

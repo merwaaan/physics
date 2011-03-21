@@ -16,29 +16,35 @@ void input(unsigned char k, int x, int y)
 
 void testGeometry()
 {
-  Edge e = {Vector3(-1,0,0), Vector3(2,0,0)};
   std::cout << "CLOSEST OF EDGE" << std::endl;
+  Edge e = {Vector3(-1,0,0), Vector3(2,0,0)};
   std::cout << Geometry::closestPointOfEdge(Vector3(0,0,0), e) << std::endl;
   std::cout << Geometry::closestPointOfEdge(Vector3(1,4,0), e) << std::endl;
   std::cout << Geometry::closestPointOfEdge(Vector3(-4,2,3), e) << std::endl;
 
-  Plane p = {Vector3(0,0,0), Vector3(0,1,0)};
   std::cout << "CLOSEST OF PLANE" << std::endl;
+  Plane p = {Vector3(0,0,0), Vector3(0,1,0)};
   std::cout << Geometry::closestPointOfPlane(Vector3(10,0,0), p) << std::endl;
   std::cout << Geometry::closestPointOfPlane(Vector3(0,10,0), p) << std::endl;
   std::cout << Geometry::closestPointOfPlane(Vector3(3,3,3), p) << std::endl;
 
-  Triangle t = {Vector3(-1,0,0), Vector3(1,0,0), Vector3(0,0,1)};
   std::cout << "CLOSEST OF TRIANGLE" << std::endl;
+  Triangle t = {Vector3(-1,0,0), Vector3(1,0,0), Vector3(0,0,1)};
   std::cout << Geometry::closestPointOfTriangle(Vector3(0,3,0), t) << std::endl;
   std::cout << Geometry::closestPointOfTriangle(Vector3(-3,0,0), t) << std::endl;
   std::cout << Geometry::closestPointOfTriangle(Vector3(-1,0, 0.5), t) << std::endl;
 
-  Sphere s(3);
   std::cout << "CLOSEST OF SPHERE" << std::endl;
+  Sphere s(3);
   std::cout << Geometry::closestPointOfSphere(Vector3(10,0,0), s) << std::endl;
   std::cout << Geometry::closestPointOfSphere(Vector3(-10,0,0), s) << std::endl;
   std::cout << Geometry::closestPointOfSphere(Vector3(3,3,0), s) << std::endl;
+
+  std::cout << "CLOSEST OF EDGE/EDGE" << std::endl;
+  Vector3 c1, c2;
+  Edge e1 = {Vector3(0,0,0), Vector3(10,0,0)};
+  Edge e2 = {Vector3(5,5,0), Vector3(5,-5,0)};
+  std::cout << c1 << c2 << Geometry::edgeEdgeDistance(e1, e2, &c1, &c2) << std::endl;
 }
 
 void testGJK()
@@ -143,13 +149,7 @@ void demoSimpleBox()
 void demoMultiBox()
 {
 	Cube* c = new Cube(2);
-	c->prepare();
-	std::vector<Edge> edges = c->structure.getEdges();
-	for(int i = 0; i < edges.size(); ++i)
-		std::cout << edges[i].a << edges[i].b << std::endl;
-	return;
-
-  c->angularMomentum = Vector3(3, 3, 0);
+  //c->angularMomentum = Vector3(3, 3, 0);
   c->setPosition(0, 5, 0);
   e->addRigidBody_p(c);
 

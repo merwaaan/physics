@@ -117,6 +117,8 @@ struct Contact
 
 namespace Geometry
 {
+  double clamp(double x, double min, double max);
+
   bool areOnTheSameSide(Vector3 p1, Vector3 p2, Vector3 a, Vector3 b);
   Vector3 centerOfPoints(std::vector<Vector3> points);
   
@@ -138,7 +140,7 @@ namespace Geometry
   std::vector<Vector3> minkowskiDifference(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
   Vector3 gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool* interPenetration_p = NULL);
 
-  std::vector<Contact> vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance);
+  std::vector<Contact> vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance, bool second = false);
   std::vector<Contact> edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance);
 };
 

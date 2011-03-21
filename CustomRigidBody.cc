@@ -326,7 +326,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
   {
     std::vector<Contact> vfContacts = Geometry::vertexFaceContacts(this, rb_p, tolerance);
     std::vector<Contact> eeContacts = Geometry::edgeEdgeContacts(this, rb_p, tolerance);
-
+    std::cout << vfContacts.size() << " vf and " << eeContacts.size() << std::endl;
     for(int i = 0; i < eeContacts.size(); ++i)
       vfContacts.push_back(eeContacts[i]);
 

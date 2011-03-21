@@ -39,6 +39,14 @@ Vector3 CustomPolygon::getNormal() const
   return (v1 ^ v2).normalize();
 }
 
+double Geometry::clamp(double x, double min, double max)
+{
+  x = x < min ? min : x;
+  x = x > max ? max : x;
+
+  return x;
+}
+
 /**
  * Return true if the two points are on the same side of an edge
  */
@@ -85,18 +93,16 @@ bool Geometry::isInsideConvexHull(Vector3 point, std::vector<Vector3> hull)
   for(int i = 0; i < hull.size(); ++i)
     hull[i] -= center;
   point -= center;
-  std::cout << "center " << center << std::endl;
 
   for(int i = 0; i < hull.size(); ++i)
   {
-    std::cout << point << hull[i] << hull[i] * point << " " << hull[i] * hull[i] << std::endl;
-
 	  if(hull[i] * point > hull[i] * hull[i])
     {
       // put back the remaining points to their original positions
       for(int i = 0; i < hull.size(); ++i)
         hull[i] += center;
       point += center;
+
       return false;
     }
   }
@@ -110,7 +116,70 @@ bool Geometry::isInsideConvexHull(Vector3 point, std::vector<Vector3> hull)
 
 double Geometry::edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, Vector3* closest2_p)
 {
+  double s, t;
 
+  Vector3 d1 = edge1.b - edge1.a;
+  Vector3 d2 = edge2.b - edge2.a;
+
+  Vector3 r = edge1.a - edge2.a;
+  double a = d1 * d1;
+  double e = d2 * d2;
+  double f = d2 * r;
+
+  double tolerance = 0.001;
+
+  if(a <= tolerance && e <= tolerance)
+  {
+    s = t = 0;
+    *closest1_p = edge1.a;
+    *closest2_p = edge2.a;
+
+    return (*closest1_p - *closest2_p) * (*closest1_p - *closest2_p);
+  }
+
+  if(a <= tolerance)
+  {
+    s = 0;
+    t = Geometry::clamp(f / e, 0, 1);
+  }
+  else
+  {
+    double c = d1 * r;
+    
+    if(e <= tolerance)
+    {
+      t = 0;
+      s = Geometry::clamp(-c / a, 0, 1);
+    }
+    else
+    {
+      double b = d1 * d2;
+      double denominator = a * e - b * b;
+
+      if(denominator != 0)
+        s = Geometry::clamp((b * f - c * e) / denominator, 0, 1);
+      else
+        s = 0;
+
+      t = (b * s + f) / e;
+
+      if(t < 0)
+      {
+        t = 0;
+        s = Geometry::clamp(-c / a, 0, 1);
+      }
+      else if(t > 1)
+      {
+        t = 1;
+        s = Geometry::clamp((b - c) / a, 0, 1);
+      }
+    }
+  }
+
+  *closest1_p = edge1.a + d1 * s;
+  *closest2_p = edge2.a + d2 * t;
+
+  return (*closest1_p - *closest2_p) * (*closest1_p - *closest2_p);
 }
 
 /**
@@ -186,7 +255,41 @@ Vector3 Geometry::closestPointOfTriangle(Vector3 point, Triangle triangle, doubl
  */
 Vector3 Geometry::closestPointOfPolygon(Vector3 point, Polygon polygon, double* distance_p)
 {
+  // find the center of the polygon
+  Vector3 center;
+  for(int i = 0; i < polygon.points.size(); ++i)
+    center += polygon.points[i];
+  center = center / polygon.points.size();
 
+  // subvidide the polygon into an triangle fan
+  std::vector<Triangle> triangles;
+  for(int i = 0; i < polygon.points.size() - 1; ++i)
+    triangles.push_back((Triangle){polygon.points[i], center, polygon.points[i + 1]});
+  triangles.push_back((Triangle){polygon.points[polygon.points.size() - 1], center, polygon.points[0]});
+
+  // find the closest point for each triangle
+  std::vector<Vector3> closests(triangles.size());
+  std::vector<double> distances(triangles.size());
+  for(int i = 0; i < triangles.size(); ++i)
+  {
+    closests[i] = Geometry::closestPointOfTriangle(point, triangles[i], &distances[i]);
+    std::cout << distances[i] << std::endl;
+  }
+  
+  // only keep the closest point
+  Vector3 closest = closests[0];
+  double bestDistance = distances[0];
+  for(int i = 1; i < triangles.size(); ++i)
+    if(distances[i] < bestDistance)
+    {
+      bestDistance = distances[i];
+      closest = closests[i];
+    }
+
+  if(distance_p != NULL)
+    *distance_p = bestDistance;
+
+  return closest;
 }
 
 /**
@@ -323,30 +426,44 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
   }
 }
 
-std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance)
+std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance, bool second)
 {
   std::vector<Contact> contacts;
+  std::cout << rb2_p->structure.polygons.size() << " poly" << std::endl;
+  std::cout << rb1_p->structure.vertices.size() << " vert" << std::endl;
 
-  for(int i = 0; i < rb1_p->structure.vertices.size(); ++i)
-    for(int j = 0; j < rb2_p->structure.polygons.size(); ++j)
+  for(int i = 0; i < rb2_p->structure.polygons.size(); ++i)
+    for(int j = 0; j < rb1_p->structure.vertices.size(); ++j)
     {
-      Vector3 vertex = rb1_p->structure.vertices[i].absPosition;
+      Vector3 vertex = rb1_p->structure.vertices[j].absPosition;
       Polygon face = rb2_p->structure.polygons[i].getPolygon();
 
       double distance;
-      Geometry::closestPointOfPolygon(vertex, face, &distance);
-
+      Vector3 point = Geometry::closestPointOfPolygon(vertex, face, &distance);
+      //std::cout << distance << std::endl;
       if(distance < tolerance)
       {
         Contact contact;
         contact.a = rb1_p;
         contact.b = rb2_p;
-        contact.position = Vector3(0, 4, 0);
-        contact.normal = Vector3(0, 1, 0);
+        contact.position = (point + vertex) / 2;
+        contact.normal = (point - vertex).normalize();
 
         contacts.push_back(contact);  
       }
     }
+
+  // if it's the first passage, recursively call the method to obtain the contacts from
+  // the perspective of the other body and append them to the list
+  if(!second)
+  {
+    std::vector<Contact> contacts2 = Geometry::vertexFaceContacts(rb2_p, rb1_p, tolerance, true);
+
+    for(int i = 0; i < contacts2.size(); ++i)
+      contacts.push_back(contacts2[i]);
+  }
+ 
+  return contacts;
 }
 
 std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance)

@@ -8,7 +8,7 @@
 Display* display_pg = NULL;
 
 Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
-  drawBoundingBoxes(true),
+  drawBoundingBoxes(false),
   engine_p(engine_p)
 {
   glutInit(argc, argv);
@@ -27,10 +27,10 @@ Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
   GLfloat lightModel[] = {0.3, 0.3, 0.3, 1.0};
   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, lightModel);
 
-  GLfloat lightSpecular[] = {0.5, 0.5, 0.5, 1.0};
+  GLfloat lightSpecular[] = {0.1, 0.1, 0.1, 1.0};
   glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
   
-  GLfloat lightAmbient[] = {170.0/255, 162.0/255, 113.0/255, 1.0};
+  GLfloat lightAmbient[] = {200.0/255, 200.0/255, 200.0/255, 1.0};
   glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
  
   GLfloat lightPosition[] = {5, 10, 0.0, 1.0};

@@ -35,13 +35,19 @@ void RigidBody::clearAccumulators()
 
 void RigidBody::applyCenterForce(Vector3 force, double dt)
 {
+	if(this->fixed)
+		return;
+
   this->accumulatedForces += force * dt;
 }
 
 void RigidBody::applyOffCenterForce(Vector3 force, double dt, Vector3 poa)
 {
-  this->accumulatedForces += force * dt;
-  this->accumulatedTorques += poa ^ (force * dt);
+	if(this->fixed)
+		return;
+
+	//this->accumulatedForces += force * dt;
+  //this->accumulatedTorques += poa ^ (force * dt);
 }
 
 void RigidBody::integrate(double dt)

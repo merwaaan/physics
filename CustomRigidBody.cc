@@ -176,8 +176,8 @@ void CustomRigidBody::computeBoundingBox()
       maxz = pos.Z();
   }
 
-  this->boundingBox.a = Vector3(minx - 1, miny - 1, minz - 1);
-  this->boundingBox.b = Vector3(maxx + 1, maxy + 1, maxz + 1);
+  this->boundingBox.a = Vector3(minx-1, miny-1, minz-1);
+  this->boundingBox.b = Vector3(maxx+1, maxy+1, maxz+1);
 }
 
 /**
@@ -266,21 +266,21 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
  */
 std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
-  Vector3 d = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
-  std::cout << "DIST " << d <<" " << d.length() <<  std::endl;
+	Vector3 d = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
+	std::cout << "DISTANCE " << d.length() << std::endl;
+
   double tolerance = 0.01;
 
   // if at least one separation plane exists, there is no collision
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
   {
-    std::cout << "separation plane found" << std::endl;
+	  std::cout << "separation plane found : no collision" << std::endl;
     std::vector<Contact> contacts;
 
     return contacts;
   }
 
-  std::cout << "no separation plane" << std::endl;
-
+  std::cout << "no separation plane found : collision!" << std::endl;
   return this->resolveInterPenetration(rb_p, dt, tolerance);
 }
 
@@ -317,16 +317,17 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 {
   // find the distance between the two bodies
   Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
-  bool interPenetration = (distance.length() == 0);
+  bool interPenetration = !this->findSeparationPlane(rb_p) && !rb_p->findSeparationPlane(this);
 
-  std::cout << "p=" << interPenetration << " d=" << distance.length() << " t=" << tolerance << " dt=" << dt << std::endl;
-  std::cout << position << rb_p->position << std::endl;
+  std::cout << "d = " << distance.length() << " ip = " << interPenetration << std::endl;
+
   // if bodies are within the tolerance area, compute the real contact points
-  if(!interPenetration && distance.length() < tolerance)
+  if(distance.length() < tolerance)
   {
     std::vector<Contact> vfContacts = Geometry::vertexFaceContacts(this, rb_p, tolerance);
     std::vector<Contact> eeContacts = Geometry::edgeEdgeContacts(this, rb_p, tolerance);
-    std::cout << vfContacts.size() << " vf and " << eeContacts.size() << std::endl;
+    std::cout << vfContacts.size() << " v/f and " << eeContacts.size() << " e/e" << std::endl;
+
     for(int i = 0; i < eeContacts.size(); ++i)
       vfContacts.push_back(eeContacts[i]);
 
@@ -335,7 +336,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
   // if the bodies are too far apart, integrate forward in time
   else if(!interPenetration)
   {
-    std::cout << "going forward" << std::endl;
+	  std::cout << "going forward " << dt/100 << "ms" << std::endl;
     this->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
     rb_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
     this->integrate(dt / 100);
@@ -346,7 +347,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
   // else if the bodies are inter-penetrating, integrate backward in time
   else
   {
-    std::cout << "going backward" << std::endl;
+	  std::cout << "going backward " << dt/100 << "ms" << std::endl;
     this->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
     rb_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
     engine_pg->reverseTime();

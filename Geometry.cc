@@ -216,38 +216,94 @@ Vector3 Geometry::closestPointOfPlane(Vector3 point, Plane plane, double* distan
 
 /**
  * Return the closest point of a triangle to a point p
+ *
+ * From Real-Time Collision Detection - Christer Ericson
  */
 Vector3 Geometry::closestPointOfTriangle(Vector3 point, Triangle triangle, double* distance_p)
 {
-  // project the point onto the plane extending the triangle
-  Plane plane = {triangle.a, ((triangle.b - triangle.a) ^ (triangle.c - triangle.a)).normalize()};
-  Vector3 projection = Geometry::closestPointOfPlane(point, plane);
+	Vector3 ab = triangle.b - triangle.a;
+	Vector3 ac = triangle.c - triangle.a;
+	Vector3 ap = point - triangle.a;
+	double d1 = ab * ap;
+	double d2 = ac * ap;
 
-  // if the projection lies within the triangle border, the closest point is the projection
-  if(Geometry::isInsideTriangle(projection, triangle))
-    return projection;
+ 	if(d1 <= 0 && d2 <= 0)
+	{
+		if(distance_p != NULL)
+			*distance_p = (point - triangle.a).length();
 
-  // else the closest point lies on one of the edges
-  Edge ab = {triangle.a, triangle.b};
-  Edge bc = {triangle.b, triangle.c};
-  Edge ca = {triangle.c, triangle.a};
-  double dab, dbc, dca;
+		return triangle.a;
+	}
+	
+	Vector3 bp = point - triangle.b;
+	double d3 = ab * bp;
+	double d4 = ac * bp;
 
-  Vector3 pab = Geometry::closestPointOfEdge(point, ab, &dab);
-  Vector3 pbc = Geometry::closestPointOfEdge(point, bc, &dbc);
-  Vector3 pca = Geometry::closestPointOfEdge(point, ca, &dca);
+	if(d3 >= 0 && d4 <= d3)
+	{
+		if(distance_p != NULL)
+			*distance_p = (point - triangle.b).length();
 
-  Vector3 closest = pab;
-  double closestDistance = dab;
-  if(dbc < closestDistance)
-  {
-    closest = pbc;
-    closestDistance = dbc;
-  }
-  if(dca < closestDistance)
-    closest = pca;
+		return triangle.b;
+	}
 
-  return closest;
+	double vc = d1 * d4 - d3 * d2;
+	if(vc <= 0 && d1 >= 0 && d3 <= 0)
+	{
+		double v = d1 / (d1 - d3);
+		Vector3 closest = triangle.a + v * ab;
+
+		if(distance_p != NULL)
+			*distance_p = (point - closest).length();
+
+		return closest;
+	}
+
+	Vector3 cp = point - triangle.c;
+	double d5 = ab * cp;
+	double d6 = ac * cp;
+
+	if(d6 >= 0 && d5 <= d6)
+	{
+		if(distance_p != NULL)
+			*distance_p = (point - triangle.c).length();
+
+		return triangle.c;
+	}
+
+	double vb = d5 * d2 - d1 * d6;
+	if(vb <= 0 && d2 >= 0 && d6 <= 0)
+	{
+		double w = d2 / (d2 - d6);
+		Vector3 closest = triangle.a + w * ac;
+
+		if(distance_p != NULL)
+			*distance_p = (point - closest).length();
+
+		return closest;
+	}
+
+	double va = d3 * d6 - d5 * d4;
+	if(va <= 0 && (d4 - d3) >= 0 && (d5 - d6) >= 0)
+	{
+		double w = (d4 - d3) / ((d4 - d3) + (d5 - d6));
+		Vector3 closest = triangle.b + w * (triangle.c - triangle.b);
+
+		if(distance_p != NULL)
+			*distance_p = (point - closest).length();
+		
+		return closest;
+	}
+	
+	double denom = 1.0 / (va + vb + vc);
+	double v = vb * denom;
+	double w = vc * denom;
+	Vector3 closest = triangle.a + ab * v + ac * w;
+
+	if(distance_p != NULL)
+		*distance_p = (point - closest).length();
+
+	return closest;
 }
 
 /**
@@ -271,10 +327,7 @@ Vector3 Geometry::closestPointOfPolygon(Vector3 point, Polygon polygon, double* 
   std::vector<Vector3> closests(triangles.size());
   std::vector<double> distances(triangles.size());
   for(int i = 0; i < triangles.size(); ++i)
-  {
     closests[i] = Geometry::closestPointOfTriangle(point, triangles[i], &distances[i]);
-    std::cout << distances[i] << std::endl;
-  }
   
   // only keep the closest point
   Vector3 closest = closests[0];
@@ -429,8 +482,6 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
 std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance, bool second)
 {
   std::vector<Contact> contacts;
-  std::cout << rb2_p->structure.polygons.size() << " poly" << std::endl;
-  std::cout << rb1_p->structure.vertices.size() << " vert" << std::endl;
 
   for(int i = 0; i < rb2_p->structure.polygons.size(); ++i)
     for(int j = 0; j < rb1_p->structure.vertices.size(); ++j)
@@ -440,7 +491,7 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
 
       double distance;
       Vector3 point = Geometry::closestPointOfPolygon(vertex, face, &distance);
-      //std::cout << distance << std::endl;
+
       if(distance < tolerance)
       {
         Contact contact;
@@ -484,11 +535,11 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 		    Contact contact;
 		    contact.a = rb1_p;
 		    contact.b = rb2_p;
-		    contact.position = (closest1 + closest2) / 2;
+		    contact.position = closest1 + (closest2 - closest1) / 2;
 
 		    Vector3 v1 = edges1[i].b - edges1[i].a;
 		    Vector3 v2 = edges2[j].b - edges2[j].a;
-		    contact.normal = v1 ^ v2;
+		    contact.normal = (v1 ^ v2).normalize();
 
 		    contacts.push_back(contact);
 	    }

@@ -29,10 +29,10 @@ void testGeometry()
   std::cout << Geometry::closestPointOfPlane(Vector3(3,3,3), p) << std::endl;
 
   std::cout << "CLOSEST OF TRIANGLE" << std::endl;
-  Triangle t = {Vector3(-1,0,0), Vector3(1,0,0), Vector3(0,0,1)};
+  Triangle t = {Vector3(-1,0,0), Vector3(1,0,0), Vector3(0,1,0)};
   std::cout << Geometry::closestPointOfTriangle(Vector3(0,3,0), t) << std::endl;
   std::cout << Geometry::closestPointOfTriangle(Vector3(-3,0,0), t) << std::endl;
-  std::cout << Geometry::closestPointOfTriangle(Vector3(-1,0, 0.5), t) << std::endl;
+  std::cout << Geometry::closestPointOfTriangle(Vector3(-1,0.5,0), t) << std::endl;
 
   std::cout << "CLOSEST OF SPHERE" << std::endl;
   Sphere s(3);
@@ -149,8 +149,7 @@ void demoSimpleBox()
 void demoMultiBox()
 {
 	Cube* c = new Cube(2);
-  //c->angularMomentum = Vector3(3, 3, 0);
-  c->setPosition(0, 5, 0);
+  c->setPosition(2.5, 5, 0);
   e->addRigidBody_p(c);
 
 	Cube* c2 = new Cube(4);
@@ -174,10 +173,10 @@ int main(int argc, char** argv)
   //testTimeReversing();
   //compareRK4ToEuler();
 
+  //demoMultiBall();
   //demoSimpleBox();
   demoMultiBox();
-  //demoMultiBall();
-
+  
   delete e;
 
   return 0;

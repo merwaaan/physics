@@ -36,6 +36,70 @@ Ensuite, on greffera au moteur une gestion de l'aspect kinétique, c'est à dire
 
 Une fois que nos solides disposeront d'un comportement réaliste en tant qu'entités, nous les ferons réagir entre eux. Concrètement cette partie sera divisée en deux sections. Tout d'abord, on veut déterminer si deux objets sont en contact, puis l'on va provoquer des réactions collisionnelles proportionnelles à leur vitesse relative.
 
+\section{Notions utiles de géométrie}
+
+\subsection{Calcul du point le plus proche}
+
+\subsubsection{Distance entre un point et un segment}
+
+Dans le cadre de la simulation, des corps rigides seront amenés à entrer en collision et l'une de tâches de base du moteur physique sera de détecter et de gérer ces évenements. Pour cela, il sera souvent nécessaire de répondre à des question géométriques telles que : un corps est-il en contact avec un autre corps ? \`A quelle distance s'en trouve-t-il ? Les méthodes que le moteur utilise pour répondre à ce type de question sont décrites dans cette section.
+
+Les méthodes décrites servent deux buts distincts mais en rapport direct : déterminer la distance entre deux objets géométriques et trouver les points les plus proches les séparant. Deux point $x_k$ et $y_l$ appartenant respectivement aux solides $X$ et $Y$ sont considérés comme étant les plus proches si $distance(x_k,y_l) = min(distance(x_i, y_i))$. Autrement dit, ce sont les points de chaque solide qui sont les plus proches l'un de l'autre. On se concentrera sur la recherche des points les plus proches puisque la détermination de la distance entre les deux corps considérés revient à calculer la distance entre les points les proches.
+
+Premièrement, on veut déterminer le point d'un segment $AB$ le plus proche d'un point $P$ quelconque flottant dans l'espace. Pour commencer, réalisons la même opération mais avec une droite. On cherche donc le point de la droite prolongeant $AB$ le plus proche de $P$. De façon triviale, $C$ est trouvé en projetant $P$ sur la droite $AB$ (c'est l'intersection de $AB$ et de la droite orthogonale à $AB$ passant par $P$.
+
+DESSIN
+
+Le problème du segment est proche de celui dont on vient de décrire la solution, mis à part qu'un segment ne dispose pas d'une longueur infinie et que la projection de $P$ risque d'en sortir. Si c'est le cas, le point le plus proche $C$ est alors soit $A$ soit $B$.
+
+DESSIN
+
+Tout point $Q$ appartenant au segment $AB$ a pour équation $Q=A+t(B-A)$ avec $0 \leq t \leq 1$. On doit donc calculer le $t$ de la projection du point $P$. S'il est inférieur à $0$, le point le plus proche est $A$. S'il est supérieur à $0$, le point de plus proche est $B$. Sinon le point le plus proche est le point d'équation blabla
+
+\subsubsection{Distance entre un point et un plan}
+
+On veut maintenant calculer le point d'un plan le plus proche d'un point quelconque $P$. On définit un plan par un point lui appartenant et un vecteur lui étant normal. blabla
+
+\subsubsection{Point d'un triangle le plus proche}
+
+On veut déterminer le point d'un triangle $ABC$ le plus proche d'un point quelconque $P$. Comme pour les problèmes précédents, on se basera sur une projection du point $P$, plus précisément sur la projection de $P$ sur le plan auquel appartient $ABC$.
+
+Deux situations sont envisageables, $C$ peut se trouver soit à l'intérieur soit à l'extérieur du triangle $ABC$. S'il est à l'intérieur, le point le plus proche est $C$. S'il se trouve à l'extérieur, alors on est certain que $C$ se trouve sur une des arêtes du triangle. Il nous reste donc à calculer le point de chaque arête le plus proche de $P$ grâce à la méthode segment/point décrite précédemment et à choisir le point le plus proche parmi les trois.
+
+Il n'a pas encore été précisé de méthode à utiliser pour détecter si le point projeté se trouve à l'intérieur de $ABC$. On peut utiliser une des propriétés des triangles qui dicte que la somme des angles blabla
+
+DESSIN?
+
+\subsubsection{Point d'un polygone le plus proche}
+
+On veut déterminer le point d'un polygone $G$ le plus proche d'un point quelconque $P$. On va une fois encore utiliser une des méthodes précedemment présentées afin de subdiviser le problème. Un polygone est constitué d'un ou de plusieurs triangles, on va donc subdiviser $Q$ en triangles puis calculer le point le plus proche entre $P$ et chaque triangle et conserver le meilleur.
+
+Il a ici été fait le choix de subdiviser le triangle en calculant le centre du polygone puis en reliant chaque sommet consécutifs du polygone à ce centre.
+
+DESSIN
+
+\subsubsection{Point d'une sphère le plus proche}
+
+Le calcule du point d'une sphère le plus proche d'un point quelconque $P$ se fait de façon triviale. Il s'agit de l'intersection du segment reliant le centre de $S$ à $P$ et du rayon de la sphère. Concrètement, on calcule le vecteur séparant le centre de $S$ et $P$, on le normalise puis on le multiplie par le rayon.
+
+DESSIN
+
+\subsubsection{Point de deux segments les plus proches}
+
+megablabla 
+
+\subsection{Distance entre deux corps}
+
+\subsubsection{Différence de Minkowski}
+
+\subsubsection{Algorithme de GJK}
+
+L'algorithme de JKLKHJHJGHJG, aussi appelé GJK, trouve rapidement le membre d'un ensemble de points qui est le plus proche d'un point quelconque. Dans notre cas, ce point quelconque sera l'origine du repère absolu puisque la distance entre le point de plus de la différence de Minkowski et l'origine correspond à la distance entre les corps.
+
+Cet algorithme se base sur l'utilisation de simplex, une structure géométrique contenu dans un corps. Sa dimension peut varier de 1 à la dimension du problème. Le simplex de dimension une correspond à un simple point dans l'espace. Le simplex de dimension deux correpond à un segment. Le simplex de dimension trois correspond à un triangle. Le simplex de dimension quatre correspond à un tétrahèdre.
+
+Le principe de l'algorithme GJK est de partir d'un simplex de base, qui sera ici un des points de la différence de Minkowski, et de le faire évoluer afin qu'il prenne des formes de plus en plus proches de l'origine tant que c'est possible. Une des clés de ce travail est de réduire la dimension du simplex dés que possible, c'est à dire dés que certains de ces caractères deviennent inutiles à la détermination du point le plus proche.
+
 \section{Dynamique} 
 
 \subsection{La composante linéaire du mouvement}
@@ -127,21 +191,68 @@ Il nous faut désormais représenter le taux de variation de l'orientation d'un 
 
 \subsection{Le cas des sphères}
 
-\subsubsection{Détection d'une collision}
-
 \subsubsection{Détection du point de contact}
 
+Nous allons dans un premier temps réduire le problème collisionnel aux interactions entre sphères. On sait que deux corps sont en collision si la distance qui sépare leurs centres est inférieure à la somme de leurs rayons. Cette simplification nous permet de nous concentrer sur la détermination des points de contact réels. 
+
+\`A chaque itération de la simulation, les corps présents dans notre environnement de test sont susceptibles de se déplacer et donc d'entrer en contact. Le moteur simule ces évolutions de manière non continue et il est très improbable qu'une collision soit détectée au moment précis o\`u elle se produit. On se retrouve donc dans des situations d'inter-pénétration au sein desquelles l'intégrité physique des objets est corrompue. On pourrait calculer les forces à appliquer aux corps pour les séparer dés cet instant mais le réalisme de la simulation en serait ammoindri.
+
+DESSIN
+
+Pour trouver le point de contact réel entre deux sphères, il existe plusieurs approches. Les systèmes qui préfèrent favoriser le temps d'éxécution au détriment du réalisme se contente de repositionner les corps à un point de contact calculé par interpolation en fonction du temps de la dernière ntégration. Il est évident que des objets sujets à des déplacements non linéaires (variation de la vitesse pendant un pas de temps, trajectoire elliptique) seront mal replacés.
+
+Même si la vitesse d'éxecution est un facteur important dans nos choix de conception, nous allons prendre un chemin différent et sélectionner une méthode plus précise qui fonctionnera par retour en arrière. La fonction d'intégration du moteur prend comme seul argument le pas de temps duquel faire avancer la simulation et pour l'instant on utilisait un pas constant. Or, une caractéristique intéressante de cette fonction et qu'elle peut prendre en argument un pas de temps négatif et simuler en sens inverse ! Grâce à cette caractéristique, dés qu'une inter-pénétration est détectée, on peut revenir en arrière jusqu'à retrouver le temps de contact exact. Le terme "exact" est à prendre avec des pincettes puisque notre simulation est limité par l'arithmétique des nombres à virgules flottantes et que l'on devra se contente d'un résultat quasi-exact, validé par un seuil de tolérance adapté.
+
+Afin d'accélérer cette phase de recherche de la configuration de contact, le retour en arrière se fera par dichotomie. On recule en premier lieu de la moitié du pas de temps puis, si l'inter-pénétration est toujours présente, on recule d'un quart du pas de temps, sinon on avance d'un quart du pas de temps, et ainsi de suite jusqu'à obtenir une précision satisfaisante.
+
+DESSIN
+
+Une fois ce processus achevé, la configuration de contact est retrouvé et les deux sphères ne sont plus en situation de pénétration mutuelle. Il reste à déterminer quelles forces appliquer aux corps pour qu'ils se séparent.
+
 \subsubsection{Réponse à une collision}
+
+
 
 \subsection{Le cas général des corps rigides}
 
-\subsubsection{Détection d'une collision}
+\subsubsection{Détection précise d'une collision}
+
+Nous avons vu comment détecter une collision entre deux sphères, retrouver la configuration au temps de contact et les faire réagir de façon réaliste. Le procédé à suivre pour appliquer le même traitement à des corps rigides généralisés se base sur les mêmes principes mais nécessite des méthodes différentes, notamment du fait de leur structure géométrique plus complexe.
+
+Si pour les sphère on détectait une collision en comparant la distance entre les centres et la somme des rayons, il faudra utiliser une autre technique pour les polyhèdres. Heureusement, une loi géométrique naturelle va permettre de vérifier ce prédicat de manière simple et rapide. Cette loi dicte que deux corps ne sont pas en situation d'interpénétration s'il existe dans l'espace un plan les séparant. On nommera un tel plan, plan de séparation.
+
+En cas de non collision, il existe une infinité de plan de séparation entre deux polyhèdres mais on peut se limiter à vérifier les plans prolongeant les faces de chaque corps.
+
+DESSIN
+
+L'algorithme de détection d'une collision suivra donc le mode opératoire suivant :
+
+interpenetration(p1, p2)
+-pour toutes les faces de p1
+--pour tous les vertex de p2
+---si v du mauvais côté
+----retourne vrai
+-retourne faux
+
+r=i(p1, p2) || i(p2, p1)
+
+Cette méthode a pour avantage de savoir de manière certaine si deux polyhèdres sont entrés en collisions ou non mais sa complexité est de mauvaise augure pour la vitesse générale du moteur physique. Des corps composés de peu de faces, des boîtes par exemple, ne poseront pas de problème, mais des polyhèdres plus complexes risquent de ralentir fortement la détection d'une collision (une nouvelle raison d'avoir traîté le problème des sphères de façon différente). Si l'on ajoute à ce problème le fait que cette procédure est subit par chaque corps à chaque itération, blabla.
+
+\subsubsection{Détection d'une collision potentielle}
+
+Une méthode déterminant de façon certaine si des corps sont en contact a été présentée mais malgré la certitude de ses résultats, elle est trop coûteuse pour être utilisée pour chaque corps et à chaque itération. Nous allons utiliser une seconde technique de détection qui nous renseignera sur la possibilité d'une collision. Elle sera moins précise mais beaucoup plus économique. C'est seulement quand cette méthode nous avertira d'une collision possible que l'on utilisera la méthode plus coûteuse des plans de séparation.
+
+La méthode se basera sur l'utilisation de boîtes englobantes, ou \textit{bounding boxes}. Chaque corps est associé à une boîte que le contient entièrement et est alignée par rapport aux axes du repère global (on parle d'\textit{AABB}, pour \textit{axis-aligned bounding-box}). 
 
 \subsubsection{Détection du point de contact}
 
 \subsubsection{Réponse à une collision}
 
-\section{Améliorations}
+\section{Le moteur physique}
+
+\subsection{Tunneling}
+
+\subsection{Ordonnancement des collisions}
 
 \subsection{Partitionnement de l'espace}
 

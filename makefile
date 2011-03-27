@@ -20,4 +20,4 @@ $(EXEC): $(OBJ)
 	g++ -o $@ -c $^
 
 clean:
-	rm *.o *~ .*.swp
+	rm *.o

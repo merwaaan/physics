@@ -18,9 +18,9 @@ Engine::~Engine()
 {
   for(int i = 0; i < this->bodies_p.size(); ++i)
     delete this->bodies_p[i];
-  
-  for(int i = 0; i < this->forces_p.size(); ++i)
-    delete this->forces_p[i];
+
+	for(int i = 0; i < this->environmentalForces_p.size(); ++i)
+		delete this->environmentalForces_p[i];
 }
 
 void Engine::run()
@@ -59,12 +59,15 @@ void Engine::update()
 
             for(int k = 0; k < contacts.size(); ++k)
             {
-	            Vector3 impulse = this->computeImpulse(contacts[k]) * 100;
+	            Vector3 impulse = this->computeImpulse(contacts[k]);
 
-	            this->bodies_p[i]->applyOffCenterForce(-1 * impulse, 1, contacts[k].position);
-	            this->bodies_p[j]->applyOffCenterForce(impulse, 1, contacts[k].position);
+	            this->bodies_p[i]->accumulatedForces += -1 * impulse;
+	    				this->bodies_p[i]->accumulatedTorques += (contacts[k].position - this->bodies_p[i]->position) ^ (-1 * impulse);
+
+							this->bodies_p[j]->accumulatedForces += impulse;
+							this->bodies_p[j]->accumulatedTorques += (contacts[k].position - this->bodies_p[j]->position) ^ impulse;
             }
-          }
+					}
         }
       }
 
@@ -74,10 +77,10 @@ void Engine::update()
     for(int i = 0; i < this->bodies_p.size(); ++i)
     {      
       // apply the external forces
-      for(int j = 0; j < this->forces_p.size(); ++j)
-        this->forces_p[j]->apply(this->bodies_p[i], this->timeStep);
+      for(int j = 0; j < this->environmentalForces_p.size(); ++j)
+        this->environmentalForces_p[j]->apply(this->bodies_p[i], this->timeStep);
 
-      // integrate ach body state
+      // integrate each body state
       this->bodies_p[i]->integrate(this->timeStep);
 
       std::cout << "#" << i << std::endl << *bodies_p[i] << std::endl;
@@ -109,7 +112,7 @@ Vector3 Engine::computeImpulse(Contact contact)
   double t2 = n * ((contact.a->inverseInertiaTensor * (da ^ n)) ^ da);
   double t3 = n * ((contact.b->inverseInertiaTensor * (db ^ n)) ^ db);
 
-  double restitution = this->timeStep > 0 ? 0.8 : 1.25;
+  double restitution = this->timeStep >= 0 ? 0.8 : 1.25;
   double impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t2);
 
   std::cout << "impulse = " << impulse * n << std::endl;
@@ -148,8 +151,8 @@ int Engine::getBodyCount()
   return this->bodies_p.size();
 }
 
-void Engine::addForce_p(Force* force_p)
+void Engine::addEnvironmentalForce_p(Force* force_p)
 {
-  this->forces_p.push_back(force_p);
+  this->environmentalForces_p.push_back(force_p);
 }
 

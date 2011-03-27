@@ -11,7 +11,7 @@ class Engine
 {
   private:
     std::vector<RigidBody*> bodies_p;
-    std::vector<Force*> forces_p;
+    std::vector<Force*> environmentalForces_p;
 
     double timeStep;
     double simulationTime;
@@ -25,6 +25,7 @@ class Engine
     void run();
     void update();
     Vector3 computeImpulse(Contact contact);
+		void applyEnvironmentalForces(RigidBody* rb_p, double dt);
 
     void reverseTime();
     double getTimeStep();
@@ -33,7 +34,7 @@ class Engine
     RigidBody* getBody_p(int i);
     int getBodyCount();
 
-    void addForce_p(Force* force_p);
+    void addEnvironmentalForce_p(Force* force_p);
 };
 
 #endif

@@ -61,12 +61,14 @@ void Engine::update()
             {
 	            Vector3 impulse = this->computeImpulse(contacts[k]);
 
-	            this->bodies_p[i]->accumulatedForces += -1 * impulse;
-	    				this->bodies_p[i]->accumulatedTorques += (contacts[k].position - this->bodies_p[i]->position) ^ (-1 * impulse);
+	            this->bodies_p[i]->accumulatedForces -= impulse;
+	    				this->bodies_p[i]->accumulatedTorques -= (contacts[k].position - this->bodies_p[i]->position) ^ impulse;
 
 							this->bodies_p[j]->accumulatedForces += impulse;
 							this->bodies_p[j]->accumulatedTorques += (contacts[k].position - this->bodies_p[j]->position) ^ impulse;
+							std::cout << "torque " << ((contacts[k].position - this->bodies_p[j]->position) ^ impulse) << std::endl;
             }
+//            exit(0);
 					}
         }
       }
@@ -102,7 +104,7 @@ Vector3 Engine::computeImpulse(Contact contact)
   std::cout << "contact position = " << p << std::endl;
   std::cout << "contact normal = " << n << std::endl;
 
-  double relativeVelocity = n * (contact.a->getVelocity() - contact.b->getVelocity());
+  double relativeVelocity = n * (contact.a->getVelocity(p) - contact.b->getVelocity(p));
 
   // displacements of the contact point with respect to the center of mass of each body
   Vector3 da = p - contact.a->position;
@@ -118,6 +120,12 @@ Vector3 Engine::computeImpulse(Contact contact)
   std::cout << "impulse = " << impulse * n << std::endl;
 
   return impulse * n;
+}
+
+void Engine::applyEnvironmentalForces(RigidBody* rb_p, double dt)
+{
+	for(int i = 0; i < this->environmentalForces_p.size(); ++i)
+		this->environmentalForces_p[i]->apply(rb_p, dt);
 }
 
 void Engine::reverseTime()

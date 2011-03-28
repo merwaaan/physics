@@ -77,6 +77,7 @@ class RigidBody
 
     Vector3 getPosition() const;
     Vector3 getVelocity() const;
+    Vector3 getVelocity(const Vector3& point) const;
 };
 
 #endif

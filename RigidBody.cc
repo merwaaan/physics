@@ -56,7 +56,7 @@ void RigidBody::integrate(double dt)
   if(this->fixed)
     return;
 
-  DerivativeState start;
+/*  DerivativeState start;
 
   DerivativeState k1 = this->evaluate(dt, 0, start);
   DerivativeState k2 = this->evaluate(dt, dt * 0.5, k1);
@@ -83,14 +83,8 @@ void RigidBody::integrate(double dt)
     1.0 / 6 *
     (k1.deltaAngularMomentum + 2 * k2.deltaAngularMomentum + 2 * k3.deltaAngularMomentum + k4.deltaAngularMomentum);
 
-  // reorthogonalize and normalize the orientation matrix to avoid numerical drift
-  this->orientation = this->orientation.orthogonalize();
-  this->orientation = this->orientation.normalize();
-
-  // clear the forces accumulated during the last frame
-  this->clearAccumulators();
-
-/*
+  
+*/
   // linear movement
   this->linearMomentum += this->accumulatedForces;
   Vector3 velocity = this->linearMomentum * this->inverseMass * dt;
@@ -101,7 +95,13 @@ void RigidBody::integrate(double dt)
   Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
   Vector3 angularVelocity = inverseInertia * this->angularMomentum * dt;
   this->orientation += (angularVelocity.toStarMatrix() * this->orientation) * dt;
-*/
+
+// reorthogonalize and normalize the orientation matrix to avoid numerical drift
+  this->orientation = this->orientation.orthogonalize();
+  this->orientation = this->orientation.normalize();
+
+  // clear the forces accumulated during the last frame
+  this->clearAccumulators();
 }
 
 void RigidBody::integrate2(double dt)
@@ -185,3 +185,12 @@ Vector3 RigidBody::getVelocity() const
   return this->linearMomentum * this->inverseMass;
 }
 
+Vector3 RigidBody::getVelocity(const Vector3& point) const
+{
+	Vector3 velocity = this->linearMomentum * this->inverseMass;
+
+  Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
+  Vector3 angularVelocity = inverseInertia * this->angularMomentum;
+
+	return velocity + (angularVelocity ^ (point - this->position));
+}

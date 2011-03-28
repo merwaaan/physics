@@ -176,8 +176,8 @@ void CustomRigidBody::computeBoundingBox()
       maxz = pos.Z();
   }
 
-  this->boundingBox.a = Vector3(minx-1, miny-1, minz-1);
-  this->boundingBox.b = Vector3(maxx+1, maxy+1, maxz+1);
+  this->boundingBox.a = Vector3(minx, miny, minz);
+  this->boundingBox.b = Vector3(maxx, maxy, maxz);
 }
 
 /**
@@ -269,7 +269,7 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 	Vector3 d = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
 	std::cout << "DISTANCE " << d.length() << std::endl;
 
-  double tolerance = 0.01;
+  double tolerance = 0.2;
 
   // if at least one separation plane exists, there is no collision
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
@@ -321,8 +321,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 
   std::cout << "d = " << distance.length() << " ip = " << interPenetration << std::endl;
 	std::cout << *this << std::endl;
-	for(int i = 0; i < this->structure.vertices.size(); ++i)
-		std::cout << this->structure.vertices[i].absPosition << std::endl;
+
   // if bodies are within the tolerance area, compute the real contact points
   if(distance.length() < tolerance)
   {
@@ -339,8 +338,10 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
   else if(!interPenetration)
   {
 	  std::cout << "going forward " << dt/100 << "ms" << std::endl;
-    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
-    rb_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
+
+	  engine_pg->applyEnvironmentalForces(this, dt / 100);
+	  engine_pg->applyEnvironmentalForces(rb_p, dt / 100);
+
     this->integrate(dt / 100);
     rb_p->integrate(dt / 100);
 
@@ -350,13 +351,16 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
   else
   {
 	  std::cout << "going backward " << dt/100 << "ms" << std::endl;
-    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
-    rb_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 100);
+
+	  engine_pg->applyEnvironmentalForces(this, dt / 100);
+	  engine_pg->applyEnvironmentalForces(rb_p, dt / 100);
+
     engine_pg->reverseTime();
     this->integrate(-dt / 100);
     rb_p->integrate(-dt / 100);
     engine_pg->reverseTime();
-    exit(0);
+
+//  exit(0);
     return this->resolveInterPenetration(rb_p, dt, tolerance);
   }
 }

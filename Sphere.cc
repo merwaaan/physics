@@ -112,27 +112,35 @@ std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt, dou
  
   if(distance > radii + tolerance)
   {
-    std::cout << "OUTSIDE (going on " << dt / 2 << ")" << std::endl;
+		double sdt = dt / 2;
 
-    // integrate forward in time in order to determine the real contact point
-    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
-    s_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
-    this->integrate(dt / 2);
-    s_p->integrate(dt / 2);
+    std::cout << "going forward " << sdt << "ms" << std::endl;
+
+		engine_pg->applyEnvironmentalForces(this, sdt);
+		engine_pg->applyEnvironmentalForces(s_p, sdt);
     
-    return this->resolveInterPenetration(s_p, dt / 2, tolerance);
+		this->integrate(sdt);
+    s_p->integrate(sdt);
+    
+    return this->resolveInterPenetration(s_p, sdt, tolerance);
   }
   else if(distance < radii - tolerance)
   {
-    std::cout << "INSIDE (going back " << dt / 2 << ")" << std::endl;
+		double sdt = dt / 2;
 
-    // integrate backward in time in order to determine the real contact point
-    this->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
-    s_p->applyCenterForce(Vector3(0, -9.81, 0), dt / 2);
-    engine_pg->reverseTime();
-    this->integrate(-dt / 2);
-    s_p->integrate(-dt / 2);
-    engine_pg->reverseTime();
+    std::cout << "going backward " << sdt << "ms" << std::endl;
+
+	  engine_pg->applyEnvironmentalForces(this, sdt);
+	  engine_pg->applyEnvironmentalForces(s_p, sdt);
+
+		this->reverseTime();
+		s_p->reverseTime();
+
+    this->integrate(-sdt);
+    s_p->integrate(-sdt);
+
+		this->reverseTime();
+		s_p->reverseTime();
 
     return this->resolveInterPenetration(s_p, dt / 2, tolerance);
   }
@@ -163,4 +171,3 @@ double Sphere::getRadius() const
 {
   return this->radius;
 }
-

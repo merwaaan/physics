@@ -266,7 +266,7 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
  */
 std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
-  double tolerance = 0.2;
+  double tolerance = 0.01;
 
   // if at least one separation plane exists, there is no collision
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
@@ -320,7 +320,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 	std::cout << *this << std::endl;
 
   // if bodies are within the tolerance area, compute the real contact points
-  if(distance.length() < tolerance)
+  if(!interPenetration)//distance.length() < tolerance)
   {
     std::vector<Contact> vfContacts = Geometry::vertexFaceContacts(this, rb_p, tolerance);
     std::vector<Contact> eeContacts = Geometry::edgeEdgeContacts(this, rb_p, tolerance);
@@ -334,9 +334,9 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
   // if the bodies are too far apart, integrate forward in time
   else if(!interPenetration)
   {
-	  std::cout << "going forward " << dt/100 << "ms" << std::endl;
+		double sdt = dt / 2;
 
-		double sdt = dt / 100;
+	  std::cout << "going forward " << sdt << "ms" << std::endl;
 
 	  engine_pg->applyEnvironmentalForces(this, sdt);
 	  engine_pg->applyEnvironmentalForces(rb_p, sdt);
@@ -344,14 +344,15 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
     this->integrate(sdt);
     rb_p->integrate(sdt);
 
-    return this->resolveInterPenetration(rb_p, dt, tolerance);
+    return this->resolveInterPenetration(rb_p, sdt, tolerance);
   }
   // else if the bodies are inter-penetrating, integrate backward in time
   else
   {
-	  std::cout << "going backward " << dt/100 << "ms" << std::endl;
+		double sdt = dt / 2;
 
-		double sdt = dt / 100;
+	  std::cout << "going backward " << sdt << "ms" << std::endl;
+
 	  engine_pg->applyEnvironmentalForces(this, sdt);
 	  engine_pg->applyEnvironmentalForces(rb_p, sdt);
 
@@ -365,7 +366,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 		rb_p->reverseTime();
 
 //  exit(0);
-    return this->resolveInterPenetration(rb_p, dt, tolerance);
+    return this->resolveInterPenetration(rb_p, sdt, tolerance);
   }
 }
 

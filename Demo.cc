@@ -64,50 +64,31 @@ void testGJK()
   std::cout << "DISTANCE" << Geometry::gjkDistanceBetweenPolyhedra(c1, c2) << std::endl;
 }
 
-void compareRK4ToEuler()
-{
-  double dt = 0.0166;
-
-  Sphere* s = new Sphere(1);
-  s->prepare();
-  Sphere* s2 = new Sphere(1);
-  s2->prepare();
-
-  s2->applyCenterForce(Vector3(10, 0, 0), dt);
-  s2->integrate(0.1);
-
-  for(int i = 1; i < 10; ++i)
-  {
-    s->applyCenterForce(Vector3(10, 0, 0), dt);
-    s2->applyCenterForce(Vector3(10, 0, 0), dt);
-    
-    s->integrate(0.1);
-    s2->integrate2(0.1);
-    
-    std::cout << 0.5 * 10  * i * i / 100<< " " << s->position.length() << " " << s2->position.length() << std::endl;
-  }
- 
-}
-
 void testTimeReversing()
 {
   double dt = 1;
+	double g = -1;
 
   Sphere* s = new Sphere(1);
   s->prepare();
-  s->applyCenterForce(Vector3(0, -9.81, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
-  s->applyCenterForce(Vector3(0, -9.81, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
-  s->applyCenterForce(Vector3(0, -9.81, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
-  s->applyCenterForce(Vector3(0, -9.81, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
+	s->angularMomentum = Vector3(1, 0, 0);
+
+	std::cout << *s << std::endl;
+  s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
+  s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
+  s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
+  s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
 
   std::cout << "reversing time..." << std::endl << std::endl;
-  s->linearMomentum = -1 * s->linearMomentum;
+  s->linearMomentum *= -1;
+	s->angularMomentum *= -1;
+	dt *= -1;
 
   std::cout << *s << std::endl;
-  s->applyCenterForce(Vector3(0, -9.81, 0), -dt); s->integrate(-dt); std::cout << *s << std::endl;
-  s->applyCenterForce(Vector3(0, -9.81, 0), -dt); s->integrate(-dt); std::cout << *s << std::endl;
-  s->applyCenterForce(Vector3(0, -9.81, 0), -dt); s->integrate(-dt); std::cout << *s << std::endl;
-  s->applyCenterForce(Vector3(0, -9.81, 0), -dt); s->integrate(-dt); std::cout << *s << std::endl;
+  s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
+  s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
+  s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
+  s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
 }
 
 void demoMultiBall()
@@ -149,7 +130,7 @@ void demoSimpleBox()
 void demoMultiBox()
 {
 	Cube* c = new Cube(2);
-//	c->angularMomentum = Vector3(3, 3, 3);
+	c->angularMomentum = Vector3(3, 3, 3);
 	c->setPosition(2.5, 5, 0);
   e->addRigidBody_p(c);
 
@@ -172,11 +153,10 @@ int main(int argc, char** argv)
   //testGeometry();
   //testGJK();
   //testTimeReversing();
-  //compareRK4ToEuler();
 
   //demoMultiBall();
-  //demoSimpleBox();
-  demoMultiBox();
+  demoSimpleBox();
+	//demoMultiBox();
   
   delete e;
 

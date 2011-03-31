@@ -38,7 +38,7 @@ void RigidBody::applyCenterForce(Vector3 force, double dt)
 	if(this->fixed)
 		return;
 
-  this->accumulatedForces += force * dt;
+  this->accumulatedForces += force * dt * (dt < 0 ? -1 : 1);
 }
 
 void RigidBody::applyOffCenterForce(Vector3 force, double dt, Vector3 poa)
@@ -52,88 +52,43 @@ void RigidBody::applyOffCenterForce(Vector3 force, double dt, Vector3 poa)
 
 void RigidBody::integrate(double dt)
 {
-  // we don't need to integrate fixed bodies
+  // short-circuit the integration of fixed bodies in order to use less ressources
   if(this->fixed)
     return;
 
-/*  DerivativeState start;
+  /**
+	 * LINEAR MOVEMENT
+	 */
+ 
+	if(dt > 0)
+		this->linearMomentum += this->accumulatedForces;
 
-  DerivativeState k1 = this->evaluate(dt, 0, start);
-  DerivativeState k2 = this->evaluate(dt, dt * 0.5, k1);
-  DerivativeState k3 = this->evaluate(dt, dt * 0.5, k2);
-  DerivativeState k4 = this->evaluate(dt, dt, k3);
+  Vector3 velocity = this->linearMomentum * this->inverseMass;
+  this->position += velocity * dt * (dt < 0 ? -1 : 1);
 
-  this->position +=
-    (dt < 0 ? -1 : 1) *
-    1.0 / 6 *
-    (k1.deltaPosition + 2 * k2.deltaPosition + 2 * k3.deltaPosition + k4.deltaPosition);
-  
-  this->linearMomentum +=
-    (dt < 0 ? -1 : 1) *
-    1.0 / 6 *
-    (k1.deltaLinearMomentum + 2 * k2.deltaLinearMomentum + 2 * k3.deltaLinearMomentum + k4.deltaLinearMomentum);
+	if(dt < 0)
+		this->linearMomentum += this->accumulatedForces;
 
-  this->orientation +=
-    (dt < 0 ? -1 : 1) *
-    1.0 / 6 *
-	  (k1.deltaOrientation + 2 * k2.deltaOrientation + 2 * k3.deltaOrientation + k4.deltaOrientation);
+	/**
+	 * ANGULAR MOVEMENT
+	 */
 
-  this->angularMomentum +=
-    (dt < 0 ? -1 : 1) *
-    1.0 / 6 *
-    (k1.deltaAngularMomentum + 2 * k2.deltaAngularMomentum + 2 * k3.deltaAngularMomentum + k4.deltaAngularMomentum);
+	if(dt > 0)
+		this->angularMomentum += this->accumulatedTorques;
 
-  
-*/
-  // linear movement
-  this->linearMomentum += this->accumulatedForces;
-  Vector3 velocity = this->linearMomentum * this->inverseMass * dt;
-  this->position += velocity * dt;
-
-  // angular movement
-  this->angularMomentum += this->accumulatedTorques;
   Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
-  Vector3 angularVelocity = inverseInertia * this->angularMomentum * dt;
+  Vector3 angularVelocity = inverseInertia * this->angularMomentum;
   this->orientation += (angularVelocity.toStarMatrix() * this->orientation) * dt;
 
-// reorthogonalize and normalize the orientation matrix to avoid numerical drift
+	if(dt < 0)
+		this->angularMomentum += this->accumulatedTorques;
+
+	// reorthogonalize and normalize the orientation matrix to avoid numerical drift
   this->orientation = this->orientation.orthogonalize();
   this->orientation = this->orientation.normalize();
 
   // clear the forces accumulated during the last frame
   this->clearAccumulators();
-}
-
-void RigidBody::integrate2(double dt)
-{
-  Vector3 velocity = this->linearMomentum * this->inverseMass * dt;
-  this->position += velocity * dt;
-  
-  this->linearMomentum += this->accumulatedForces;
-
-  this->clearAccumulators();
-}
-
-DerivativeState RigidBody::evaluate(double dt, double sdt, DerivativeState ds)
-{
-  Vector3 linearMomentum = this->linearMomentum + ds.deltaLinearMomentum * (dt >= 0 ? sdt / dt : 1 - sdt / dt);
-  Vector3 angularMomentum = this->angularMomentum + ds.deltaAngularMomentum * (dt >= 0 ? sdt / dt : 1 - sdt / dt);
-
-  DerivativeState ds2;
-
-  // linear component
-  Vector3 velocity = linearMomentum * this->inverseMass * sdt;
-  ds2.deltaPosition = velocity;
-  ds2.deltaLinearMomentum = this->accumulatedForces;
-
-  // angular component
-  Matrix3 orientation = this->orientation + ds.deltaOrientation;
-  Matrix3 inverseInertia = orientation * this->inverseInertiaTensor * orientation.transpose();
-  Vector3 angularVelocity = inverseInertia * angularMomentum * sdt;
-  ds2.deltaOrientation = angularVelocity.toStarMatrix() * this->orientation;
-  ds2.deltaAngularMomentum = this->accumulatedTorques;
-
-  return ds2;
 }
 
 bool RigidBody::isBoundingBoxCollidingWith(RigidBody* rb_p)

@@ -57,8 +57,6 @@ class RigidBody
     void applyCenterForce(Vector3 force, double dt);
     void applyOffCenterForce(Vector3 force, double dt, Vector3 poa);
     virtual void integrate(double dt);
-    virtual void integrate2(double dt);
-    DerivativeState evaluate(double dt, double sdt, DerivativeState ds);
 
     virtual void draw() = 0;
 

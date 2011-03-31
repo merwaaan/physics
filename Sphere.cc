@@ -65,13 +65,6 @@ void Sphere::integrate(double dt)
   this->computeBoundingBox();
 }
 
-void Sphere::integrate2(double dt)
-{
-  RigidBody::integrate2(dt);
-  
-  this->computeBoundingBox();
-}
-
 void Sphere::draw()
 {
   glPushMatrix();

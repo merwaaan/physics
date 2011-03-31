@@ -68,7 +68,7 @@ void Engine::update()
 							this->bodies_p[j]->accumulatedTorques += (contacts[k].position - this->bodies_p[j]->position) ^ impulse;
 							std::cout << "torque " << ((contacts[k].position - this->bodies_p[j]->position) ^ impulse) << std::endl;
             }
-//            exit(0);
+            //exit(0);
 					}
         }
       }
@@ -133,10 +133,7 @@ void Engine::reverseTime()
   this->timeStep = -this->timeStep;
 
   for(int i = 0; i < this->bodies_p.size(); ++i)
-  {
-    this->bodies_p[i]->linearMomentum *= -1;
-    this->bodies_p[i]->angularMomentum *= -1;
-  }
+		this->bodies_p[i]->reverseTime();
 }
 
 double Engine::getTimeStep()

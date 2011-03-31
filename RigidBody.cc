@@ -46,8 +46,8 @@ void RigidBody::applyOffCenterForce(Vector3 force, double dt, Vector3 poa)
 	if(this->fixed)
 		return;
 
-	this->accumulatedForces += force * dt;
-  this->accumulatedTorques += (poa - this->position) ^ (force * dt);
+	this->accumulatedForces += force * dt * (dt < 0 ? -1 : 1);
+  this->accumulatedTorques += (poa - this->position) ^ (force * dt) * (dt < 0 ? -1 : 1);
 }
 
 void RigidBody::integrate(double dt)
@@ -78,7 +78,7 @@ void RigidBody::integrate(double dt)
 
   Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
   Vector3 angularVelocity = inverseInertia * this->angularMomentum;
-  this->orientation += (angularVelocity.toStarMatrix() * this->orientation) * dt;
+  this->orientation += (angularVelocity.toStarMatrix() * this->orientation) * dt * (dt < 0 ? -1 : 1);
 
 	if(dt < 0)
 		this->angularMomentum += this->accumulatedTorques;
@@ -89,6 +89,12 @@ void RigidBody::integrate(double dt)
 
   // clear the forces accumulated during the last frame
   this->clearAccumulators();
+}
+
+void RigidBody::reverseTime()
+{
+	this->linearMomentum *= -1;
+	this->angularMomentum *= -1;
 }
 
 bool RigidBody::isBoundingBoxCollidingWith(RigidBody* rb_p)

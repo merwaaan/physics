@@ -57,6 +57,7 @@ class RigidBody
     void applyCenterForce(Vector3 force, double dt);
     void applyOffCenterForce(Vector3 force, double dt, Vector3 poa);
     virtual void integrate(double dt);
+		void reverseTime();
 
     virtual void draw() = 0;
 

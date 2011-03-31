@@ -266,9 +266,6 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
  */
 std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
-	Vector3 d = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
-	std::cout << "DISTANCE " << d.length() << std::endl;
-
   double tolerance = 0.2;
 
   // if at least one separation plane exists, there is no collision
@@ -339,11 +336,13 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
   {
 	  std::cout << "going forward " << dt/100 << "ms" << std::endl;
 
-	  engine_pg->applyEnvironmentalForces(this, dt / 100);
-	  engine_pg->applyEnvironmentalForces(rb_p, dt / 100);
+		double sdt = dt / 100;
 
-    this->integrate(dt / 100);
-    rb_p->integrate(dt / 100);
+	  engine_pg->applyEnvironmentalForces(this, sdt);
+	  engine_pg->applyEnvironmentalForces(rb_p, sdt);
+
+    this->integrate(sdt);
+    rb_p->integrate(sdt);
 
     return this->resolveInterPenetration(rb_p, dt, tolerance);
   }
@@ -352,13 +351,18 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
   {
 	  std::cout << "going backward " << dt/100 << "ms" << std::endl;
 
-	  engine_pg->applyEnvironmentalForces(this, dt / 100);
-	  engine_pg->applyEnvironmentalForces(rb_p, dt / 100);
+		double sdt = dt / 100;
+	  engine_pg->applyEnvironmentalForces(this, sdt);
+	  engine_pg->applyEnvironmentalForces(rb_p, sdt);
 
-    engine_pg->reverseTime();
-    this->integrate(-dt / 100);
-    rb_p->integrate(-dt / 100);
-    engine_pg->reverseTime();
+		this->reverseTime();
+		rb_p->reverseTime();
+
+    this->integrate(-sdt);
+    rb_p->integrate(-sdt);
+
+		this->reverseTime();
+		rb_p->reverseTime();
 
 //  exit(0);
     return this->resolveInterPenetration(rb_p, dt, tolerance);

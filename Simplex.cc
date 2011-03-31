@@ -4,15 +4,11 @@
 
 void Simplex::reduce(Vector3 closest)
 {
-  // the simplex only has one point : it is already in his minimum form
-  if(this->points.size() == 1)
-    return;
-
-  // the simplex has two points : the edge can de reduced to a single vertex
-  if(this->points.size() == 2)
+	// the simplex has four points : the tetrahedron can be reduced to a face
+  if(this->points.size() == 4)
   {
-    if(this->points[1] == closest)
-	    this->points.erase(this->points.begin());
+		
+
   }
 
   // the simplex has three points : the face can de reduced to an edge
@@ -24,19 +20,13 @@ void Simplex::reduce(Vector3 closest)
     Geometry::closestPointOfEdge(closest, edge, &distance);
 
     if(distance < 0.01)
-    {
       this->points.erase(this->points.begin());
-
-      // recursively call the reduction method so that the previous cases can be tested
-      this->reduce(closest);
-    }
   }
 
-  // the simplex has four points : the tetrahedron can be reduced to a face
-  if(this->points.size() == 4)
-  {
-
-  }
+  // the simplex has two points : the edge can de reduced to a single vertex
+  if(this->points.size() == 2)
+    if(this->points[1] == closest)
+	    this->points.erase(this->points.begin());
 }
 
 Vector3 Simplex::closestPointToOrigin() const
@@ -75,4 +65,3 @@ Vector3 Simplex::closestPointToOrigin() const
 
   return Vector3(0, 0, 0);
 }
-

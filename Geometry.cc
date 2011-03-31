@@ -471,6 +471,7 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
     // add the support point to the simplex
     simplex.points.push_back(support);
 
+		// find the simplex point closest to the origin
     closest = simplex.closestPointToOrigin();
 
     // reduce the simplex to a minimum simplex by getting rid of the vertices which

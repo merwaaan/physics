@@ -32,14 +32,20 @@ class RigidBody
     Matrix3 inverseInertiaTensor;
 
     BoundingBox boundingBox;
-    
+
+    // linear component
     Vector3 position;
     Vector3 linearMomentum;
     Vector3 accumulatedForces;
 
+    // angular component
     Matrix3 orientation;
     Vector3 angularMomentum;
     Vector3 accumulatedTorques;
+
+    // cached auxiliary quantities
+    Vector3 linearVelocity;
+    Vector3 angularVelocity;
 
     bool fixed;
 
@@ -57,6 +63,7 @@ class RigidBody
     void applyCenterForce(Vector3 force, double dt);
     void applyOffCenterForce(Vector3 force, double dt, Vector3 poa);
     virtual void integrate(double dt);
+    void computeAuxiliaryQuantities();
 		void reverseTime();
 
     virtual void draw() = 0;

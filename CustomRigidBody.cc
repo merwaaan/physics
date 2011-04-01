@@ -329,6 +329,11 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
     for(int i = 0; i < eeContacts.size(); ++i)
 			vfContacts.push_back(eeContacts[i]);
 
+    // recompute auxiliary quantities as they could have been
+    // corrupted during the binary search
+    vfContacts[0].a->computeAuxiliaryQuantities();
+    vfContacts[0].b->computeAuxiliaryQuantities();
+
     return vfContacts;
   }
   // if the bodies are too far apart, integrate forward in time
@@ -365,7 +370,6 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 		this->reverseTime();
 		rb_p->reverseTime();
 
-//  exit(0);
     return this->resolveInterPenetration(rb_p, sdt, tolerance);
   }
 }

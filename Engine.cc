@@ -62,14 +62,15 @@ void Engine::update()
 	            Vector3 impulse = this->computeImpulse(contacts[k]);
 
 	            this->bodies_p[i]->accumulatedForces -= impulse;
-	    				this->bodies_p[i]->accumulatedTorques -= (contacts[k].position - this->bodies_p[i]->position) ^ impulse;
+	            this->bodies_p[i]->accumulatedTorques -= (contacts[k].position - this->bodies_p[i]->position) ^ impulse;
 
-							this->bodies_p[j]->accumulatedForces += impulse;
-							this->bodies_p[j]->accumulatedTorques += (contacts[k].position - this->bodies_p[j]->position) ^ impulse;
+	            this->bodies_p[j]->accumulatedForces += impulse;
+	            this->bodies_p[j]->accumulatedTorques += (contacts[k].position - this->bodies_p[j]->position) ^ impulse;
 
 							std::cout << "torque " << ((contacts[k].position - this->bodies_p[j]->position) ^ impulse) << std::endl;
             }
 					}
+//          exit(0);
         }
       }
 
@@ -103,6 +104,7 @@ Vector3 Engine::computeImpulse(Contact contact)
   Vector3 n = contact.normal;
 	RigidBody* a = contact.a;
 	RigidBody* b = contact.b;
+
   std::cout << "contact position = " << p << std::endl;
   std::cout << "contact normal = " << n << std::endl;
 
@@ -113,13 +115,13 @@ Vector3 Engine::computeImpulse(Contact contact)
   Vector3 db = p - b->position;
 
 	Matrix3 inverseInertiaA = a->orientation * a->inverseInertiaTensor * a->orientation.transpose();
-	Matrix3 inverseInertiaB = b->orientation * b->inverseInertiaTensor * b->orientation.transpose();
+ 	Matrix3 inverseInertiaB = b->orientation * b->inverseInertiaTensor * b->orientation.transpose();
 
   double t1 = a->inverseMass + b->inverseMass;
   double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
   double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
 
-  double restitution = this->timeStep >= 0 ? 0.8 : 1.25;
+  double restitution = this->timeStep > 0 ? 0.8 : 1.25;
 
   double impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t2);
 

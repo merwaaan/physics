@@ -12,6 +12,16 @@ void input(unsigned char k, int x, int y)
 {
   if(k == 32)
 	  e->reverseTime();
+  else if(k == 97)
+  {
+	  Cube* c = new Cube(2);
+
+	  c->setPosition((float)rand() / RAND_MAX * 8, 5, (float)rand() / RAND_MAX * 8);
+	  c->position += Vector3(-4, 0, -4);
+	  
+	  c->prepare();
+	  e->addRigidBody_p(c);
+  }
 }
 
 void testGeometry()
@@ -130,7 +140,7 @@ void demoSimpleBox()
 void demoMultiBox()
 {
 	Cube* c = new Cube(2);
-	//c->angularMomentum = Vector3(3, 3, 3);
+//	c->angularMomentum = Vector3(3, 3, 3);
 	c->setPosition(2.5, 5, 0);
   e->addRigidBody_p(c);
 
@@ -146,6 +156,8 @@ void demoMultiBox()
 
 int main(int argc, char** argv)
 {
+	srand(time(NULL));
+
   e = new Engine(&argc, argv, 0.0166);
   
   glutKeyboardFunc(&input);
@@ -154,7 +166,7 @@ int main(int argc, char** argv)
   //testGJK();
   //testTimeReversing();
 
-  demoMultiBall();
+  //demoMultiBall();
   //demoSimpleBox();
 	demoMultiBox();
   

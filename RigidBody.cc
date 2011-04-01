@@ -89,6 +89,17 @@ void RigidBody::integrate(double dt)
 
   // clear the forces accumulated during the last frame
   this->clearAccumulators();
+
+  // cache the auxiliary quantities
+  this->computeAuxiliaryQuantities();
+}
+
+void RigidBody::computeAuxiliaryQuantities()
+{
+	this->linearVelocity = this->linearMomentum * this->inverseMass;
+
+  Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
+  this->angularVelocity = inverseInertia * this->angularMomentum;
 }
 
 void RigidBody::reverseTime()
@@ -148,10 +159,5 @@ Vector3 RigidBody::getVelocity() const
 
 Vector3 RigidBody::getVelocity(const Vector3& point) const
 {
-	Vector3 velocity = this->linearMomentum * this->inverseMass;
-
-  Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
-  Vector3 angularVelocity = inverseInertia * this->angularMomentum;
-
-	return velocity + (angularVelocity ^ (point - this->position));
+	return this->linearVelocity + (this->angularVelocity ^ (point - this->position));
 }

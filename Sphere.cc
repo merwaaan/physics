@@ -156,6 +156,11 @@ std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt, dou
   std::vector<Contact> contacts;
   contacts.push_back(contact);
 
+  // recompute auxiliary quantites as they could have been
+  // corrupted during the binary search
+  contacts[0].a->computeAuxiliaryQuantities();
+  contacts[0].b->computeAuxiliaryQuantities();
+
   return contacts;
 }
 

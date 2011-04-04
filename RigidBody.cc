@@ -46,7 +46,7 @@ void RigidBody::applyOffCenterForce(Vector3 force, double dt, Vector3 poa)
 	if(this->fixed)
 		return;
 
-	this->accumulatedForces += force * dt * (dt < 0 ? -1 : 1);
+	this->accumulatedForces += (force * dt) * (dt < 0 ? -1 : 1);
   this->accumulatedTorques += (poa - this->position) ^ (force * dt) * (dt < 0 ? -1 : 1);
 }
 

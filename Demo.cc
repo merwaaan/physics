@@ -156,7 +156,7 @@ void demoMultiBox()
 
 int main(int argc, char** argv)
 {
-	srand(time(NULL));
+	srand(1);
 
   e = new Engine(&argc, argv, 0.0166);
   

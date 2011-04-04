@@ -544,8 +544,8 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 		    Vector3 normal = (v1 ^ v2).normalize();
 
 		    // check if the normal vector is directed toward the appropriate body
-		    if(???)
-			    ???;
+//		    if(???)
+//			    ???;
 
 		    contact.normal = normal;
 

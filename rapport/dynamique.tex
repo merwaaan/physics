@@ -1,0 +1,88 @@
+\section{Dynamique} 
+
+\subsection{La composante linéaire du mouvement}
+
+Nous allons pour l'instant nous concentrer sur l'aspect cinématique d'un corps rigide, c'est à dire son mouvement lorsqu'il n'est soumis à aucune force extérieure. Les corps dont nous allons simuler le comportement seront réduits à de simples particules. Les figures présentées sont en deux dimensions pour des raisons de clarté mais le principe reste similaire lorsqu'il est étendu à la troisième dimension.
+
+La cinématique est l'étude de l'évolution des quantités qui influent sur le déplacement d'un objet dans l'espace. La quantité d'un objet la plus perceptible visuellement pour un spectateur est sa position $p$. Pour notre représentation finale, c'est cette valeur à tout instant $t$ de la simulation que l'on veut déterminer. Tout solide dispose aussi d'une vitesse $v$, qui correspond à la variation de sa position pour une unité de temps. On note cette relation sous la forme dérivée :
+
+\[v = \frac{\delta p}{\delta t}\]
+
+Pareillement, l'accéleration $a$ correspond à la variation de la vitesse par rapport à une unité de temps. Par transitivité, on remarque que la position est dépendantes de l'accélération.
+
+\[a = \frac{\delta v}{\delta t} = \frac{\delta^2 p}{\delta t}\]
+
+Une question reste en suspens. Nous savons que la position d'un corps dépend de son accélération, mais comment cette dernière varie-t-elle ?
+
+Pour répondre, nous allons nous diriger vers la seconde loi de Newton, qui énonce la relation entre l'accélération $a$ d'un objet, sa masse $m$ et les forces $F_i$ qu'il subit.
+
+\[\sum F_i = m a\]
+
+\[a = \frac{\sum F_i}{m}\]
+
+Chacun des corps rigides dont l'on veut simuler l'évolution possède ces trois quantités sous forme de vecteurs et l'une des tâches de base du moteur physique sera de déterminer leurs fluctuations. On sait qu'elles entretiennent des relations de dérivation, il faudra donc procéder par intégration pour calculer la position d'un objet à partir de son accélération.
+
+\subsection{Intégration}
+
+Dans la sous-section précédente, les différentes quantités physiques entrant en jeu dans les mouvement linéaires ont été présentées. Voyons maintenant de façon plus concrète quels calculs serviront de fondation au moteur physique.
+
+Les phénomènes mécaniques du monde réel évoluent de façon continue mais notre simulation ne peut pas s'autoriser ce luxe puisque la rapidité d'éxécution est l'une des principales contraintes imposées. Le modèle du moteur physique sera donc discret et avancera par pas de temps fixe. Des intégrations successives doivent être réalisées pour déterminer le changement d'état d'un corps d'un instant $t_n$ à un instant $t_{n+1}$ mais toujours pour des raisons d'efficacité, nous devrons nous contenter d'approximations de ces intégrales.
+
+Parmi les méthodes classiques d'intégration approximative, on trouve l'intégration d'Euler. Cette méthode part du principe que l'on dispose de la valeur initiale $x_0$ de la quantité que l'on souhaite faire évoluer ainsi que de son taux de changement $x'$ et de la variation de temps par rapport à l'état précédent.
+
+\[x_{n+1} = x_{n} + x' * t\]
+
+Si l'on adapte cette idée à notre problème, on obtient la succession de calculs suivante :
+
+\[a_{n+1} = \frac{\sum F}{m}\]
+\[v_{n+1} = v_n + a_{n+1} t\]
+\[p_{n+1} = p_n + v_{n+1} t\]
+
+On calcule l'accélération à un instant $t$ puis on intègre en fonction du temps jusqu'à obtenir la nouvelle position du corps. En l'état actuel des choses, les trois quantités doivent être continuellement calculées et maintenues à jour. Afin de réduire la complexité de la structure informatique qui représentera un corps rigide, nous allons introduire la notion d'élan linéaire. Pour un corps de masse $m$ doté d'une vitesse $v$, l'élan linéaire est noté $L = mv$. Cette nouvelle quantité a pour avantage de posséder comme dérivée la variation de force exercée sur le corps, ce qui signifie que l'on peut réduire l'intégration de l'état d'un corps à :
+
+\[L_{n+1} = {\sum F}\]
+\[p_{n+1} = p_n + \frac{L_{n+1}}{m} t\]
+
+\subsection{Modélisation d'un corps rigide}
+
+Nous avons décrit dans la partie précédente les quantités régissant le mouvement linéaire d'une particule mais le moteur physique que l'on conçoit à pour visée de simuler les interactions entre des corps rigides de dimension trois. Comment peut-on étendre les principes énoncés plus haut à ce modèle ?
+
+On pourrait en premier lieu penser à représenter un tel corps par une liste de particules, chacune placée à un coin de l'objet. Chaque particule évoluerait indépendement et des contraintes de cohésion entre particules voisines seraient appliquées pour empêcher toute déformation du corps. Cette méthode est envisageable mais elle présente plusieurs désavantages. Premièrement, les règles de cohésion à mettre en place nécessiteraient des traitements supplémentaires, et donc un temps de calcul plus long. Deuxièmement, il existe une solution plus simple et plus élégante qui permet de réduire les mouvements d'un corps rigide à ceux d'une unique particule judicieusement placée.
+
+Introduisons en premier lieu la notion de repères absolu et local. Le repère absolu est le référentiel orthogonal dont l'origine sert de centre à l'environnement de notre simulation. Un repère local est un référentiel qui est unique à chaque corps et dont le centre se situe à l'intérieur même de cet objet. Sa position exacte dépend de la position des particules qui forment l'objet mais il ne s'agit pas d'un simple centre géométrique puisque la masse de chaque particule est aussi un facteur déterminant. Cette position se nomme le centre de masse, ou barycentre, et sera calculée une fois la structure du corps définie par l'équation suivante, o\`u $M$ représente la masse totale des particules, $m_i$ la masse de la particule $i$ et $p_i$ la position de la particule dans le repère absolu.
+
+\[C = \frac{1}{M} \sum m_i p_i\]
+
+Une fois le centre de masse défini, la position locale $r_i$ d'une particule $i$ peut être calculée en fonction de sa position absolue $p_i$ par :
+
+\[r_i = p_i - C\]
+
+Une fois la position du centre de masse déterminée, on l'utilise comme point de référence pour positionner le corps.
+
+DESSIN repère global + corps avec repère local
+
+\subsection{La composante angulaire du mouvement}
+
+Le modèle que nous avons défini est encore incomplet puisqu'il ne prend pas en compte la composante rotationnelle des mouvements dont l'on peut être témoin dans un environnement réel. Les particules étant de simples points flottants dans l'espace, cela ne posait pas de problème précédemment mais le moteur physique que l'on conçoit doit gérer des corps rigiques plus complexes. Imaginons une boîte cubique que l'on lancerait en l'air, si aucune rotation n'apparaît (si la base de la boîte reste parallèle au sol), l'imitation du réel que l'on souhaite reproduire perd toute crédibilité.
+
+Les quantités physiques entrant en jeu dans la décomposition angulaire d'un déplacement sont analogues à celle présentées dans la partie traitant de la cinétique linéaire. De la même façon que la position représentait visuellement l'état d'un corps au sein de la composante linéaire, un corps doit posséder une orientation. En deux dimensions, un nombre flottant représentant l'angle du corps par rapport à un axe fixe suffirait à décrire l'orientation d'un objet mais pas dans notre environnement en trois dimensions. Le repère local d'un corps a été introduit dans la partie précédente et se résumait à un centre de masse faisant office d'origine, mais un repère possède aussi des axes et ceux du repère local ne sont pas nécessairement alignés avec ceux du repère absolu ! Pour représenter la direction des axes du repère local, on utilisera une matrice de dimension trois au sein de laquelle chaque vecteur colonne correspondra à un des axes du repère local. Pour illustrer ces propos, analysons la matrice d'orientation d'un objet aligné avec le repère absolu (elle pourrait correspondre à celle d'un objet n'ayant subi aucune rotation).
+
+\[
+%\begin{pmatrix}
+%  1 & 0 & 0 \\
+%  0 & 1 & 0 \\
+%  0 & 0 & 1
+%\end{pmatrix}
+\]
+
+Si l'on isole chaque vecteur colonne de cette matrice identité, on remarque que chaque vecteur correspond à un des axes du repère global.
+
+\[
+\begin{pmatrix}
+  1 \\
+  0 \\
+  0
+\end{pmatrix}
+\]
+
+Il nous faut désormais représenter le taux de variation de l'orientation d'un corps, la vitesse angulaire (l'analogie linéaire est ici la vitesse linéaire décrite précédemment). La vitesse angulaire sera représentée par un vecteur dont la direction correspondra à l'axe autour duquel le corps effectuera sa rotation et dont la magnitude représentera le nombre de rotations à effectuer en une unité de temps. La relation entre orientation

@@ -496,10 +496,11 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
       if(distance < tolerance)
       {
         Contact contact;
+
         contact.a = rb1_p;
         contact.b = rb2_p;
         contact.position = (point + vertex) / 2;
-        contact.normal = (point - vertex).normalize();
+        contact.normal = (vertex - point).normalize();
 
         contacts.push_back(contact);  
       }
@@ -524,8 +525,9 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 
   std::vector<Edge> edges1 = rb1_p->structure.getEdges();
   std::vector<Edge> edges2 = rb2_p->structure.getEdges();
-  std::cout << "1 " << ((Box*)rb1_p)->width << std::endl;
-  std::cout << "2 " << ((Box*)rb2_p)->width << std::endl;
+  std::cout << "a " << ((Box*)rb1_p)->width << std::endl;
+  std::cout << "b " << ((Box*)rb2_p)->width << std::endl;
+
   for(int i = 0; i < edges1.size(); ++i)
 	  for(int j = 0; j < edges2.size(); ++j)
     {
@@ -535,19 +537,14 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 	    if(distance < tolerance)
 	    {
 		    Contact contact;
+
 		    contact.a = rb1_p;
 		    contact.b = rb2_p;
 		    contact.position = closest1 + (closest2 - closest1) / 2;
 
 		    Vector3 v1 = edges1[i].b - edges1[i].a;
 		    Vector3 v2 = edges2[j].b - edges2[j].a;
-		    Vector3 normal = (v1 ^ v2).normalize();
-
-		    // check if the normal vector is directed toward the appropriate body
-//		    if(???)
-//			    ???;
-
-		    contact.normal = normal;
+		    contact.normal = (v1 ^ v2).normalize();
 
 		    contacts.push_back(contact);
 	    }

@@ -36,10 +36,10 @@ void Engine::update()
 {
   if(this->simulationTime >= 0)
   {
-    std::cout << "---------------------------------------" << std::endl;
-    std::cout << "simulation time = " << this->simulationTime << "s" << std::endl;
+    ///std::cout << "---------------------------------------" << std::endl;
+    //std::cout << "simulation time = " << this->simulationTime << "s" << std::endl;
 
-    std::cout << std::endl << "--- COLLISION PHASE ---" << std::endl;
+		// std::cout << std::endl << "--- COLLISION PHASE ---" << std::endl;
 
     // check for collisions
     for(int i = 1; i < this->bodies_p.size(); ++i)
@@ -69,7 +69,7 @@ void Engine::update()
         }
       }
 
-    std::cout << std::endl << "--- INTEGRATION PHASE ---" << std::endl;
+    //std::cout << std::endl << "--- INTEGRATION PHASE ---" << std::endl;
 
     // integrate the rigid bodies states
     for(int i = 0; i < this->bodies_p.size(); ++i)
@@ -81,7 +81,7 @@ void Engine::update()
       // integrate each body state
       this->bodies_p[i]->integrate(this->timeStep);
 
-      std::cout << "#" << i << std::endl << *bodies_p[i] << std::endl;
+      //std::cout << "#" << i << std::endl << *bodies_p[i] << std::endl;
     }
 
     this->simulationTime += this->timeStep;
@@ -104,27 +104,32 @@ Vector3 Engine::computeImpulse(Contact contact)
   std::cout << "contact normal = " << n << std::endl;
 
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
+
   std::cout << "relative velocity " << relativeVelocity << std::endl;
 
   // displacements of the contact point with respect to the center of mass of each body
   Vector3 da = p - a->position;
   Vector3 db = p - b->position;
-  std::cout << "displacement " << da.length() << " " << db.length() << std::endl;
+  std::cout << "displacement " << da << " " << db << std::endl;
 
 	Matrix3 inverseInertiaA = a->orientation * a->inverseInertiaTensor * a->orientation.transpose();
  	Matrix3 inverseInertiaB = b->orientation * b->inverseInertiaTensor * b->orientation.transpose();
 	std::cout << "A " << ((Box*)a)->width << std::endl;
+
   double t1 = a->inverseMass + b->inverseMass;
   double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
   double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
 
+	std::cout << n << std::endl;
+	std::cout << (-1.8 * relativeVelocity) / (t1 + t2 + t3) << std::endl;
+	std::cout <<  (-1.8 * relativeVelocity) / (t1 + t2 + t3) * n << std::endl;
   double restitution = this->timeStep > 0 ? 0.8 : 1.25;
 
-  double impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t2);
+  Vector3 impulse = (-1.8 * relativeVelocity) / (t1 + t2 + t3) * n;
 
-  std::cout << "impulse = " << impulse * n << std::endl;
+std::cout << "impulse = " << impulse << std::endl;
 
-  return impulse * n;
+  return impulse;
 }
 
 void Engine::applyEnvironmentalForces(RigidBody* rb_p, double dt)

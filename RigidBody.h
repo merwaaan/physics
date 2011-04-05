@@ -47,6 +47,8 @@ class RigidBody
     Vector3 linearVelocity;
     Vector3 angularVelocity;
 
+		double coefficientOfRestitution;
+
     bool fixed;
 
   public:
@@ -84,6 +86,9 @@ class RigidBody
     Vector3 getPosition() const;
     Vector3 getVelocity() const;
     Vector3 getVelocity(const Vector3& point) const;
+
+		void setCoefficientOfRestitution(double restitution);
+		double getCoefficientOfRestitution() const;
 };
 
 #endif

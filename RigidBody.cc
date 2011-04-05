@@ -5,6 +5,7 @@
 extern Engine* engine_pg;
 
 RigidBody::RigidBody() :
+	coefficientOfRestitution(0.8),
   fixed(false)
 {
   // initial orientation (aligned with the axis)
@@ -160,4 +161,14 @@ Vector3 RigidBody::getVelocity() const
 Vector3 RigidBody::getVelocity(const Vector3& point) const
 {
 	return this->linearVelocity + (this->angularVelocity ^ (point - this->position));
+}
+
+void RigidBody::setCoefficientOfRestitution(double restitution)
+{
+	this->coefficientOfRestitution = restitution;
+}
+
+double RigidBody::getCoefficientOfRestitution() const
+{
+	return this->coefficientOfRestitution;
 }

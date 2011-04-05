@@ -95,39 +95,28 @@ void Engine::update()
 #include "Box.h"
 Vector3 Engine::computeImpulse(Contact contact)
 {
-  Vector3 p = contact.position;
-  Vector3 n = contact.normal;
 	RigidBody* a = contact.a;
 	RigidBody* b = contact.b;
-
-  std::cout << "contact position = " << p << std::endl;
-  std::cout << "contact normal = " << n << std::endl;
+  Vector3 p = contact.position;
+  Vector3 n = contact.normal;
 
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
-
-  std::cout << "relative velocity " << relativeVelocity << std::endl;
 
   // displacements of the contact point with respect to the center of mass of each body
   Vector3 da = p - a->position;
   Vector3 db = p - b->position;
-  std::cout << "displacement " << da << " " << db << std::endl;
 
 	Matrix3 inverseInertiaA = a->orientation * a->inverseInertiaTensor * a->orientation.transpose();
  	Matrix3 inverseInertiaB = b->orientation * b->inverseInertiaTensor * b->orientation.transpose();
-	std::cout << "A " << ((Box*)a)->width << std::endl;
 
   double t1 = a->inverseMass + b->inverseMass;
   double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
   double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
 
-	std::cout << n << std::endl;
-	std::cout << (-1.8 * relativeVelocity) / (t1 + t2 + t3) << std::endl;
-	std::cout <<  (-1.8 * relativeVelocity) / (t1 + t2 + t3) * n << std::endl;
-  double restitution = this->timeStep > 0 ? 0.8 : 1.25;
+  double restitution = this->timeStep > 0 ? 0.5 : 1.25;
 
-  Vector3 impulse = (-1.8 * relativeVelocity) / (t1 + t2 + t3) * n;
-
-std::cout << "impulse = " << impulse << std::endl;
+Vector3 impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
+std::cout << "impulse " << impulse << " at " << contact.position << std::endl;
 
   return impulse;
 }

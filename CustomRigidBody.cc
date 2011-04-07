@@ -151,33 +151,26 @@ void CustomRigidBody::computeInverseInertiaTensor()
  */
 void CustomRigidBody::computeBoundingBox()
 {
-  double minx, miny, minz, maxx, maxy, maxz;
+  double min[3], max[3];
 
-  minx = miny = minz = std::numeric_limits<double>::max();
-  maxx = maxy = maxz = -minx;
+  min[0] = min[1] = min[2] = std::numeric_limits<double>::max();
+  max[0] = max[1] = max[2] = -min[0];
 
   for(int i = 0; i < this->structure.vertices.size(); ++i)
   {
-    Vector3 pos = this->structure.vertices[i].absPosition;
+    Vector3 p = this->structure.vertices[i].absPosition;
 
-    if(pos.X() < minx)
-      minx = pos.X();
-    if(pos.X() > maxx)
-      maxx = pos.X();
-    
-    if(pos.Y() < miny)
-      miny = pos.Y();
-    if(pos.Y() > maxy)
-      maxy = pos.Y();
+		min[0] = p.X() < min[0] ? p.X() : min[0];
+		min[1] = p.Y() < min[1] ? p.Y() : min[1];
+		min[2] = p.Z() < min[2] ? p.Z() : min[2];
 
-    if(pos.Z() < minz)
-      minz = pos.Z();
-    if(pos.Z() > maxz)
-      maxz = pos.Z();
-  }
+		max[0] = p.X() > max[0] ? p.X() : max[0];
+		max[1] = p.Y() > max[1] ? p.Y() : max[1];
+		max[2] = p.Z() > max[2] ? p.Z() : max[2];
+	}
 
-  this->boundingBox.a = Vector3(minx-1, miny-1, minz-1);
-  this->boundingBox.b = Vector3(maxx+1, maxy+1, maxz+1);
+  this->boundingBox.a = Vector3(min[0], min[1], min[2]);
+  this->boundingBox.b = Vector3(max[0], max[1], max[2]);
 }
 
 /**
@@ -268,6 +261,7 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
 std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
 	std::cout << Geometry::gjkDistanceBetweenPolyhedra(this, rb_p).length() << std::endl;
+	std::cout << *rb_p << std::endl;
   // if at least one separation plane exists, there is no collision
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
   {
@@ -324,6 +318,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 		double sdt = dt / 2;
 
 	  std::cout << "going forward " << sdt << "ms" << std::endl;
+		std::cout << *rb_p << std::endl;
 
 	  engine_pg->applyEnvironmentalForces(this, sdt);
 	  engine_pg->applyEnvironmentalForces(rb_p, sdt);
@@ -339,6 +334,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 		double sdt = dt / 2;
 
 	  std::cout << "going backward " << sdt << "ms" << std::endl;
+		std::cout << *rb_p << std::endl;
 
 	  engine_pg->applyEnvironmentalForces(this, sdt);
 	  engine_pg->applyEnvironmentalForces(rb_p, sdt);

@@ -1,4 +1,5 @@
 EXEC=demo
+COMP=clang
 OBJ= \
 	Box.o \
 	CustomRigidBody.o \
@@ -14,10 +15,10 @@ OBJ= \
 	Vector3.o
 
 $(EXEC): $(OBJ)
-	clang -g -Wall $^ -lglut -lGLU -ggdb -o $(EXEC)
+	$(COMP) -g -Wall $^ -lglut -lGLU -ggdb -o $(EXEC)
 
 %.o: %.cc
-	clang -o $@ -c $^
+	$(COMP) -o $@ -c $^
 
 clean:
 	rm *.o

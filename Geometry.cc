@@ -569,16 +569,18 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
 		std::cout << "dir " << directionToOrigin << std::endl;
 		std::cout << "sup " << support << std::endl;
 
-    // terminate when the support point is already contained within the simplex
-    for(int i = 0; i < simplex.points.size(); ++i)
-      if(simplex.points[i] == support)
-			{
-				std::cout << closest << std::endl;
-				if(interPenetration_p != NULL)
-					*interPenetration_p = closest == origin;
-
-        return Vector3(0, 0, 0) - closest;
-			}
+    // terminate when the chosen support point is not less or equally extremal than the closest point
+		std::cout << "support " << (support * directionToOrigin) << std::endl;
+		std::cout << "closest " << (closest * directionToOrigin) << std::endl;
+		if(support == closest || support * directionToOrigin <= closest * directionToOrigin)
+		{
+			std::cout << closest << std::endl;
+			std::cout << "closest to origin = " << (closest - origin).length() << std::endl;
+			if(interPenetration_p != NULL)
+				*interPenetration_p = closest == origin;
+			
+			return directionToOrigin;
+		}
 
     // add the support point to the simplex
     simplex.points.push_back(support);

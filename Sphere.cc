@@ -94,7 +94,7 @@ std::vector<Contact> Sphere::isCollidingWith(Sphere* s_p, double dt)
   double distance = (this->position - s_p->position).length();
   double radii = this->radius + s_p->radius;
  
-  if(distance > radii + tolerance)
+  if(distance > radii)
   {
     std::cout << "NO CONTACT" << std::endl;
     std::vector<Contact> contacts;
@@ -124,7 +124,7 @@ std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt, dou
     
     return this->resolveInterPenetration(s_p, sdt, tolerance);
   }
-  else if(distance < radii - tolerance)
+  else if(distance < radii)
   {
 		double sdt = dt / 2;
 

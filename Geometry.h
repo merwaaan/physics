@@ -6,6 +6,8 @@
 #include "Sphere.h"
 #include "Vector3.h"
 
+#define GEOMETRY_TOLERANCE 0.001
+
 class CustomRigidBody;
 class Sphere;
 
@@ -52,6 +54,10 @@ struct Triangle
   Vector3 a;
   Vector3 b;
   Vector3 c;
+
+	Vector3 getCenter() const;
+	Plane getPlane() const;
+	std::vector<Edge> getEdges() const;
 };
 
 /**
@@ -64,6 +70,8 @@ struct Tetrahedron
   Triangle b;
   Triangle c;
   Triangle d;
+
+	std::vector<Triangle> getTriangles() const;
 };
 
 /**
@@ -123,6 +131,7 @@ namespace Geometry
   Vector3 centerOfPoints(std::vector<Vector3> points);
   
   bool isInsideTriangle(Vector3 point, Triangle triangle);
+	bool isInsideTetrahedron(Vector3 point, Tetrahedron tetra);
   bool isInsideConvexHull(Vector3 point, std::vector<Vector3> hull);
 
   double edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, Vector3* closest2_p);
@@ -140,8 +149,8 @@ namespace Geometry
   std::vector<Vector3> minkowskiDifference(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
   Vector3 gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool* interPenetration_p = NULL);
 
-  std::vector<Contact> vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance, bool second = false);
-  std::vector<Contact> edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, double tolerance);
+  std::vector<Contact> vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool second = false);
+  std::vector<Contact> edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
 };
 
 #endif

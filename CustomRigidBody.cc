@@ -176,8 +176,8 @@ void CustomRigidBody::computeBoundingBox()
       maxz = pos.Z();
   }
 
-  this->boundingBox.a = Vector3(minx, miny, minz);
-  this->boundingBox.b = Vector3(maxx, maxy, maxz);
+  this->boundingBox.a = Vector3(minx-1, miny-1, minz-1);
+  this->boundingBox.b = Vector3(maxx+1, maxy+1, maxz+1);
 }
 
 /**
@@ -259,6 +259,7 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(RigidBody* rb_p, double dt
  */
 std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
 {
+	return std::vector<Contact>();
 }
 
 /**
@@ -266,8 +267,7 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
  */
 std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
-  double tolerance = 0.01;
-
+	std::cout << Geometry::gjkDistanceBetweenPolyhedra(this, rb_p).length() << std::endl;
   // if at least one separation plane exists, there is no collision
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
   {
@@ -278,7 +278,7 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
   }
 
   std::cout << "no separation plane found : collision!" << std::endl;
-  return this->resolveInterPenetration(rb_p, dt, tolerance);
+  return this->resolveInterPenetration(rb_p, dt);
 }
 
 /**
@@ -310,34 +310,16 @@ bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
 /**
  * Determine the exact contact point by integrating backward in time
  */
-std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double dt, double tolerance)
+std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double dt)
 {
-  // find the distance between the two bodies
-  Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p);
-  bool interPenetration = !this->findSeparationPlane(rb_p) && !rb_p->findSeparationPlane(this);
+  // compute the distance between the two bodies
+	bool interPenetration = false;
+  Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &interPenetration);
 
   std::cout << "d = " << distance.length() << " ip = " << interPenetration << std::endl;
-	std::cout << *this << std::endl;
 
-  // if bodies are within the tolerance area, compute the real contact points
-  if(!interPenetration)//distance.length() < tolerance)
-  {
-    std::vector<Contact> vfContacts = Geometry::vertexFaceContacts(this, rb_p, tolerance);
-    std::vector<Contact> eeContacts = Geometry::edgeEdgeContacts(this, rb_p, tolerance);
-    std::cout << vfContacts.size() << " v/f and " << eeContacts.size() << " e/e" << std::endl;
-
-    for(int i = 0; i < eeContacts.size(); ++i)
-			vfContacts.push_back(eeContacts[i]);
-
-    // recompute auxiliary quantities as they could have been
-    // corrupted during the binary search
-    vfContacts[0].a->computeAuxiliaryQuantities();
-    vfContacts[0].b->computeAuxiliaryQuantities();
-
-    return vfContacts;
-  }
   // if the bodies are too far apart, integrate forward in time
-  else if(!interPenetration)
+  if(!interPenetration && distance.length() > 0.01)
   {
 		double sdt = dt / 2;
 
@@ -349,10 +331,10 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
     this->integrate(sdt);
     rb_p->integrate(sdt);
 
-    return this->resolveInterPenetration(rb_p, sdt, tolerance);
+    return this->resolveInterPenetration(rb_p, sdt);
   }
   // else if the bodies are inter-penetrating, integrate backward in time
-  else
+  else if(interPenetration)
   {
 		double sdt = dt / 2;
 
@@ -370,8 +352,23 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 		this->reverseTime();
 		rb_p->reverseTime();
 
-    return this->resolveInterPenetration(rb_p, sdt, tolerance);
+    return this->resolveInterPenetration(rb_p, sdt);
   }
+
+  // if bodies are within the tolerance area, compute the real contact points
+	std::vector<Contact> vfContacts = Geometry::vertexFaceContacts(this, rb_p);
+	std::vector<Contact> eeContacts = Geometry::edgeEdgeContacts(this, rb_p);
+	std::cout << vfContacts.size() << " v/f and " << eeContacts.size() << " e/e" << std::endl;
+
+	for(int i = 0; i < eeContacts.size(); ++i)
+		vfContacts.push_back(eeContacts[i]);
+
+	// recompute auxiliary quantities as they could have been
+	// corrupted during the binary search
+	vfContacts[0].a->computeAuxiliaryQuantities();
+	vfContacts[0].b->computeAuxiliaryQuantities();
+
+	return vfContacts;
 }
 
 /**

@@ -55,6 +55,26 @@ void testGeometry()
   Edge e1 = {Vector3(0,0,0), Vector3(10,0,0)};
   Edge e2 = {Vector3(5,5,0), Vector3(5,-5,0)};
   std::cout << c1 << c2 << Geometry::edgeEdgeDistance(e1, e2, &c1, &c2) << std::endl;
+
+	std::cout << "TETRAHEDRON RESTRUCTURATION" << std::endl;
+	Vector3 a(-1, 0, 0), b(1, 0, 0), c(0, 0, -1), d(0, 1, 0);
+	Triangle t1 = {a, b, c}, t2 = {a, b, d}, t3 = {d, c, b}, t4 = {d, c, a};
+	Tetrahedron te = {t1, t2, t3, t4};
+	std::vector<Triangle> triangles = te.getTriangles();
+	for(int i = 0; i < 4; ++i)
+		std::cout << triangles[i].getPlane().normal << std::endl;
+
+	std::cout << "INSIDE TETRAHEDRON?" << std::endl;
+	std::cout << Geometry::isInsideTetrahedron(Vector3(-1, 0, 0), te) << std::endl;
+	std::cout << Geometry::isInsideTetrahedron(Vector3(0.5, 0.1, 0), te) << std::endl;
+	std::cout << Geometry::isInsideTetrahedron(Vector3(10, 0, 0), te) << std::endl;
+
+	std::cout << "CLOSEST POINT OF TETRAHEDRON" << std::endl;
+	std::cout << Geometry::closestPointOfTetrahedron(Vector3(-10, 0, 0), te) << std::endl;
+	std::cout << Geometry::closestPointOfTetrahedron(Vector3(10, 0, 0), te) << std::endl;
+	std::cout << Geometry::closestPointOfTetrahedron(Vector3(0, 10, 0), te) << std::endl;
+	std::cout << Geometry::closestPointOfTetrahedron(Vector3(0.25, 0.25, 1), te) << std::endl;
+	std::cout << Geometry::closestPointOfTetrahedron(Vector3(0, 0.25, -0.25), te) << std::endl;
 }
 
 void testGJK()
@@ -101,7 +121,7 @@ void testTimeReversing()
   s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
 }
 
-void demoMultiBall()
+void demoBalls()
 {
   int q = 6;
 
@@ -128,22 +148,8 @@ void demoMultiBall()
   e->run();
 }
 
-void demoSimpleBox()
+void demoBoxes()
 {
-	Cube* c = new Cube(2);
-	c->applyOffCenterForce(Vector3(0, 10, 5), 1, Vector3(1, 1, 1));
-  e->addRigidBody_p(c);
-
-  e->run();
-}
-
-void demoMultiBox()
-{
-	Cube* c = new Cube(2);
-//	c->angularMomentum = Vector3(3, 3, 3);
-	c->setPosition(2.5, 5, 0);
-  e->addRigidBody_p(c);
-
 	Cube* c2 = new Cube(4);
   c2->setFixed(true);
   e->addRigidBody_p(c2);
@@ -166,9 +172,8 @@ int main(int argc, char** argv)
   //testGJK();
   //testTimeReversing();
 
-  //demoMultiBall();
-  //demoSimpleBox();
-	demoMultiBox();
+  //demoBalls();
+	demoBoxes();
   
   delete e;
 

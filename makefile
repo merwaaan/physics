@@ -14,10 +14,10 @@ OBJ= \
 	Vector3.o
 
 $(EXEC): $(OBJ)
-	g++ -g -Wall $^ -lglut -lGLU -ggdb -o $(EXEC)
+	clang -g -Wall $^ -lglut -lGLU -ggdb -o $(EXEC)
 
 %.o: %.cc
-	g++ -o $@ -c $^
+	clang -o $@ -c $^
 
 clean:
 	rm *.o

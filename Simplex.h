@@ -9,8 +9,11 @@ struct Simplex
 {
   std::vector<Vector3> points;
 
-  Vector3 closestPointToOrigin() const;
-  void reduce(Vector3 closest);
+  Vector3 getClosestPointAndReduce();
+
+	bool reduceToPoint(Vector3 closest);
+	bool reduceToEdge(Vector3 closest, Triangle triangle);
+	bool reduceToTriangle(Vector3 closest, Tetrahedron tetra);
 };
 
 #endif

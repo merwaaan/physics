@@ -41,7 +41,7 @@ class CustomRigidBody : public RigidBody
 
     std::vector<Contact> isCollidingWith(CustomRigidBody* rb_p, double dt);
     bool findSeparationPlane(CustomRigidBody* rb_p);
-    std::vector<Contact> resolveInterPenetration(CustomRigidBody* rb_p, double dt, double tolerance);
+    std::vector<Contact> resolveInterPenetration(CustomRigidBody* rb_p, double dt);
 
     CustomVertex* getVertexById_p(int id);
     int getPolyCount();

@@ -6,6 +6,8 @@
 #include "Matrix3.h"
 #include "Vector3.h"
 
+#define COLISION_TOLERANCE 0.001
+
 class Contact;
 class CustomRigidBody;
 class Sphere;

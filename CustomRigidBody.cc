@@ -260,8 +260,6 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
  */
 std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
-	std::cout << Geometry::gjkDistanceBetweenPolyhedra(this, rb_p).length() << std::endl;
-	std::cout << *rb_p << std::endl;
   // if at least one separation plane exists, there is no collision
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
   {
@@ -326,6 +324,8 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
     this->integrate(sdt);
     rb_p->integrate(sdt);
 
+    std::cout << *rb_p << std::endl;
+
     return this->resolveInterPenetration(rb_p, sdt);
   }
   // else if the bodies are inter-penetrating, integrate backward in time
@@ -348,6 +348,9 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 		this->reverseTime();
 		rb_p->reverseTime();
 
+		std::cout << *rb_p << std::endl;
+
+
     return this->resolveInterPenetration(rb_p, sdt);
   }
 
@@ -365,6 +368,25 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 	vfContacts[0].b->computeAuxiliaryQuantities();
 
 	return vfContacts;
+}
+
+Vector3 CustomRigidBody::getSupportPoint(Vector3 direction)
+{
+	int indexBest = 0;
+  double bestLength = this->structure.vertices[0].absPosition * direction;
+
+  for(int i = 1; i < this->structure.vertices.size(); ++i)
+  {
+    double length = this->structure.vertices[i].absPosition * direction;
+
+    if(length > bestLength)
+    {
+      indexBest = i;
+      bestLength = length;
+    }
+  }
+
+  return this->structure.vertices[indexBest].absPosition;
 }
 
 /**

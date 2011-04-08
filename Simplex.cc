@@ -3,6 +3,14 @@
 #include "CustomRigidBody.h"
 
 /**
+ * Return a support point by choosing the farthest in a specified direction
+ */
+Vector3 Simplex::getSupportPoint(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, Vector3 direction)
+{
+	return rb1_p->getSupportPoint(direction) - rb2_p->getSupportPoint(direction.negate());
+}
+
+/**
  * Determine the closest point from the origin within the simplex.
  * Reduce the simplex's dimension if possible.
  */
@@ -10,28 +18,8 @@ Vector3 Simplex::getClosestPointAndReduce()
 {
 	Vector3 closest;
 
-  // the simplex only has one point : return the point
-  if(this->points.size() == 1)
-    return this->points[0];
-  // the simplex has two points : find the closest point on the edge formed by these vertices
-  else if(this->points.size() == 2)
-  {
-    Edge edge = {this->points[0], this->points[1]};
-
-		closest = Geometry::closestPointOfEdge(Vector3(0, 0, 0), edge);
-
-		this->reduceToPoint(closest);
-	}
-  // the simplex has three points : find the closest point on the triangle formed by theses vertices
-	else if(this->points.size() == 3)
-  {
-	  Triangle triangle = {this->points[0], this->points[1], this->points[2]};
-		closest = Geometry::closestPointOfTriangle(Vector3(0, 0, 0), triangle);
-
-		this->reduceToEdge(closest, triangle);
-  }
 	// the simplex has four points : find the closest point on the tetrahedron formed by these vertices
-  else
+  if(this->points.size() == 4)
 	{
 		Triangle a = {this->points[1], this->points[2], this->points[3]};
 		Triangle b = {this->points[0], this->points[2], this->points[3]};
@@ -43,6 +31,29 @@ Vector3 Simplex::getClosestPointAndReduce()
 
 		this->reduceToTriangle(closest, tetrahedron);
 	}
+
+	// the simplex has three points : find the closest point on the triangle formed by theses vertices
+	if(this->points.size() == 3)
+  {
+	  Triangle triangle = {this->points[0], this->points[1], this->points[2]};
+		closest = Geometry::closestPointOfTriangle(Vector3(0, 0, 0), triangle);
+
+		this->reduceToEdge(closest, triangle);
+  }
+
+	// the simplex has two points : find the closest point on the edge formed by these vertices
+  if(this->points.size() == 2)
+  {
+    Edge edge = {this->points[0], this->points[1]};
+
+		closest = Geometry::closestPointOfEdge(Vector3(0, 0, 0), edge);
+
+		this->reduceToPoint(closest);
+	}
+
+  // the simplex only has one point : return the point
+  if(this->points.size() == 1)
+    closest = this->points[0];
 
 	return closest;
 }
@@ -57,6 +68,11 @@ bool Simplex::reduceToPoint(Vector3 closest)
 
 	if(closest == this->points[1])
 	{
+		std::cout << "reduce to point" << std::endl;
+		std::cout << "closest " << closest << std::endl;
+		for(int i = 0; i < this->points.size(); ++i)
+			std::cout << this->points[i] << std::endl;
+
 		this->points.erase(this->points.begin());
 		return true;
 	}
@@ -75,6 +91,11 @@ bool Simplex::reduceToEdge(Vector3 closest, Triangle triangle)
 
 		if(distance < 0.01)
 		{
+			std::cout << "reduce to edge" << std::endl;
+			std::cout << "closest " << closest << std::endl;
+			for(int j = 0; j < this->points.size(); ++j)
+				std::cout << this->points[i] << std::endl;
+
 			this->points.erase(this->points.begin() + (i + 2) % 3);
 			return true;
 		}
@@ -93,6 +114,11 @@ bool Simplex::reduceToTriangle(Vector3 closest, Tetrahedron tetra)
 		Geometry::closestPointOfTriangle(closest, triangles[i], &distance);
 		if(distance < 0.01)
 		{
+			std::cout << "reduce to triangle" << std::endl;
+			std::cout << "closest " << closest << std::endl;
+			for(int j = 0; j < this->points.size(); ++j)
+				std::cout << this->points[j] << std::endl;
+
 			this->points.erase(this->points.begin() + i);
 			return true;
 		}

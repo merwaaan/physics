@@ -9,6 +9,7 @@ struct Simplex
 {
   std::vector<Vector3> points;
 
+	Vector3 getSupportPoint(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, Vector3 direction);
   Vector3 getClosestPointAndReduce();
 
 	bool reduceToPoint(Vector3 closest);

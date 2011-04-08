@@ -86,11 +86,6 @@ void testGJK()
   c2->setPosition(5, 0, 0);
   c2->prepare();
   
-  std::vector<Vector3> m = Geometry::minkowskiDifference(c1, c2);
-  std::cout << "CONVEX HULL" << std::endl;
-  for(int i = 0; i < m.size(); ++i)
-    std::cout << m[i] << std::endl;
-
   std::cout << "DISTANCE" << Geometry::gjkDistanceBetweenPolyhedra(c1, c2) << std::endl;
 }
 
@@ -173,7 +168,7 @@ int main(int argc, char** argv)
   //testTimeReversing();
 
   //demoBalls();
-	demoBoxes();
+  demoBoxes();
   
   delete e;
 

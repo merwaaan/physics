@@ -148,6 +148,13 @@ Vector3 Vector3::normalize() const
   return result;
 }
 
+Vector3 Vector3::negate() const
+{
+	Vector3 result = *this;
+
+	return result * -1;
+}
+
 /**
  * Transforms a Vector3 into a special kind of Matrix3 used in the simulation
  */

@@ -143,10 +143,6 @@ namespace Geometry
   Vector3 closestPointOfTetrahedron(Vector3 point, Tetrahedron tetrahedron, double* distance = NULL);
   Vector3 closestPointOfSphere(Vector3 p, Sphere sphere, double* distance_p = NULL);
 
-  Vector3 supportPoint(std::vector<Vector3> points, Vector3 direction);
-
-  std::vector<Vector3> convexHull(std::vector<Vector3> points);
-  std::vector<Vector3> minkowskiDifference(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
   Vector3 gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool* interPenetration_p = NULL);
 
   std::vector<Contact> vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool second = false);

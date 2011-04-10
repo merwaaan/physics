@@ -286,7 +286,6 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 
 	while(interPenetration)
 	{
-		distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &interPenetration);
 		std::cout << "distance " << distance.length() << std::endl;
     std::cout << "going backward " << sdt << "ms" << std::endl;
 
@@ -295,6 +294,8 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 
 		this->integrate(sdt);
     rb_p->integrate(sdt);
+
+		distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &interPenetration);
 	}
 
 	this->reverseTime();

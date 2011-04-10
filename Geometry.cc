@@ -560,13 +560,11 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 		    contact.a = rb1_p;
 		    contact.b = rb2_p;
 		    contact.position = closest1 + (closest2 - closest1) / 2;
-				std::cout << "d=" << Geometry::gjkDistanceBetweenPolyhedra(rb1_p, rb2_p).length() << std::endl;
+
 		    Vector3 v1 = edges1[i].b - edges1[i].a;
 		    Vector3 v2 = edges2[j].b - edges2[j].a;
 		    contact.normal = (v1 ^ v2).normalize();
-				std::cout << "e1 " << closest1 << std::endl;
-				std::cout << "e2 " << closest2 << std::endl;
-				std::cout << "ee " << contact.position << " " << (closest1 - closest2).length() << std::endl;
+
 		    contacts.push_back(contact);
 	    }
     }

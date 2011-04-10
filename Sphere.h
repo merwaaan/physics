@@ -22,7 +22,7 @@ class Sphere : public RigidBody
     std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt);
 
     std::vector<Contact> isCollidingWith(Sphere* s_p, double dt);
-    std::vector<Contact> resolveInterPenetration(Sphere* s_p, double dt, double tolerance);
+    std::vector<Contact> resolveInterPenetration(Sphere* s_p, double dt);
     
     std::vector<Contact> isCollidingWith(CustomRigidBody* rb_p, double dt);
 

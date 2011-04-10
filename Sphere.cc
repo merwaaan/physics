@@ -89,28 +89,59 @@ std::vector<Contact> Sphere::isCollidingWith(RigidBody* rb_p, double dt)
 
 std::vector<Contact> Sphere::isCollidingWith(Sphere* s_p, double dt)
 {
-  double tolerance = 0.01;
-
   double distance = (this->position - s_p->position).length();
   double radii = this->radius + s_p->radius;
  
+	// no collision
   if(distance > radii)
   {
-    std::cout << "NO CONTACT" << std::endl;
+    std::cout << "NO CONTACT DETECTED" << std::endl;
     std::vector<Contact> contacts;
 
     return contacts;
   }
-   
-  return this->resolveInterPenetration(s_p, dt, tolerance);
+
+	// collision
+
+  std::cout << "CONTACT DETECTED" << std::endl;
+	std::cout << "(separating bodies)" << std::endl;
+
+	double sdt = -dt / 10;
+
+	this->reverseTime();
+	s_p->reverseTime();
+	
+	while(distance < radii)
+	{
+		distance = (this->position - s_p->position).length();
+		std::cout << "distance " << distance << std::endl;
+    std::cout << "going backward " << sdt << "ms" << std::endl;
+
+	  engine_pg->applyEnvironmentalForces(this, sdt);
+	  engine_pg->applyEnvironmentalForces(s_p, sdt);
+
+		this->integrate(sdt);
+    s_p->integrate(sdt);
+	}
+
+	this->reverseTime();
+	s_p->reverseTime();
+
+  return this->resolveInterPenetration(s_p, dt);
 }
 
-std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt, double tolerance)
+std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt)
 {
-  double distance = (this->position - s_p->position).length();
+	if(dt < 0.0000000001)
+		exit(0);
+  
+	double distance = (this->position - s_p->position).length();
   double radii = this->radius + s_p->radius;
- 
-  if(distance > radii + tolerance)
+	int interPenetration = distance < radii;
+
+	std::cout << "dist=" << distance << " radii=" << radii << " ip=" << interPenetration << std::endl;
+
+  if(distance > radii + 0.01)
   {
 		double sdt = dt / 2;
 
@@ -122,7 +153,7 @@ std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt, dou
 		this->integrate(sdt);
     s_p->integrate(sdt);
     
-    return this->resolveInterPenetration(s_p, sdt, tolerance);
+    return this->resolveInterPenetration(s_p, sdt);
   }
   else if(distance < radii)
   {
@@ -133,19 +164,11 @@ std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt, dou
 	  engine_pg->applyEnvironmentalForces(this, sdt);
 	  engine_pg->applyEnvironmentalForces(s_p, sdt);
 
-		this->reverseTime();
-		s_p->reverseTime();
+    this->integrateBackward(sdt);
+    s_p->integrateBackward(sdt);
 
-    this->integrate(-sdt);
-    s_p->integrate(-sdt);
-
-		this->reverseTime();
-		s_p->reverseTime();
-
-    return this->resolveInterPenetration(s_p, dt / 2, tolerance);
+    return this->resolveInterPenetration(s_p, dt / 2);
   }
-
-  std::cout << "SURFACE CONTACT" << std::endl;
 
   Contact contact;
   contact.a = this;

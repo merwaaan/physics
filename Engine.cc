@@ -56,13 +56,13 @@ void Engine::update()
           if(contacts.size() > 0)
           {
             std::cout << "real collision detected between #" << i << " and #" << j << std::endl;
-
+						std::cout << contacts.size() << std::endl;
             for(int k = 0; k < contacts.size(); ++k)
             {
-	            Vector3 impulse = this->computeImpulse(contacts[k]);
+	            Vector3* impulses = this->computeImpulse(contacts[k]);
 
-	            contacts[k].a->applyOffCenterForce(impulse, 1, contacts[k].position);
-	            contacts[k].b->applyOffCenterForce(-1 * impulse, 1, contacts[k].position);
+	            contacts[k].a->applyOffCenterForce(impulses[0], 1, contacts[k].position);
+	            contacts[k].b->applyOffCenterForce(impulses[1], 1, contacts[k].position);
             }
 					}
         }
@@ -80,10 +80,12 @@ void Engine::update()
       // integrate each body state
       this->bodies_p[i]->integrate(this->timeStep);
 
-      //std::cout << "#" << i << std::endl << *bodies_p[i] << std::endl;
+      if(i == 0 || i == 1) std::cout << "#" << i << std::endl << *bodies_p[i] << std::endl;
     }
 
     this->simulationTime += this->timeStep;
+
+		this->cleanUp();
   }
   else
   {
@@ -91,8 +93,8 @@ void Engine::update()
     this->reverseTime();
   }
 }
-#include "Box.h"
-Vector3 Engine::computeImpulse(Contact contact)
+
+Vector3* Engine::computeImpulse(Contact contact)
 {
 	RigidBody* a = contact.a;
 	RigidBody* b = contact.b;
@@ -100,6 +102,22 @@ Vector3 Engine::computeImpulse(Contact contact)
   Vector3 n = contact.normal;
 
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
+
+	/**
+	 * RESTING CONTACT
+	 */
+
+/*	if(relativeVelocity < 0.5)
+	{
+		Vector3 impulseA = relativeVelocity * n;
+		Vector3 impulseB = -1 * relativeVelocity * n;
+
+		return (Vector3[]){impulseA, impulseB};
+	}
+*/
+	/**
+	 * SEPARATING CONTACT
+	 */
 
   // displacements of the contact point with respect to the center of mass of each body
   Vector3 da = p - a->position;
@@ -112,12 +130,15 @@ Vector3 Engine::computeImpulse(Contact contact)
   double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
   double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
 
-  double restitution = this->timeStep > 0 ? 0.5 : 1.25;
+  double restitution = this->timeStep > 0 ? 0.8 : 1.25;
+	Vector3 impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
 
-Vector3 impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
-std::cout << "impulse " << impulse << " at " << contact.position << std::endl;
+	std::cout << "impulse " << impulse << " at " << contact.position << std::endl;
 
-  return impulse;
+	Vector3 impulseA = impulse;
+	Vector3 impulseB = -1 * impulse;// mass?;
+
+	return (Vector3[]){impulseA, impulseB};
 }
 
 void Engine::applyEnvironmentalForces(RigidBody* rb_p, double dt)
@@ -132,6 +153,18 @@ void Engine::reverseTime()
 
   for(int i = 0; i < this->bodies_p.size(); ++i)
 		this->bodies_p[i]->reverseTime();
+}
+
+void Engine::cleanUp()
+{
+	Vector3 origin(0, 0, 0);
+
+	for(int i = 0; i < this->bodies_p.size(); ++i)
+		if((this->bodies_p[i]->position - origin).length() > 20)
+		{
+			this->bodies_p.erase(this->bodies_p.begin() + i);
+			--i;
+		}
 }
 
 double Engine::getTimeStep()
@@ -158,4 +191,3 @@ void Engine::addEnvironmentalForce_p(Force* force_p)
 {
   this->environmentalForces_p.push_back(force_p);
 }
-

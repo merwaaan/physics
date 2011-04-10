@@ -452,43 +452,47 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
 	Vector3 origin(0, 0, 0);
 
   // initialize the simplex to a random point
-  Simplex simplex; 
-  simplex.points.push_back(simplex.getSupportPoint(rb1_p, rb2_p, Vector3(1, 0, 0)));
+  Simplex simplex;
+  simplex.points.push_back(simplex.getSupportPoint(rb1_p, rb2_p, Vector3(0, 1, 0)));
 
+	// the closest point from the origin can only be the unique simplex's point
   Vector3 closest = simplex.points[0];
 	std::cout << "start " << closest << std::endl;
 
   while(true)
   {
-    // find the closest point to the origin and a support point along its direction to the origin
+    // find a support point along the direction from the closest point to the origin
 	  Vector3 support = simplex.getSupportPoint(rb1_p, rb2_p, closest.negate());
-	  std::cout << "dir " << closest.negate() << std::endl;
-		std::cout << "sup " << support << std::endl;
+    simplex.points.push_back(support);
 
-    // terminate when the chosen support point is not less or equally extremal than the closest point
-		double s = support * closest.negate();
-		double c = closest * closest.negate();
-		std::cout << "s " << s << std::endl;
-		std::cout << "c " << c << std::endl;
-		if(s <= c)
+		Vector3 newClosest = simplex.getClosestPointAndReduce();
+
+		std::cout << "closest "  << closest << std::endl;
+		std::cout << "closest 2 " << newClosest << std::endl;
+		std::cout << "current distance " << closest.length() << std::endl;
+
+		// if the closest point is the origin, the bodies are inter-penetrating
+		if((closest - origin).length() < 0.001)
 		{
-			std::cout << closest << std::endl;
-			std::cout << "closest to origin = " << closest.negate() << std::endl;
+			std::cout << "origin touched" << std::endl;
 			if(interPenetration_p != NULL)
-				*interPenetration_p = closest == origin;
-			
+				*interPenetration_p = true;
+
 			return closest;
 		}
 
-    // add the support point to the simplex
-    simplex.points.push_back(support);
+    // if the support point is not less or equally extremal than the closest point,
+		// we have the closest point from the origin
+		if((closest - newClosest).length() < 0.001)
+		{
+			std::cout << "closest point touched " << closest << std::endl;
+			if(interPenetration_p != NULL)
+				*interPenetration_p = false;           ;
 
-		// find the simplex's point closest to the origin and reduce the simplex
-		// by getting rid of the vertices which are not part of the definition
-		// of the closest point
-    std::cout << simplex.points.size() << " points" << std::endl;
-    closest = simplex.getClosestPointAndReduce();
-    std::cout << simplex.points.size() << " points" << std::endl;
+			return closest;
+		}
+
+		closest = newClosest;
   }
 }
 
@@ -511,7 +515,7 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
 
         contact.a = rb1_p;
         contact.b = rb2_p;
-        contact.position = (point + vertex) / 2;
+        contact.position = point;
         contact.normal = (vertex - point).normalize();
 
         contacts.push_back(contact);  

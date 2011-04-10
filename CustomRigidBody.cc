@@ -49,14 +49,18 @@ std::vector<Edge> Structure::getEdges() const
 Vector3 Structure::getSupportPoint(Vector3 direction) const
 {
   int bestIndex = 0;
-  double bestLength = this->vertices[0].absPosition * direction;
+  double bestProj = this->vertices[0].absPosition * direction;
 
   for(int i = 1; i < this->vertices.size(); ++i)
-    if(this->vertices[i].absPosition * direction > bestLength)
+	{
+		double proj = this->vertices[i].absPosition * direction;
+
+    if(proj > bestProj)
     {
       bestIndex = i;
-      bestLength = this->vertices[i].absPosition * direction;
+      bestProj = proj;
     }
+	}
 
   return this->vertices[bestIndex].absPosition;
 }
@@ -269,7 +273,33 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
     return contacts;
   }
 
-  std::cout << "no separation plane found : collision!" << std::endl;
+  std::cout << "CONTACT DETECTED" << std::endl;
+	std::cout << "(separating bodies)" << std::endl;
+
+	double sdt = -dt / 10;
+
+	this->reverseTime();
+	rb_p->reverseTime();
+
+	bool interPenetration = true;
+	Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &interPenetration);
+
+	while(interPenetration)
+	{
+		distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &interPenetration);
+		std::cout << "distance " << distance.length() << std::endl;
+    std::cout << "going backward " << sdt << "ms" << std::endl;
+
+	  engine_pg->applyEnvironmentalForces(this, sdt);
+	  engine_pg->applyEnvironmentalForces(rb_p, sdt);
+
+		this->integrate(sdt);
+    rb_p->integrate(sdt);
+	}
+
+	this->reverseTime();
+	rb_p->reverseTime();
+	std::cout << "NEXT STEP" << std::endl;
   return this->resolveInterPenetration(rb_p, dt);
 }
 
@@ -339,17 +369,10 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 	  engine_pg->applyEnvironmentalForces(this, sdt);
 	  engine_pg->applyEnvironmentalForces(rb_p, sdt);
 
-		this->reverseTime();
-		rb_p->reverseTime();
-
-    this->integrate(-sdt);
-    rb_p->integrate(-sdt);
-
-		this->reverseTime();
-		rb_p->reverseTime();
+    this->integrateBackward(sdt);
+    rb_p->integrateBackward(sdt);
 
 		std::cout << *rb_p << std::endl;
-
 
     return this->resolveInterPenetration(rb_p, sdt);
   }

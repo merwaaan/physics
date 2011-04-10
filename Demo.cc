@@ -118,6 +118,15 @@ void testTimeReversing()
 
 void demoBalls()
 {
+/*  Sphere* s1 = new Sphere(1);
+	s1->setPosition(0, 4, 0);
+	e->addRigidBody_p(s1);
+   
+  Sphere* s2 = new Sphere(1);
+	s2->setPosition(0, 0, 0);
+	s2->setFixed(true);
+	e->addRigidBody_p(s2);*/
+
   int q = 6;
 
   for(int i = -q; i < q; i += 3)
@@ -128,8 +137,16 @@ void demoBalls()
       e->addRigidBody_p(s);
     }
 
-  for(int i = -q; i < q; i += 3)
+	for(int i = -q; i < q; i += 3)
     for(int j = -q; j < q; j += 3)
+    {
+      Sphere* s = new Sphere(1);
+      s->setPosition(i + 0.3 * i, 12, j * 0.1 + j);
+      e->addRigidBody_p(s);
+    }
+
+  for(int i = -q-3; i < q+3; i += 3)
+    for(int j = -q-3; j < q+3; j += 3)
     {
       Sphere* s = new Sphere(1);
       s->setPosition(i, 0, j);
@@ -174,4 +191,3 @@ int main(int argc, char** argv)
 
   return 0;
 }
-

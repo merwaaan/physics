@@ -95,6 +95,16 @@ void RigidBody::integrate(double dt)
   this->computeAuxiliaryQuantities();
 }
 
+void RigidBody::integrateBackward(double dt)
+{
+	if(this->fixed)
+		return;
+
+	this->reverseTime();
+	this->integrate(-dt);
+	this->reverseTime();
+}
+
 void RigidBody::computeAuxiliaryQuantities()
 {
 	this->linearVelocity = this->linearMomentum * this->inverseMass;

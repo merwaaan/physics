@@ -3,11 +3,11 @@
 #include "CustomRigidBody.h"
 
 /**
- * Return a support point by choosing the farthest in a specified direction
+ * Returns a support point based on the implicit Minkowki difference of two rigid bodies.
  */
 Vector3 Simplex::getSupportPoint(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, Vector3 direction)
 {
-	return rb1_p->getSupportPoint(direction) - rb2_p->getSupportPoint(direction.negate());
+	return rb1_p->getSupportPoint(direction) - rb2_p->getSupportPoint(-1 * direction);
 }
 
 /**
@@ -62,17 +62,15 @@ bool Simplex::reduceToPoint(Vector3 closest)
 {
 	if(closest == this->points[0])
 	{
+		std::cout << "reduce to point" << std::endl;
+		std::cout << "closest " << closest << std::endl;
+
 		this->points.erase(this->points.begin() + 1);
 		return true;
 	}
 
 	if(closest == this->points[1])
 	{
-		std::cout << "reduce to point" << std::endl;
-		std::cout << "closest " << closest << std::endl;
-		for(int i = 0; i < this->points.size(); ++i)
-			std::cout << this->points[i] << std::endl;
-
 		this->points.erase(this->points.begin());
 		return true;
 	}
@@ -91,12 +89,8 @@ bool Simplex::reduceToEdge(Vector3 closest, Triangle triangle)
 
 		if(distance < 0.01)
 		{
-			std::cout << "reduce to edge" << std::endl;
-			std::cout << "closest " << closest << std::endl;
-			for(int j = 0; j < this->points.size(); ++j)
-				std::cout << this->points[i] << std::endl;
-
 			this->points.erase(this->points.begin() + (i + 2) % 3);
+
 			return true;
 		}
 	}
@@ -115,11 +109,11 @@ bool Simplex::reduceToTriangle(Vector3 closest, Tetrahedron tetra)
 		if(distance < 0.01)
 		{
 			std::cout << "reduce to triangle" << std::endl;
-			std::cout << "closest " << closest << std::endl;
-			for(int j = 0; j < this->points.size(); ++j)
-				std::cout << this->points[j] << std::endl;
 
-			this->points.erase(this->points.begin() + i);
+			for(int j = 0; j < 4; ++j)
+				if(this->points[j] != triangles[i].a && this->points[j] != triangles[i].b && this->points[j] != triangles[i].c)
+					this->points.erase(this->points.begin() + j);
+
 			return true;
 		}
 	}

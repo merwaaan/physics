@@ -29,6 +29,11 @@ bool Vector3::operator==(const Vector3& v) const
 	return (*this - v).length() < tolerance;
 }
 
+bool Vector3::operator!=(const Vector3& v) const
+{
+	return !(*this == v);
+}
+
 Vector3 Vector3::operator+(const Vector3& v) const
 {
   Vector3 result;

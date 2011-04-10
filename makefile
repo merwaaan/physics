@@ -1,5 +1,5 @@
 EXEC=demo
-COMP=g++
+COMP=clang
 OBJ= \
 	Box.o \
 	CustomRigidBody.o \

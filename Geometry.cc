@@ -262,7 +262,7 @@ Vector3 Geometry::closestPointOfTriangle(Vector3 point, Triangle triangle, doubl
 	Vector3 originalPoint = point;
 
 	// project the point onto the plane extending the triangle
-	point = Geometry::closestPointOfPlane(point, triangle.getPlane());
+	point = Geometry::closestPointOfPlane(originalPoint, triangle.getPlane());
 
 	Vector3 ab = triangle.b - triangle.a;
 	Vector3 ac = triangle.c - triangle.a;
@@ -399,16 +399,21 @@ Vector3 Geometry::closestPointOfTetrahedron(Vector3 point, Tetrahedron tetra, do
 	{
 		if(distance_p != NULL)
 			*distance_p = 0;
-
+		std::cout << "inside" << std::endl;
 		return point;
 	}
 	
+	std::cout << "outside" << std::endl;
+
 	// compute the distances from the point to each triangles
 	std::vector<Triangle> triangles = tetra.getTriangles();
 	Vector3 closests[4];
 	double distances[4];
 	for(int i = 0; i < 4; ++i)
+	{
 		closests[i] = Geometry::closestPointOfTriangle(point, triangles[i], &distances[i]);
+		std::cout << "sub tetra " << distances[i] << " " << closests[i] << std::endl;
+	}
 
 	// only keep the closest one
 	int indexClosest = 0;
@@ -453,39 +458,44 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
 
   // initialize the simplex to a random point
   Simplex simplex;
-  simplex.points.push_back(simplex.getSupportPoint(rb1_p, rb2_p, Vector3(0, 1, 0)));
+	simplex.points.push_back(simplex.getSupportPoint(rb1_p, rb2_p, Vector3(0, 1, 0)));
 
 	// the closest point from the origin can only be the unique simplex's point
   Vector3 closest = simplex.points[0];
-	std::cout << "start " << closest << std::endl;
 
   while(true)
   {
     // find a support point along the direction from the closest point to the origin
-	  Vector3 support = simplex.getSupportPoint(rb1_p, rb2_p, closest.negate());
-    simplex.points.push_back(support);
+		Vector3 originDirection = -1 * closest;
+	  Vector3 support = simplex.getSupportPoint(rb1_p, rb2_p, originDirection);
+  
+		// check if the support point is already part of the simplex
+		for(int i = 0; i < simplex.points.size(); ++i)
+			if(support == simplex.points[i])
+			{
+				if(interPenetration_p != NULL)
+					*interPenetration_p = (origin - closest).length() < 0.000001;
+		
+				return closest;
+			}
 
+		simplex.points.push_back(support);
+
+		// compute the closest point of the new simplex
 		Vector3 newClosest = simplex.getClosestPointAndReduce();
 
-		std::cout << "closest "  << closest << std::endl;
-		std::cout << "closest 2 " << newClosest << std::endl;
-		std::cout << "current distance " << closest.length() << std::endl;
-
 		// if the closest point is the origin, the bodies are inter-penetrating
-		if((closest - origin).length() < 0.001)
+		if((newClosest - origin).length() < 0.001)
 		{
-			std::cout << "origin touched" << std::endl;
 			if(interPenetration_p != NULL)
 				*interPenetration_p = true;
 
-			return closest;
+			return newClosest;
 		}
-
-    // if the support point is not less or equally extremal than the closest point,
-		// we have the closest point from the origin
-		if((closest - newClosest).length() < 0.001)
+		// if the new closest point is equals to the old one, the search
+		// over the simplex is done
+		else if((closest - newClosest).length() < 0.001)
 		{
-			std::cout << "closest point touched " << closest << std::endl;
 			if(interPenetration_p != NULL)
 				*interPenetration_p = false;           ;
 
@@ -522,7 +532,7 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
       }
     }
 
-  // if it's the first passage, recursively call the method to obtain the contacts from
+  // if it's the first passage, recursively call the method to obtain contacts from
   // the perspective of the other body and append them to the list
   if(!second)
   {
@@ -555,11 +565,13 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 		    contact.a = rb1_p;
 		    contact.b = rb2_p;
 		    contact.position = closest1 + (closest2 - closest1) / 2;
-
+				std::cout << "d=" << Geometry::gjkDistanceBetweenPolyhedra(rb1_p, rb2_p).length() << std::endl;
 		    Vector3 v1 = edges1[i].b - edges1[i].a;
 		    Vector3 v2 = edges2[j].b - edges2[j].a;
 		    contact.normal = (v1 ^ v2).normalize();
-
+				std::cout << "e1 " << closest1 << std::endl;
+				std::cout << "e2 " << closest2 << std::endl;
+				std::cout << "ee " << contact.position << " " << (closest1 - closest2).length() << std::endl;
 		    contacts.push_back(contact);
 	    }
     }

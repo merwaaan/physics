@@ -56,7 +56,7 @@ void Engine::update()
           if(contacts.size() > 0)
           {
             std::cout << "real collision detected between #" << i << " and #" << j << std::endl;
-						std::cout << contacts.size() << std::endl;
+
             for(int k = 0; k < contacts.size(); ++k)
             {
 	            Vector3* impulses = this->computeImpulse(contacts[k]);

@@ -35,10 +35,7 @@ std::vector<Edge> Structure::getEdges() const
 		for(int j = i + 1; j < edges.size(); ++j)
 			if(edges[i].a == edges[j].a && edges[i].b == edges[j].b ||
 			   edges[i].a == edges[j].b && edges[i].b == edges[j].a)
-			{
-				edges.erase(edges.begin() + j);
-				--j;
-			}
+				edges.erase(edges.begin() + j--);
 
 	return edges;
 }
@@ -277,16 +274,13 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 	std::cout << "(separating bodies)" << std::endl;
 
 	double sdt = -dt / 10;
+	int backtrackings = 0;
 
 	this->reverseTime();
 	rb_p->reverseTime();
 
-	bool interPenetration = true;
-	Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &interPenetration);
-
-	while(interPenetration)
+	while(!this->findSeparationPlane(rb_p) && !rb_p->findSeparationPlane(this))
 	{
-		std::cout << "distance " << distance.length() << std::endl;
     std::cout << "going backward " << sdt << "ms" << std::endl;
 
 	  engine_pg->applyEnvironmentalForces(this, sdt);
@@ -295,13 +289,14 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 		this->integrate(sdt);
     rb_p->integrate(sdt);
 
-		distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &interPenetration);
+		++backtrackings;
 	}
 
 	this->reverseTime();
 	rb_p->reverseTime();
+
 	std::cout << "NEXT STEP" << std::endl;
-  return this->resolveInterPenetration(rb_p, dt);
+  return this->resolveInterPenetration(rb_p, sdt * backtrackings);
 }
 
 /**
@@ -336,18 +331,17 @@ bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
 std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double dt)
 {
   // compute the distance between the two bodies
-	bool interPenetration = false;
+	bool interPenetration;
   Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &interPenetration);
 
   std::cout << "d = " << distance.length() << " ip = " << interPenetration << std::endl;
-
+	std::cout << *rb_p << std::endl;
   // if the bodies are too far apart, integrate forward in time
   if(!interPenetration && distance.length() > 0.01)
   {
 		double sdt = dt / 2;
 
 	  std::cout << "going forward " << sdt << "ms" << std::endl;
-		std::cout << *rb_p << std::endl;
 
 	  engine_pg->applyEnvironmentalForces(this, sdt);
 	  engine_pg->applyEnvironmentalForces(rb_p, sdt);
@@ -365,7 +359,6 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 		double sdt = dt / 2;
 
 	  std::cout << "going backward " << sdt << "ms" << std::endl;
-		std::cout << *rb_p << std::endl;
 
 	  engine_pg->applyEnvironmentalForces(this, sdt);
 	  engine_pg->applyEnvironmentalForces(rb_p, sdt);

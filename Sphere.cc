@@ -113,7 +113,6 @@ std::vector<Contact> Sphere::isCollidingWith(Sphere* s_p, double dt)
 	
 	while(distance < radii)
 	{
-		distance = (this->position - s_p->position).length();
 		std::cout << "distance " << distance << std::endl;
     std::cout << "going backward " << sdt << "ms" << std::endl;
 
@@ -122,6 +121,8 @@ std::vector<Contact> Sphere::isCollidingWith(Sphere* s_p, double dt)
 
 		this->integrate(sdt);
     s_p->integrate(sdt);
+
+		distance = (this->position - s_p->position).length();
 	}
 
 	this->reverseTime();

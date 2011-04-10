@@ -399,21 +399,16 @@ Vector3 Geometry::closestPointOfTetrahedron(Vector3 point, Tetrahedron tetra, do
 	{
 		if(distance_p != NULL)
 			*distance_p = 0;
-		std::cout << "inside" << std::endl;
+
 		return point;
 	}
 	
-	std::cout << "outside" << std::endl;
-
 	// compute the distances from the point to each triangles
 	std::vector<Triangle> triangles = tetra.getTriangles();
 	Vector3 closests[4];
 	double distances[4];
 	for(int i = 0; i < 4; ++i)
-	{
 		closests[i] = Geometry::closestPointOfTriangle(point, triangles[i], &distances[i]);
-		std::cout << "sub tetra " << distances[i] << " " << closests[i] << std::endl;
-	}
 
 	// only keep the closest one
 	int indexClosest = 0;

@@ -26,9 +26,9 @@ Vector3 Simplex::getClosestPointAndReduce()
 		Triangle c = {this->points[0], this->points[1], this->points[3]};
 		Triangle d = {this->points[0], this->points[1], this->points[2]};
 		Tetrahedron tetrahedron = {a, b, c, d};
-		std::cout << "++++++++++++++++++++++++++++++++++++++++" << std::endl;
+
 		closest =  Geometry::closestPointOfTetrahedron(Vector3(0, 0, 0), tetrahedron);
-		std::cout << "tetratest " << closest.length() << std::endl;
+
 		this->reduceToTriangle(closest, tetrahedron);
 	}
 
@@ -54,7 +54,7 @@ Vector3 Simplex::getClosestPointAndReduce()
   // the simplex only has one point : return the point
   if(this->points.size() == 1)
     closest = this->points[0];
-	std::cout << points.size() << " " << closest.length() << " " << closest << std::endl;
+
 	return closest;
 }
 

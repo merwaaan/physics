@@ -184,7 +184,7 @@ int main(int argc, char** argv)
   //testGJK();
   //testTimeReversing();
 
-  //demoBalls();
+  demoBalls();
   demoBoxes();
   
   delete e;

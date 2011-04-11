@@ -107,14 +107,14 @@ Vector3* Engine::computeImpulse(Contact contact)
 	 * RESTING CONTACT
 	 */
 
-/*	if(relativeVelocity < 0.5)
+	/*if(relativeVelocity < 0.5)
 	{
 		Vector3 impulseA = relativeVelocity * n;
 		Vector3 impulseB = -1 * relativeVelocity * n;
 
 		return (Vector3[]){impulseA, impulseB};
-	}
-*/
+		}*/
+
 	/**
 	 * SEPARATING CONTACT
 	 */

@@ -7,8 +7,7 @@
 #include "Engine.h"
 #include "Sphere.h"
 
-extern Display* display_pg;
-extern Engine* engine_pg;
+extern Engine* E;
 
 std::vector<Edge> Structure::getEdges() const
 {
@@ -212,7 +211,7 @@ void CustomRigidBody::draw()
   }
 
   // draw the bounding box
-  if(display_pg->areBoundingBoxesDrawn())
+  if(E->areBoundingBoxesDrawn())
   {
     glPushMatrix();
 
@@ -283,8 +282,8 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 	{
     std::cout << "going backward " << sdt << "ms" << std::endl;
 
-	  engine_pg->applyEnvironmentalForces(this, sdt);
-	  engine_pg->applyEnvironmentalForces(rb_p, sdt);
+	  E->applyEnvironmentalForces(this, sdt);
+	  E->applyEnvironmentalForces(rb_p, sdt);
 
 		this->integrate(sdt);
     rb_p->integrate(sdt);
@@ -343,8 +342,8 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 
 	  std::cout << "going forward " << sdt << "ms" << std::endl;
 
-	  engine_pg->applyEnvironmentalForces(this, sdt);
-	  engine_pg->applyEnvironmentalForces(rb_p, sdt);
+	  E->applyEnvironmentalForces(this, sdt);
+	  E->applyEnvironmentalForces(rb_p, sdt);
 
     this->integrate(sdt);
     rb_p->integrate(sdt);
@@ -360,8 +359,8 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 
 	  std::cout << "going backward " << sdt << "ms" << std::endl;
 
-	  engine_pg->applyEnvironmentalForces(this, sdt);
-	  engine_pg->applyEnvironmentalForces(rb_p, sdt);
+	  E->applyEnvironmentalForces(this, sdt);
+	  E->applyEnvironmentalForces(rb_p, sdt);
 
     this->integrateBackward(sdt);
     rb_p->integrateBackward(sdt);

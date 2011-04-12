@@ -5,13 +5,13 @@
 
 #include "Geometry.h"
 
-Engine* engine_pg = NULL;
+Engine* E = NULL;
 
 Engine::Engine(int* argc, char** argv, double timeStep) :
   timeStep(timeStep),
-  display(argc, argv, 600, 600, this)
+  display(argc, argv, 600, 600)
 {
-  engine_pg = this;
+  E = this;
 }
 
 Engine::~Engine()
@@ -21,6 +21,9 @@ Engine::~Engine()
 
 	for(int i = 0; i < this->environmentalForces_p.size(); ++i)
 		delete this->environmentalForces_p[i];
+	
+	for(int i = 0; i < this->constraints_p.size(); ++i)
+		delete this->constraints_p[i];
 }
 
 void Engine::run()
@@ -36,7 +39,7 @@ void Engine::update()
 {
   if(this->simulationTime >= 0)
   {
-    ///std::cout << "---------------------------------------" << std::endl;
+    //std::cout << "---------------------------------------" << std::endl;
     //std::cout << "simulation time = " << this->simulationTime << "s" << std::endl;
 
 		// std::cout << std::endl << "--- COLLISION PHASE ---" << std::endl;
@@ -50,7 +53,7 @@ void Engine::update()
         {
           std::cout << "bounding box collision detected between #" << i << " and #" << j << std::endl;
 
-          // accurate test
+          // narrow-phase test
           std::vector<Contact> contacts = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
         
           if(contacts.size() > 0)
@@ -68,6 +71,9 @@ void Engine::update()
         }
       }
 
+		for(int i = 0; i < this->constraints_p.size(); ++i)
+				this->constraints_p[i]->apply(0.5);
+
     //std::cout << std::endl << "--- INTEGRATION PHASE ---" << std::endl;
 
     // integrate the rigid bodies states
@@ -80,12 +86,12 @@ void Engine::update()
       // integrate each body state
       this->bodies_p[i]->integrate(this->timeStep);
 
-      if(i == 0 || i == 1) std::cout << "#" << i << std::endl << *bodies_p[i] << std::endl;
+			//std::cout << "#" << i << std::endl << *bodies_p[i] << std::endl;
     }
 
     this->simulationTime += this->timeStep;
 
-		this->cleanUp();
+		//this->cleanUp();
   }
   else
   {
@@ -160,7 +166,7 @@ void Engine::cleanUp()
 	Vector3 origin(0, 0, 0);
 
 	for(int i = 0; i < this->bodies_p.size(); ++i)
-		if((this->bodies_p[i]->position - origin).length() > 20)
+		if((this->bodies_p[i]->position - origin).length() > 50)
 		{
 			this->bodies_p.erase(this->bodies_p.begin() + i);
 			--i;
@@ -190,4 +196,19 @@ int Engine::getBodyCount()
 void Engine::addEnvironmentalForce_p(Force* force_p)
 {
   this->environmentalForces_p.push_back(force_p);
+}
+
+void Engine::addConstraint_p(Constraint* constraint_p)
+{
+  this->constraints_p.push_back(constraint_p);
+}
+
+Constraint* Engine::getConstraint_p(int i)
+{
+  return this->constraints_p[i];
+}
+
+int Engine::getConstraintCount()
+{
+  return this->constraints_p.size();
 }

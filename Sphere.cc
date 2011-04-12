@@ -6,8 +6,7 @@
 #include "Display.h"
 #include "Engine.h"
 
-extern Display* display_pg;
-extern Engine* engine_pg;
+extern Engine* E;
 
 Sphere::Sphere(double radius) :
   radius(radius)
@@ -73,7 +72,7 @@ void Sphere::draw()
   glutSolidSphere(this->radius, 20, 20);
 
   // draw the bounding box
-  if(display_pg->areBoundingBoxesDrawn())
+  if(E->areBoundingBoxesDrawn())
     glutWireCube(this->radius * 2);
 
   glPopMatrix();
@@ -116,8 +115,8 @@ std::vector<Contact> Sphere::isCollidingWith(Sphere* s_p, double dt)
 		std::cout << "distance " << distance << std::endl;
     std::cout << "going backward " << sdt << "ms" << std::endl;
 
-	  engine_pg->applyEnvironmentalForces(this, sdt);
-	  engine_pg->applyEnvironmentalForces(s_p, sdt);
+	  E->applyEnvironmentalForces(this, sdt);
+	  E->applyEnvironmentalForces(s_p, sdt);
 
 		this->integrate(sdt);
     s_p->integrate(sdt);
@@ -148,8 +147,8 @@ std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt)
 
     std::cout << "going forward " << sdt << "ms" << std::endl;
 
-		engine_pg->applyEnvironmentalForces(this, sdt);
-		engine_pg->applyEnvironmentalForces(s_p, sdt);
+		E->applyEnvironmentalForces(this, sdt);
+		E->applyEnvironmentalForces(s_p, sdt);
     
 		this->integrate(sdt);
     s_p->integrate(sdt);
@@ -162,8 +161,8 @@ std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt)
 
     std::cout << "going backward " << sdt << "ms" << std::endl;
 
-	  engine_pg->applyEnvironmentalForces(this, sdt);
-	  engine_pg->applyEnvironmentalForces(s_p, sdt);
+	  E->applyEnvironmentalForces(this, sdt);
+	  E->applyEnvironmentalForces(s_p, sdt);
 
     this->integrateBackward(sdt);
     s_p->integrateBackward(sdt);

@@ -3,15 +3,17 @@
 
 #include <vector>
 
+#include "Constraint.h"
 #include "Display.h"
-#include "RigidBody.h"
 #include "Force.h"
+#include "RigidBody.h"
 
 class Engine
 {
   private:
     std::vector<RigidBody*> bodies_p;
     std::vector<Force*> environmentalForces_p;
+		std::vector<Constraint*> constraints_p;
 
     double timeStep;
     double simulationTime;
@@ -36,6 +38,13 @@ class Engine
     int getBodyCount();
 
     void addEnvironmentalForce_p(Force* force_p);
+
+		void addConstraint_p(Constraint* constraint_p);
+		Constraint* getConstraint_p(int i);
+    int getConstraintCount();
+		
+		Display* getDisplay_p() { return &this->display; }
+		bool areBoundingBoxesDrawn() { return this->display.areBoundingBoxesDrawn(); }
 };
 
 #endif

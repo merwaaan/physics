@@ -5,11 +5,10 @@
 #include "Display.h"
 #include "Engine.h"
 
-Display* display_pg = NULL;
+extern Engine* E;
 
-Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
-  drawBoundingBoxes(false),
-  engine_p(engine_p)
+Display::Display(int* argc, char** argv, int w, int h) :
+  drawBoundingBoxes(false)
 {
   glutInit(argc, argv);
   glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
@@ -42,8 +41,6 @@ Display::Display(int* argc, char** argv, int w, int h, Engine* engine_p) :
   this->camera.radius = 20;
   this->camera.angle = 45;
   this->camera.lastX = -1;
-
-  display_pg = this;
 }
 
 Display::~Display()
@@ -83,11 +80,10 @@ bool Display::areBoundingBoxesDrawn()
 
 void update()
 {
-  Engine* engine_p = display_pg->engine_p;
-  if(display_pg->getLocalTime() > display_pg->lastUpdateTime + 0.01666) // ~60 FPS
+  if(E->getDisplay_p()->getLocalTime() > E->getDisplay_p()->lastUpdateTime + 0.01666) // ~60 FPS
   {
     // update the simulation
-	  engine_p->update();
+	  E->update();
 
     // clear all
     glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -102,7 +98,7 @@ void update()
     // place the camera
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    Camera* cam_p = &display_pg->camera;
+    Camera* cam_p = &E->getDisplay_p()->camera;
     gluLookAt(
       cam_p->radius * cos(cam_p->angle),
       6,
@@ -111,12 +107,16 @@ void update()
       0, 1, 0);
     
     // draw each rigid body
-    for(int i = 0; i < engine_p->getBodyCount(); ++i)
-	    engine_p->getBody_p(i)->draw();
+    for(int i = 0; i < E->getBodyCount(); ++i)
+	    E->getBody_p(i)->draw();
+
+		// draw each constraint
+		for(int i = 0; i < E->getConstraintCount(); ++i)
+			E->getConstraint_p(i)->draw();
 
     glutSwapBuffers();
     
-    display_pg->lastUpdateTime = display_pg->getLocalTime();
+    E->getDisplay_p()->lastUpdateTime = E->getDisplay_p()->getLocalTime();
   }
 
   glutPostRedisplay();
@@ -124,7 +124,7 @@ void update()
 
 void mouse(int x, int y)
 {
-  Camera* cam_p = &display_pg->camera;
+  Camera* cam_p = &E->getDisplay_p()->camera;
   
   if(cam_p->lastX < 0)
     cam_p->lastX = x;

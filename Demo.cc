@@ -116,6 +116,35 @@ void testTimeReversing()
   s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
 }
 
+void testConstraints()
+{
+	Sphere* s;
+	Constraint* c;
+	Sphere* prev;
+
+	s = new Sphere(1);
+	s->setFixed(true);
+	e->addRigidBody_p(s);	
+	prev = s;
+
+	for(int i = 0; i < 3; ++i)
+	{
+		s = new Sphere(1);
+		s->setPosition(3 + i * 3, 3 + i * 3, 0);
+		e->addRigidBody_p(s);
+
+		c = new DistanceConstraint(s, prev, 3);
+		e->addConstraint_p(c);
+
+		prev = s;
+	}
+
+  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  e->addEnvironmentalForce_p(g);
+
+	e->run();
+}
+
 void demoBalls()
 {
 /*  Sphere* s1 = new Sphere(1);
@@ -183,9 +212,10 @@ int main(int argc, char** argv)
   //testGeometry();
   //testGJK();
   //testTimeReversing();
+	testConstraints();
 
-  demoBalls();
-  demoBoxes();
+  //demoBalls();
+  //demoBoxes();
   
   delete e;
 

@@ -21,10 +21,8 @@ class Display
 
     bool drawBoundingBoxes;
 
-    Engine* engine_p;
-
   public:
-    Display(int* argc, char** argv, int w, int h, Engine* engine_p);
+    Display(int* argc, char** argv, int w, int h);
     ~Display();
 
     void run();

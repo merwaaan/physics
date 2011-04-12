@@ -14,9 +14,10 @@ class Constraint
 	  ~Constraint();
 
 	  virtual void apply(double dt) = 0;
-}
+		virtual void draw() = 0;
+};
 
-class DistanceConstraint
+class DistanceConstraint : public Constraint
 {
 protected:
 	double distance;
@@ -26,6 +27,8 @@ public:
 	~DistanceConstraint();
 
 	virtual void apply(double dt);
-}
+	virtual void draw();
+};
 
-#endif CONSTRAINT_H
+#endif
+

@@ -52,11 +52,3 @@ void DistanceConstraint::draw()
 
   glPopMatrix();
 }
-
-void RestingConstraint::apply(double dt)
-{
-}
-
-void RestingConstraint::draw()
-{
-}

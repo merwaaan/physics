@@ -109,24 +109,6 @@ Vector3* Engine::computeImpulse(Contact contact)
 
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
 
-	/**
-	 * RESTING CONTACT
-	 */
-
-	if(relativeVelocity < 0.5)
-	{
-		Vector3 impulse = (relativeVelocity / (a->inverseMass + b->inverseMass)) * n;
-
-		Vector3 impulseA = impulse * a->inverseMass; // mass?
-		Vector3 impulseB = -1 * impulse * b->inverseMass;
-
-		return (Vector3[]){impulseA, impulseB};
-	}
-
-	/**
-	 * SEPARATING CONTACT
-	 */
-
   // displacements of the contact point with respect to the center of mass of each body
   Vector3 da = p - a->position;
   Vector3 db = p - b->position;
@@ -143,6 +125,8 @@ Vector3* Engine::computeImpulse(Contact contact)
 
 	if(relativeVelocity > 0.5)
 		impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
+	else
+		impulse = (-1 * relativeVelocity) / (t1 + t2 + t3) * n;
 
 	std::cout << "impulse " << impulse << " at " << contact.position << std::endl;
 

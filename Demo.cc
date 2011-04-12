@@ -116,7 +116,7 @@ void testTimeReversing()
   s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
 }
 
-void testConstraints()
+void demoConstraints()
 {
 	Sphere* s;
 	Constraint* c;
@@ -127,10 +127,10 @@ void testConstraints()
 	e->addRigidBody_p(s);	
 	prev = s;
 
-	for(int i = 0; i < 3; ++i)
+	for(int i = 0; i < 17; ++i)
 	{
 		s = new Sphere(1);
-		s->setPosition(3 + i * 3, 3 + i * 3, 0);
+		s->setPosition(i*1.3, 3 + i * 3, 0);
 		e->addRigidBody_p(s);
 
 		c = new DistanceConstraint(s, prev, 3);
@@ -154,31 +154,26 @@ void demoBalls()
   Sphere* s2 = new Sphere(1);
 	s2->setPosition(0, 0, 0);
 	s2->setFixed(true);
-	e->addRigidBody_p(s2);*/
+	e->addRigidBody_p(s2);
 
-  int q = 6;
+  s2 = new Sphere(1);
+	s2->setPosition(0, 7, 0);
+	e->addRigidBody_p(s2);
+*/
 
-  for(int i = -q; i < q; i += 3)
-    for(int j = -q; j < q; j += 3)
+  for(int i = -2; i < 2; ++i)
+    for(int j = -2; j < 2; ++j)
     {
       Sphere* s = new Sphere(1);
-      s->setPosition(i + 0.3 * i, 5, j * 0.1 + j);
+      s->setPosition(i * 3 + 0.1 * i, 5, j * 3 + 0.2 * j);
       e->addRigidBody_p(s);
     }
 
-	for(int i = -q; i < q; i += 3)
-    for(int j = -q; j < q; j += 3)
+	for(int i = -4; i < 4; ++i)
+		for(int j = -4; j < 4; ++j)
     {
       Sphere* s = new Sphere(1);
-      s->setPosition(i + 0.3 * i, 12, j * 0.1 + j);
-      e->addRigidBody_p(s);
-    }
-
-  for(int i = -q-3; i < q+3; i += 3)
-    for(int j = -q-3; j < q+3; j += 3)
-    {
-      Sphere* s = new Sphere(1);
-      s->setPosition(i, 0, j);
+      s->setPosition(i * 3, 0, j * 3);
       s->setFixed(true);
       e->addRigidBody_p(s);
     }
@@ -212,8 +207,8 @@ int main(int argc, char** argv)
   //testGeometry();
   //testGJK();
   //testTimeReversing();
-	testConstraints();
-
+	
+	demoConstraints();
   //demoBalls();
   //demoBoxes();
   

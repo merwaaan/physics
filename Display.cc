@@ -38,7 +38,7 @@ Display::Display(int* argc, char** argv, int w, int h) :
   glutDisplayFunc(&update);
   glutPassiveMotionFunc(&mouse);
 
-  this->camera.radius = 20;
+  this->camera.radius = 50;
   this->camera.angle = 45;
   this->camera.lastX = -1;
 }
@@ -93,7 +93,8 @@ void update()
     // set an orthogonal perspective
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-10, 10, -10, 10, 1, 100);
+		int h = 100;
+    glOrtho(-h, h, -h, h, 1, 200);
 
     // place the camera
     glMatrixMode(GL_MODELVIEW);
@@ -105,7 +106,7 @@ void update()
       cam_p->radius * sin(cam_p->angle),
       0, 0, 0,
       0, 1, 0);
-    
+		
     // draw each rigid body
     for(int i = 0; i < E->getBodyCount(); ++i)
 	    E->getBody_p(i)->draw();

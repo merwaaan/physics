@@ -30,5 +30,14 @@ public:
 	virtual void draw();
 };
 
-#endif
+class RestingConstraint : public Constraint
+{
+public:
+	RestingConstraint(RigidBody* a_p, RigidBody* b_p);
+	~RestingConstraint();
 
+	virtual void apply(double dt);
+	virtual void draw();
+};
+
+#endif

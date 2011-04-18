@@ -93,7 +93,7 @@ void update()
     // set an orthogonal perspective
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-		int h = 100;
+		int h = 10;
     glOrtho(-h, h, -h, h, 1, 200);
 
     // place the camera

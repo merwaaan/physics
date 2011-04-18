@@ -145,9 +145,9 @@ void demoConstraints()
 	e->run();
 }
 
-void demoBalls()
+void demoRestingBalls()
 {
-/*  Sphere* s1 = new Sphere(1);
+  Sphere* s1 = new Sphere(1);
 	s1->setPosition(0, 4, 0);
 	e->addRigidBody_p(s1);
    
@@ -156,11 +156,18 @@ void demoBalls()
 	s2->setFixed(true);
 	e->addRigidBody_p(s2);
 
-  s2 = new Sphere(1);
-	s2->setPosition(0, 7, 0);
-	e->addRigidBody_p(s2);
+/*  Sphere* s3 = new Sphere(1);
+	s3->setPosition(0, 7, 0);
+	e->addRigidBody_p(s3);
 */
+  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  e->addEnvironmentalForce_p(g);
 
+  e->run();
+}
+
+void demoBalls()
+{
   for(int i = -2; i < 2; ++i)
     for(int j = -2; j < 2; ++j)
     {
@@ -190,6 +197,10 @@ void demoBoxes()
   c2->setFixed(true);
   e->addRigidBody_p(c2);
 
+	Cube* c1 = new Cube(2);
+	c1->setPosition(2.5, 5, 0);
+  e->addRigidBody_p(c1);
+
   Force* g = new CenterForce(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);
 
@@ -198,7 +209,7 @@ void demoBoxes()
 
 int main(int argc, char** argv)
 {
-	srand(1);
+	srand(0);
 
   e = new Engine(&argc, argv, 0.0166);
   
@@ -208,9 +219,10 @@ int main(int argc, char** argv)
   //testGJK();
   //testTimeReversing();
 	
-	demoConstraints();
-  //demoBalls();
-  //demoBoxes();
+	//demoConstraints();
+	//demoRestingBalls();
+	//demoBalls();
+  demoBoxes();
   
   delete e;
 

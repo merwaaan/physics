@@ -169,7 +169,7 @@ std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt)
 
     return this->resolveInterPenetration(s_p, dt / 2);
   }
-
+	std::cout << *this << std::endl;
   Contact contact;
   contact.a = this;
   contact.b = s_p;

@@ -64,8 +64,8 @@ void Engine::update()
             {
 	            Vector3* impulses = this->computeImpulse(contacts[k]);
 
-	            contacts[k].a->applyOffCenterForce(impulses[0], 1, contacts[k].position);
-	            contacts[k].b->applyOffCenterForce(impulses[1], 1, contacts[k].position);
+	            contacts[k].a->applyOffCenterForce(impulses[0] / contacts.size(), 1, contacts[k].position);
+	            contacts[k].b->applyOffCenterForce(impulses[1] / contacts.size(), 1, contacts[k].position);
             }
 					}
         }
@@ -108,31 +108,33 @@ Vector3* Engine::computeImpulse(Contact contact)
   Vector3 n = contact.normal;
 
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
-
-  // displacements of the contact point with respect to the center of mass of each body
-  Vector3 da = p - a->position;
-  Vector3 db = p - b->position;
-
-	Matrix3 inverseInertiaA = a->orientation * a->inverseInertiaTensor * a->orientation.transpose();
- 	Matrix3 inverseInertiaB = b->orientation * b->inverseInertiaTensor * b->orientation.transpose();
-
-  double t1 = a->inverseMass + b->inverseMass;
-  double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
-  double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
-
-  double restitution = this->timeStep > 0 ? 0.8 : 1.25;
 	Vector3 impulse;
-
-	if(relativeVelocity > 0.5)
-		impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
+	std::cout << n << " " << relativeVelocity << std::endl;
+	if(abs(relativeVelocity) < 0.5)
+		impulse = relativeVelocity * n;
 	else
-		impulse = (-1 * relativeVelocity) / (t1 + t2 + t3) * n;
+	{
+		
+		// displacements of the contact point with respect to the center of mass of each body
+		Vector3 da = p - a->position;
+		Vector3 db = p - b->position;
 
-	std::cout << "impulse " << impulse << " at " << contact.position << std::endl;
+		Matrix3 inverseInertiaA = a->orientation * a->inverseInertiaTensor * a->orientation.transpose();
+		Matrix3 inverseInertiaB = b->orientation * b->inverseInertiaTensor * b->orientation.transpose();
+
+		double t1 = a->inverseMass + b->inverseMass;
+		double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
+		double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
+	
+		double restitution = this->timeStep > 0 ? 0.8 : 1.25;
+		impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
+	}
 
 	Vector3 impulseA = impulse;
-	Vector3 impulseB = -1 * impulse;// mass?;
+	Vector3 impulseB = -1 * impulse;
 
+	std::cout << "impulse A " << impulseA << " at " << contact.position << std::endl;
+	
 	return (Vector3[]){impulseA, impulseB};
 }
 

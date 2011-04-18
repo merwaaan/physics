@@ -467,7 +467,7 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
 		// check if the support point is already part of the simplex
 		for(int i = 0; i < simplex.points.size(); ++i)
 			if(support == simplex.points[i])
-			{
+			{std::cout << 1111<< std::endl;
 				if(interPenetration_p != NULL)
 					*interPenetration_p = (origin - closest).length() < 0.000001;
 		
@@ -476,21 +476,22 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
 
 		simplex.points.push_back(support);
 
-		// compute the closest point of the new simplex
+		// Compute the closest point of the new simplex.
 		Vector3 newClosest = simplex.getClosestPointAndReduce();
 
-		// if the closest point is the origin, the bodies are inter-penetrating
-		if((newClosest - origin).length() < 0.001)
+		// If the closest point is the origin, the bodies are interpenetrating.
+		if((newClosest - origin).length() < 0.000001)
 		{
+			std::cout << 2222 << " " << newClosest << " " << (newClosest - origin).length() << std::endl;
 			if(interPenetration_p != NULL)
 				*interPenetration_p = true;
 
 			return newClosest;
-		}
-		// if the new closest point is equals to the old one, the search
-		// over the simplex is done
-		else if((closest - newClosest).length() < 0.001)
-		{
+			}
+		// If the new closest point is equals to the old one, the search
+		// over the simplex is done.
+		if((closest - newClosest).length() < 0.000001)
+		{std::cout << 333<< std::endl;
 			if(interPenetration_p != NULL)
 				*interPenetration_p = false;           ;
 

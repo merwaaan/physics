@@ -9,6 +9,7 @@ Engine* E = NULL;
 
 Engine::Engine(int* argc, char** argv, double timeStep) :
   timeStep(timeStep),
+	tolerance(0.01),
   display(argc, argv, 600, 600)
 {
   E = this;
@@ -44,16 +45,16 @@ void Engine::update()
 
 		// std::cout << std::endl << "--- COLLISION PHASE ---" << std::endl;
 
-    // check for collisions
+    // Check for collisions.
     for(int i = 1; i < this->bodies_p.size(); ++i)
       for(int j = 0; j < i; ++j)
       {
-        // broad-phase test
+        // Broad-phase test
         if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
         {
           std::cout << "bounding box collision detected between #" << i << " and #" << j << std::endl;
 
-          // narrow-phase test
+          // Narrow-phase test
           std::vector<Contact> contacts = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
         
           if(contacts.size() > 0)
@@ -71,19 +72,19 @@ void Engine::update()
         }
       }
 
+		// Apply constraints.
 		for(int i = 0; i < this->constraints_p.size(); ++i)
 				this->constraints_p[i]->apply(0.5);
 
     //std::cout << std::endl << "--- INTEGRATION PHASE ---" << std::endl;
 
-    // integrate the rigid bodies states
     for(int i = 0; i < this->bodies_p.size(); ++i)
     {      
-      // apply the external forces
+      // Apply external forces.
       for(int j = 0; j < this->environmentalForces_p.size(); ++j)
         this->environmentalForces_p[j]->apply(this->bodies_p[i], this->timeStep);
 
-      // integrate each body state
+      // Integrate each body.
       this->bodies_p[i]->integrate(this->timeStep);
 
 			//std::cout << "#" << i << std::endl << *bodies_p[i] << std::endl;

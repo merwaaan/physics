@@ -6,8 +6,6 @@
 #include "Sphere.h"
 #include "Vector3.h"
 
-#define GEOMETRY_TOLERANCE 0.01
-
 class CustomRigidBody;
 class Sphere;
 

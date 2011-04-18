@@ -1,8 +1,9 @@
 #include "Vector3.h"
 
-#include <cmath>
-
+#include "Engine.h"
 #include "Matrix3.h"
+
+extern Engine* E;
 
 Vector3::Vector3() :
   x(0),
@@ -24,9 +25,7 @@ Vector3::~Vector3()
 
 bool Vector3::operator==(const Vector3& v) const
 {
-	double tolerance = 0.001;
-
-	return (*this - v).length() < tolerance;
+	return (*this - v).length() < E->tolerance;
 }
 
 bool Vector3::operator!=(const Vector3& v) const

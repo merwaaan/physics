@@ -13,23 +13,23 @@ std::vector<Edge> Structure::getEdges() const
 {
 	std::vector<Edge> edges;
 
-	// list all the edges
+	// List all the edges.
 	for(int i = 0; i < this->polygons.size(); ++i)
 	{
 		for(int j = 0; j < this->polygons[i].size - 1; ++j)
 		{
-			Vector3 v1 = this->polygons[i].vertices_p[j]->absPosition;
-			Vector3 v2 = this->polygons[i].vertices_p[j + 1]->absPosition;
-			edges.push_back((Edge){v1, v2});
+			Vector3 a = this->polygons[i].vertices_p[j]->absPosition;
+			Vector3 b = this->polygons[i].vertices_p[j + 1]->absPosition;
+			edges.push_back((Edge){a, b});
 		}
 
-		// connect the last and the first vertex
-		Vector3 v1 = this->polygons[i].vertices_p[this->polygons[i].size - 1]->absPosition;
-		Vector3 v2 = this->polygons[i].vertices_p[0]->absPosition;
-		edges.push_back((Edge){v1, v2});
+		// Connect the last and the first vertex.
+		Vector3 a = this->polygons[i].vertices_p[this->polygons[i].size - 1]->absPosition;
+		Vector3 b = this->polygons[i].vertices_p[0]->absPosition;
+		edges.push_back((Edge){a, b});
 	}
  
-	// remove redundant edges
+	// Remove redundant edges.
 	for(int i = 0; i < edges.size(); ++i)
 		for(int j = i + 1; j < edges.size(); ++j)
 			if(edges[i].a == edges[j].a && edges[i].b == edges[j].b ||
@@ -295,6 +295,7 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 	rb_p->reverseTime();
 
 	std::cout << "NEXT STEP" << std::endl;
+	std::cout << *rb_p << std::endl;
   return this->resolveInterPenetration(rb_p, sdt * backtrackings);
 }
 
@@ -336,7 +337,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
   std::cout << "d = " << distance.length() << " ip = " << interPenetration << std::endl;
 	std::cout << *rb_p << std::endl;
   // if the bodies are too far apart, integrate forward in time
-  if(!interPenetration && distance.length() > 0.01)
+  if(!interPenetration && distance.length() > E->tolerance)
   {
 		double sdt = dt / 2;
 

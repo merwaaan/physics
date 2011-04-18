@@ -3,7 +3,10 @@
 #include <cmath>
 
 #include "CustomRigidBody.h"
+#include "Engine.h"
 #include "Simplex.h"
+
+extern Engine* E;
 
 Vector3 Triangle::getCenter() const
 {
@@ -166,7 +169,7 @@ double Geometry::edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, V
   double e = d2 * d2;
   double f = d2 * r;
 
-  if(a <= GEOMETRY_TOLERANCE && e <= GEOMETRY_TOLERANCE)
+  if(a <= E->tolerance && e <= E->tolerance)
   {
     s = t = 0;
     *closest1_p = edge1.a;
@@ -175,7 +178,7 @@ double Geometry::edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, V
     return (*closest1_p - *closest2_p) * (*closest1_p - *closest2_p);
   }
 
-  if(a <= GEOMETRY_TOLERANCE)
+  if(a <= E->tolerance)
   {
     s = 0;
     t = Geometry::clamp(f / e, 0, 1);
@@ -184,7 +187,7 @@ double Geometry::edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, V
   {
     double c = d1 * r;
     
-    if(e <= GEOMETRY_TOLERANCE)
+    if(e <= E->tolerance)
     {
       t = 0;
       s = Geometry::clamp(-c / a, 0, 1);
@@ -451,54 +454,43 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
 {
 	Vector3 origin(0, 0, 0);
 
-  // initialize the simplex to a random point
+  // Initialize the simplex to a random point.
   Simplex simplex;
-	simplex.points.push_back(simplex.getSupportPoint(rb1_p, rb2_p, Vector3(0, 1, 0)));
+	Vector3 start = rb1_p->getSupportPoint(-1 * Vector3(0,1,0)) - rb2_p->getSupportPoint(Vector3(0,1,0));
+	simplex.points.push_back(start);
 
-	// the closest point from the origin can only be the unique simplex's point
+	// The closest point from the origin can only be the unique simplex's point.
   Vector3 closest = simplex.points[0];
 
   while(true)
   {
-    // find a support point along the direction from the closest point to the origin
-		Vector3 originDirection = -1 * closest;
-	  Vector3 support = simplex.getSupportPoint(rb1_p, rb2_p, originDirection);
-  
-		// check if the support point is already part of the simplex
-		for(int i = 0; i < simplex.points.size(); ++i)
-			if(support == simplex.points[i])
-			{std::cout << 1111<< std::endl;
-				if(interPenetration_p != NULL)
-					*interPenetration_p = (origin - closest).length() < 0.000001;
-		
-				return closest;
-			}
-
-		simplex.points.push_back(support);
-
-		// Compute the closest point of the new simplex.
-		Vector3 newClosest = simplex.getClosestPointAndReduce();
+		Vector3 directionToOrigin = origin - closest;
 
 		// If the closest point is the origin, the bodies are interpenetrating.
-		if((newClosest - origin).length() < 0.000001)
+		if(closest == origin)
 		{
-			std::cout << 2222 << " " << newClosest << " " << (newClosest - origin).length() << std::endl;
 			if(interPenetration_p != NULL)
 				*interPenetration_p = true;
-
-			return newClosest;
-			}
-		// If the new closest point is equals to the old one, the search
-		// over the simplex is done.
-		if((closest - newClosest).length() < 0.000001)
-		{std::cout << 333<< std::endl;
-			if(interPenetration_p != NULL)
-				*interPenetration_p = false;           ;
 
 			return closest;
 		}
 
-		closest = newClosest;
+		// Compute the closest point of the simplex.
+		closest = simplex.getClosestPointAndReduce();
+
+    // Find a support point along the direction from the closest point to the origin.
+		Vector3 support = rb1_p->getSupportPoint(-1 * closest) - rb2_p->getSupportPoint(closest);
+		
+		if(support * directionToOrigin <= closest * directionToOrigin)
+		{
+			if(interPenetration_p != NULL)
+				*interPenetration_p = false;
+
+			return closest;
+		}
+
+		// Add the support point to the simplex.
+		simplex.points.push_back(support);
   }
 }
 
@@ -515,7 +507,7 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
       double distance;
       Vector3 point = Geometry::closestPointOfPolygon(vertex, face, &distance);
 
-      if(distance < GEOMETRY_TOLERANCE)
+      if(distance < E->tolerance)
       {
         Contact contact;
 
@@ -554,17 +546,17 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 	    Vector3 closest1, closest2;
 	    double distance = Geometry::edgeEdgeDistance(edges1[i], edges2[j], &closest1, &closest2);
 
-	    if(distance < GEOMETRY_TOLERANCE)
+	    if(distance < E->tolerance)
 	    {
 		    Contact contact;
 
 		    contact.a = rb1_p;
 		    contact.b = rb2_p;
-		    contact.position = closest1 + (closest2 - closest1) / 2;
+		    contact.position = (closest1 + closest2) / 2;
 
-		    Vector3 v1 = edges1[i].b - edges1[i].a;
-		    Vector3 v2 = edges2[j].b - edges2[j].a;
-		    contact.normal = (v1 ^ v2).normalize();
+		    Vector3 e1 = edges1[i].b - edges1[i].a;
+		    Vector3 e2 = edges2[j].b - edges2[j].a;
+		    contact.normal = (e1 ^ e2).normalize();
 
 		    contacts.push_back(contact);
 	    }

@@ -45,6 +45,8 @@ class Engine
 		
 		Display* getDisplay_p() { return &this->display; }
 		bool areBoundingBoxesDrawn() { return this->display.areBoundingBoxesDrawn(); }
+
+		double tolerance;
 };
 
 #endif

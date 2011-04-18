@@ -3,14 +3,6 @@
 #include "CustomRigidBody.h"
 
 /**
- * Returns a support point based on the implicit Minkowki difference of two rigid bodies.
- */
-Vector3 Simplex::getSupportPoint(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, Vector3 direction)
-{
-	return rb1_p->getSupportPoint(direction) - rb2_p->getSupportPoint(-1 * direction);
-}
-
-/**
  * Determine the closest point from the origin within the simplex.
  * Reduce the simplex's dimension if possible.
  */

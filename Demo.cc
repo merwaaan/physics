@@ -209,13 +209,18 @@ void demoThrowBoxes()
 
 void demoBoxes()
 {
+	Cube* c1 = new Cube(2);
+	c1->setPosition(2.5, 5, 0);
+  e->addRigidBody_p(c1);
+
 	Cube* c2 = new Cube(4);
   c2->setFixed(true);
   e->addRigidBody_p(c2);
 
-	Cube* c1 = new Cube(2);
-	c1->setPosition(2.5, 5, 0);
-  e->addRigidBody_p(c1);
+	Box* sol = new Box(30, 0.5, 30);
+	sol->setPosition(0, -2.5, 0);
+  sol->setFixed(true);
+  e->addRigidBody_p(sol);
 
   Force* g = new CenterForce(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);

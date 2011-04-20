@@ -38,7 +38,7 @@ Display::Display(int* argc, char** argv, int w, int h) :
   glutDisplayFunc(&update);
   glutPassiveMotionFunc(&mouse);
 
-  this->camera.radius = 50;
+  this->camera.radius = 40;
   this->camera.angle = 45;
   this->camera.lastX = -1;
 }
@@ -84,7 +84,8 @@ void update()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 		int h = 10;
-    glOrtho(-h, h, -h, h, 1, 200);
+		gluPerspective(50, 1, 1, 200);
+    //glOrtho(-h, h, -h, h, 1, 200);
 
     // Set the camera.
     glMatrixMode(GL_MODELVIEW);
@@ -92,7 +93,7 @@ void update()
     Camera* cam_p = &E->getDisplay_p()->camera;
     gluLookAt(
       cam_p->radius * cos(cam_p->angle),
-      6,
+      7,
       cam_p->radius * sin(cam_p->angle),
       0, 0, 0,
       0, 1, 0);

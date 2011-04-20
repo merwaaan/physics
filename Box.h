@@ -6,7 +6,7 @@
 class Box : public CustomRigidBody
 {
   public:
-    double width;
+	  double width;
     double height;
     double depth;
 

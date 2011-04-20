@@ -49,23 +49,9 @@ Display::~Display()
 
 void Display::run()
 {
-  this->startingTime = this->getAbsoluteTime();
-  this->lastUpdateTime = 0;
+  this->lastDisplayTime = 0;
 
   glutMainLoop();
-}
-
-double Display::getAbsoluteTime()
-{
-  struct timeval t;
-  gettimeofday(&t, NULL);
-
-  return t.tv_sec + (double)t.tv_usec / 1000000;
-}
-
-double Display::getLocalTime()
-{
-  return this->getAbsoluteTime() - this->startingTime;
 }
 
 void Display::setBoundingBoxesDrawn(bool draw)
@@ -80,23 +66,27 @@ bool Display::areBoundingBoxesDrawn()
 
 void update()
 {
-  if(E->getDisplay_p()->getLocalTime() > E->getDisplay_p()->lastUpdateTime + 0.01666) // ~60 FPS
-  {
-    // update the simulation
-	  E->update();
+	double t = E->getLocalTime();
 
-    // clear all
+	// Update the simulation.
+	if(t > E->lastUpdateTime + E->getTimeStep())
+		E->update();
+
+	// Display the simulation.
+  if(t > E->getDisplay_p()->lastDisplayTime + 0.001)
+  {
+    // Clear all.
     glClearColor(1.0, 1.0, 1.0, 1.0);
     glClearDepth(1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  
-    // set an orthogonal perspective
+    // Set an orthogonal perspective.
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
 		int h = 10;
     glOrtho(-h, h, -h, h, 1, 200);
 
-    // place the camera
+    // Set the camera.
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     Camera* cam_p = &E->getDisplay_p()->camera;
@@ -107,17 +97,17 @@ void update()
       0, 0, 0,
       0, 1, 0);
 		
-    // draw each rigid body
+    // Draw each rigid body.
     for(int i = 0; i < E->getBodyCount(); ++i)
 	    E->getBody_p(i)->draw();
 
-		// draw each constraint
+		// Draw each constraint.
 		for(int i = 0; i < E->getConstraintCount(); ++i)
 			E->getConstraint_p(i)->draw();
 
     glutSwapBuffers();
     
-    E->getDisplay_p()->lastUpdateTime = E->getDisplay_p()->getLocalTime();
+    E->getDisplay_p()->lastDisplayTime = E->getLocalTime();
   }
 
   glutPostRedisplay();

@@ -211,7 +211,7 @@ int main(int argc, char** argv)
 {
 	srand(0);
 
-  e = new Engine(&argc, argv, 0.0166);
+  e = new Engine(&argc, argv, 0.01);
   
   glutKeyboardFunc(&input);
   

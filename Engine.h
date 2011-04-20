@@ -16,7 +16,8 @@ class Engine
 		std::vector<Constraint*> constraints_p;
 
     double timeStep;
-    double simulationTime;
+		double startingTime;
+		double lastUpdateTime;
 
     Display display;
 
@@ -30,6 +31,8 @@ class Engine
 		void applyEnvironmentalForces(RigidBody* rb_p, double dt);
 		void cleanUp();
 
+    double getAbsoluteTime();
+    double getLocalTime();
     void reverseTime();
     double getTimeStep();
 

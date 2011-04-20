@@ -464,8 +464,6 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
 
   while(true)
   {
-		Vector3 directionToOrigin = origin - closest;
-
 		// If the closest point is the origin, the bodies are interpenetrating.
 		if(closest == origin)
 		{
@@ -477,11 +475,12 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
 
 		// Compute the closest point of the simplex.
 		closest = simplex.getClosestPointAndReduce();
+		Vector3 directionToOrigin = origin - closest;
 
     // Find a support point along the direction from the closest point to the origin.
 		Vector3 support = rb1_p->getSupportPoint(-1 * closest) - rb2_p->getSupportPoint(closest);
-		
-		if(support * directionToOrigin <= closest * directionToOrigin)
+
+		if((closest-origin).length() < E->tolerance || (origin - support) * directionToOrigin >= (origin - closest) * directionToOrigin)
 		{
 			if(interPenetration_p != NULL)
 				*interPenetration_p = false;

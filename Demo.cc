@@ -10,9 +10,7 @@ Engine* e;
 
 void input(unsigned char k, int x, int y)
 {
-  if(k == 32)
-	  e->reverseTime();
-  else if(k == 97)
+  if(k == 97)
   {
 	  Cube* c = new Cube(2);
 
@@ -191,6 +189,24 @@ void demoBalls()
   e->run();
 }
 
+void demoThrowBoxes()
+{
+	Cube* c1 = new Cube(2);
+	c1->setPosition(-5, 1, 1);
+	c1->applyOffCenterForce(Vector3(30,25,0), 1, Vector3(-6,-1,0));
+  e->addRigidBody_p(c1);
+
+	Cube* c2 = new Cube(2);
+	c2->setPosition(5, 0, 0);
+	c2->applyOffCenterForce(Vector3(-30,25,0), 1, Vector3(4, 0.25, 1));
+  e->addRigidBody_p(c2);
+
+  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  e->addEnvironmentalForce_p(g);
+
+  e->run();
+}
+
 void demoBoxes()
 {
 	Cube* c2 = new Cube(4);
@@ -209,7 +225,7 @@ void demoBoxes()
 
 int main(int argc, char** argv)
 {
-	srand(0);
+	srand(1);
 
   e = new Engine(&argc, argv, 0.01);
   
@@ -222,6 +238,7 @@ int main(int argc, char** argv)
 	//demoConstraints();
 	//demoRestingBalls();
 	//demoBalls();
+	//demoThrowBoxes();
   demoBoxes();
   
   delete e;

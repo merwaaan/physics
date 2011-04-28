@@ -5,7 +5,7 @@
 
 class Sphere : public RigidBody
 {
-  private:
+  protected:
     double radius;
 
   public:
@@ -20,13 +20,12 @@ class Sphere : public RigidBody
     void draw();
 
     std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt);
-
     std::vector<Contact> isCollidingWith(Sphere* s_p, double dt);
     std::vector<Contact> resolveInterPenetration(Sphere* s_p, double dt);
-    
     std::vector<Contact> isCollidingWith(CustomRigidBody* rb_p, double dt);
 
-    double getRadius() const;
+		void setRadius(double radius) { this->radius = radius; }
+    double getRadius() const { return this->radius; }
 };
 
 #endif

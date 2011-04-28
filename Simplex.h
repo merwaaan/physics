@@ -1,8 +1,6 @@
 #ifndef SIMPLEX_H
 #define SIMPLEX_H
 
-#include <vector>
-
 #include "Geometry.h"
 
 struct Simplex

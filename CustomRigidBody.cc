@@ -39,28 +39,6 @@ std::vector<Edge> Structure::getEdges() const
 	return edges;
 }
 
-/**
- * Return the best support point along a given direction
- */
-Vector3 Structure::getSupportPoint(Vector3 direction) const
-{
-  int bestIndex = 0;
-  double bestProj = this->vertices[0].absPosition * direction;
-
-  for(int i = 1; i < this->vertices.size(); ++i)
-	{
-		double proj = this->vertices[i].absPosition * direction;
-
-    if(proj > bestProj)
-    {
-      bestIndex = i;
-      bestProj = proj;
-    }
-	}
-
-  return this->vertices[bestIndex].absPosition;
-}
-
 CustomRigidBody::CustomRigidBody()
 {
 }
@@ -260,7 +238,7 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
  */
 std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
-  // if at least one separation plane exists, there is no collision
+  // If at least one separation plane exists, there is no collision.
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
   {
 	  std::cout << "separation plane found : no collision" << std::endl;
@@ -337,7 +315,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
   std::cout << "d = " << distance.length() << " ip = " << interPenetration << std::endl;
 	std::cout << *rb_p << std::endl;
   // if the bodies are too far apart, integrate forward in time
-  if(!interPenetration && distance.length() > E->tolerance)
+  if(!interPenetration && distance.length() > E->getTolerance())
   {
 		double sdt = dt / 2;
 
@@ -371,7 +349,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
     return this->resolveInterPenetration(rb_p, sdt);
   }
 
-  // if bodies are within the tolerance area, compute the real contact points
+  // If bodies are within the tolerance area, compute the real contact points.
 	std::vector<Contact> vfContacts = Geometry::vertexFaceContacts(this, rb_p);
 	std::vector<Contact> eeContacts = Geometry::edgeEdgeContacts(this, rb_p);
 	std::cout << vfContacts.size() << " v/f and " << eeContacts.size() << " e/e" << std::endl;

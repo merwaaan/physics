@@ -43,7 +43,7 @@ void RigidBody::applyCenterForce(Vector3 force, double dt)
   this->accumulatedForces += force * dt * (dt < 0 ? -1 : 1);
 }
 
-void RigidBody::applyOffCenterForce(Vector3 force, double dt, Vector3 poa)
+void RigidBody::applyOffCenterForce(Vector3 force, Vector3 poa, double dt)
 {
 	if(this->fixed)
 		return;
@@ -135,31 +135,6 @@ BoundingBox RigidBody::getBoundingBox()
   return this->boundingBox;
 }
 
-void RigidBody::setPosition(Vector3 position)
-{
-  this->position = position;
-}
-
-void RigidBody::setPosition(double x, double y, double z)
-{
-  this->position = Vector3(x, y, z);
-}
-
-void RigidBody::setOrientation(Matrix3 orientation)
-{
-  this->orientation = orientation;
-}
-
-void RigidBody::setFixed(bool fixed)
-{
-  this->fixed = fixed;
-}
-
-Vector3 RigidBody::getPosition() const
-{
-  return this->position;
-}
-
 Vector3 RigidBody::getVelocity() const
 {
   return this->linearMomentum * this->inverseMass;
@@ -168,24 +143,4 @@ Vector3 RigidBody::getVelocity() const
 Vector3 RigidBody::getVelocity(const Vector3& point) const
 {
 	return this->linearVelocity + (this->angularVelocity ^ (point - this->position));
-}
-
-void RigidBody::setRestitution(double restitution)
-{
-	this->restitution = restitution;
-}
-
-double RigidBody::getRestitution() const
-{
-	return this->restitution;
-}
-
-void RigidBody::setFriction(double friction)
-{
-	this->friction = friction;
-}
-
-double RigidBody::getFriction() const
-{
-	return this->friction;
 }

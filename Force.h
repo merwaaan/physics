@@ -8,7 +8,6 @@ class Force
 {
   protected:
     Vector3 force;
-    bool on;
 
   public:
     Force(Vector3 force);

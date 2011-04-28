@@ -12,7 +12,6 @@ struct Structure
   std::vector<CustomPolygon> polygons;
 
 	std::vector<Edge> getEdges() const;
-  Vector3 getSupportPoint(Vector3 direction) const;
 };
 
 class CustomRigidBody : public RigidBody
@@ -36,9 +35,7 @@ class CustomRigidBody : public RigidBody
     void computeVerticesAbsolutePositions();
  
     std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt);
-
     std::vector<Contact> isCollidingWith(Sphere* s_p, double dt);
-
     std::vector<Contact> isCollidingWith(CustomRigidBody* rb_p, double dt);
     bool findSeparationPlane(CustomRigidBody* rb_p);
     std::vector<Contact> resolveInterPenetration(CustomRigidBody* rb_p, double dt);

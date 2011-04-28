@@ -1,8 +1,7 @@
 #include "Force.h"
 
 Force::Force(Vector3 force) :
-  force(force),
-  on(true)
+  force(force)
 {
 }
 
@@ -36,6 +35,5 @@ OffCenterForce::~OffCenterForce()
 
 void OffCenterForce::apply(RigidBody* rb_p, double dt)
 {
-  rb_p->applyOffCenterForce(this->force, dt, this->pointOfApplication);
+  rb_p->applyOffCenterForce(this->force, this->pointOfApplication, dt);
 }
-

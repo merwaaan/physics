@@ -10,7 +10,7 @@ Vector3 Simplex::getClosestPointAndReduce()
 {
 	Vector3 closest;
 
-	// the simplex has four points : find the closest point on the tetrahedron formed by these vertices
+	// The simplex has four points : find the closest point on the tetrahedron formed by these vertices.
   if(this->points.size() == 4)
 	{
 		Triangle a = {this->points[1], this->points[2], this->points[3]};
@@ -24,7 +24,7 @@ Vector3 Simplex::getClosestPointAndReduce()
 		this->reduceToTriangle(closest, tetrahedron);
 	}
 
-	// the simplex has three points : find the closest point on the triangle formed by theses vertices
+	// The simplex has three points : find the closest point on the triangle formed by theses vertices.
 	if(this->points.size() == 3)
   {
 	  Triangle triangle = {this->points[0], this->points[1], this->points[2]};
@@ -33,7 +33,7 @@ Vector3 Simplex::getClosestPointAndReduce()
 		this->reduceToEdge(closest, triangle);
   }
 
-	// the simplex has two points : find the closest point on the edge formed by these vertices
+	// The simplex has two points : find the closest point on the edge formed by these vertices.
   if(this->points.size() == 2)
   {
     Edge edge = {this->points[0], this->points[1]};
@@ -43,7 +43,7 @@ Vector3 Simplex::getClosestPointAndReduce()
 		this->reduceToPoint(closest);
 	}
 
-  // the simplex only has one point : return the point
+  // The simplex only has one point : return the point.
   if(this->points.size() == 1)
     closest = this->points[0];
 

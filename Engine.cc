@@ -65,8 +65,8 @@ void Engine::update()
 					{
 						Vector3* impulses = this->computeImpulse(contacts[k]);
 
-						contacts[k].a->applyOffCenterForce(impulses[0], 1, contacts[k].position);
-						contacts[k].b->applyOffCenterForce(impulses[1], 1, contacts[k].position);
+						contacts[k].a->applyOffCenterForce(impulses[0], contacts[k].position, 1);
+						contacts[k].b->applyOffCenterForce(impulses[1], contacts[k].position, 1);
 					}
 				}
 			}

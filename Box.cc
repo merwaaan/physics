@@ -5,14 +5,18 @@ Box::Box(double width, double height, double depth) :
   height(height),
   depth(depth)
 {
-  this->addVertex(0, -width / 2, height / 2, depth / 2, 1);
-  this->addVertex(1, -width / 2, -height / 2, depth / 2, 1);
-  this->addVertex(2, width / 2, -height / 2, depth / 2, 1);
-  this->addVertex(3, width / 2, height / 2, depth / 2, 1);
-  this->addVertex(4, -width / 2, height / 2, -depth / 2, 1);
-  this->addVertex(5, -width / 2, -height / 2, -depth / 2, 1);
-  this->addVertex(6, width / 2, -height / 2, -depth / 2, 1);
-  this->addVertex(7, width / 2, height / 2, -depth / 2, 1);
+	double hw = width / 2;
+	double hh = height / 2;
+	double hd = depth / 2;
+
+  this->addVertex(0, -hw, hh, hd, 1);
+  this->addVertex(1, -hw, -hh, hd, 1);
+  this->addVertex(2, hw, -hh, hd, 1);
+  this->addVertex(3, hw, hh, hd, 1);
+  this->addVertex(4, -hw, hh, -hd, 1);
+  this->addVertex(5, -hw, -hh, -hd, 1);
+  this->addVertex(6, hw, -hh, -hd, 1);
+  this->addVertex(7, hw, hh, -hd, 1);
   
   this->addPolygon(4, (int[]){0, 1, 2, 3}); // front
   this->addPolygon(4, (int[]){7, 6, 5, 4}); // back
@@ -29,9 +33,14 @@ Box::~Box()
 void Box::computeInverseInertiaTensor()
 {
   Matrix3 inertiaTensor;
-  inertiaTensor.set(0, 0, 1 / this->inverseMass / 12 * (this->height * this->height + this->depth * this->depth));
-  inertiaTensor.set(1, 1, 1 / this->inverseMass / 12 * (this->width * this->width + this->depth * this->depth));
-  inertiaTensor.set(2, 2, 1 / this->inverseMass / 12 * (this->width * this->width + this->height * this->height));
+
+	double sh = this->height * this->height;
+	double sw = this->width * this->width;
+	double sd = this->depth * this->depth;
+
+  inertiaTensor.set(0, 0, 1 / this->inverseMass / 12 * (sh + sd));
+  inertiaTensor.set(1, 1, 1 / this->inverseMass / 12 * (sw + sd));
+  inertiaTensor.set(2, 2, 1 / this->inverseMass / 12 * (sw + sh));
 
   this->inverseInertiaTensor = inertiaTensor.inverse();
 }
@@ -44,4 +53,3 @@ Cube::Cube(double side) :
 Cube::~Cube()
 {
 }
-

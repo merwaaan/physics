@@ -13,10 +13,8 @@ void input(unsigned char k, int x, int y)
   if(k == 97)
   {
 	  Cube* c = new Cube(2);
-
 	  c->setPosition((float)rand() / RAND_MAX * 8, 5, (float)rand() / RAND_MAX * 8);
 	  c->position += Vector3(-4, 0, -4);
-	  
 	  c->prepare();
 	  e->addRigidBody_p(c);
   }
@@ -193,12 +191,12 @@ void demoThrowBoxes()
 {
 	Cube* c1 = new Cube(2);
 	c1->setPosition(-5, 1, 1);
-	c1->applyOffCenterForce(Vector3(30,25,0), 1, Vector3(-6,-1,0));
+	c1->applyOffCenterForce(Vector3(30,25,0), Vector3(-6,-1,0), 1);
   e->addRigidBody_p(c1);
 
 	Cube* c2 = new Cube(2);
 	c2->setPosition(5, 0, 0);
-	c2->applyOffCenterForce(Vector3(-30,25,0), 1, Vector3(4, 0.25, 1));
+	c2->applyOffCenterForce(Vector3(-30,25,0), Vector3(4, 0.25, 1), 1);
   e->addRigidBody_p(c2);
 
   Force* g = new CenterForce(Vector3(0, -9.81, 0));
@@ -209,13 +207,9 @@ void demoThrowBoxes()
 
 void demoBoxes()
 {
-	Cube* c1 = new Cube(2);
-	c1->setPosition(2.5, 5, 0);
-  e->addRigidBody_p(c1);
-
-	Cube* c2 = new Cube(4);
-  c2->setFixed(true);
-  e->addRigidBody_p(c2);
+	Cube* c = new Cube(4);
+  c->setFixed(true);
+  e->addRigidBody_p(c);
 
 	Box* sol = new Box(30, 0.5, 30);
 	sol->setPosition(0, -2.5, 0);
@@ -230,7 +224,7 @@ void demoBoxes()
 
 int main(int argc, char** argv)
 {
-	srand(10091990);
+	srand(17687);
 
   e = new Engine(&argc, argv, 0.01);
   

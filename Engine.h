@@ -15,6 +15,8 @@ class Engine
     std::vector<Force*> environmentalForces_p;
 		std::vector<Constraint*> constraints_p;
 
+		double tolerance;
+
     double timeStep;
 		double startingTime;
 		double lastUpdateTime;
@@ -49,7 +51,7 @@ class Engine
 		Display* getDisplay_p() { return &this->display; }
 		bool areBoundingBoxesDrawn() { return this->display.areBoundingBoxesDrawn(); }
 
-		double tolerance;
+		double getTolerance() { return this->tolerance; }
 };
 
 #endif

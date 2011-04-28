@@ -91,25 +91,23 @@ std::vector<Contact> Sphere::isCollidingWith(Sphere* s_p, double dt)
   double distance = (this->position - s_p->position).length();
   double radii = this->radius + s_p->radius;
  
-	// no collision
+	// NO COLLISION
   if(distance > radii)
   {
-    std::cout << "NO CONTACT DETECTED" << std::endl;
+    std::cout << "No contact detected" << std::endl;
     std::vector<Contact> contacts;
 
     return contacts;
   }
 
-	// collision
-
-  std::cout << "CONTACT DETECTED" << std::endl;
-	std::cout << "(separating bodies)" << std::endl;
+	// COLLISION
+  std::cout << "contact detected" << std::endl;
 
 	double sdt = -dt / 10;
 
 	this->reverseTime();
 	s_p->reverseTime();
-	
+
 	while(distance < radii)
 	{
 		std::cout << "distance " << distance << std::endl;
@@ -132,16 +130,16 @@ std::vector<Contact> Sphere::isCollidingWith(Sphere* s_p, double dt)
 
 std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt)
 {
-	if(dt < 0.0000000001)
-		exit(0);
+	//if(dt < 0.00000000001)
+	//exit(0);
   
 	double distance = (this->position - s_p->position).length();
   double radii = this->radius + s_p->radius;
-	int interPenetration = distance < radii;
+	bool interPenetration = distance < radii;
 
-	std::cout << "dist=" << distance << " radii=" << radii << " ip=" << interPenetration << std::endl;
+	std::cout << "distance = " << distance << " radii = " << radii << " ip = " << interPenetration << std::endl;
 
-  if(distance > radii + 0.01)
+  if(distance > radii + E->getTolerance())
   {
 		double sdt = dt / 2;
 
@@ -169,7 +167,7 @@ std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt)
 
     return this->resolveInterPenetration(s_p, dt / 2);
   }
-	std::cout << *this << std::endl;
+
   Contact contact;
   contact.a = this;
   contact.b = s_p;
@@ -179,8 +177,7 @@ std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt)
   std::vector<Contact> contacts;
   contacts.push_back(contact);
 
-  // recompute auxiliary quantites as they could have been
-  // corrupted during the binary search
+  // Recompute auxiliary quantities.
   contacts[0].a->computeAuxiliaryQuantities();
   contacts[0].b->computeAuxiliaryQuantities();
 
@@ -190,12 +187,4 @@ std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt)
 std::vector<Contact> Sphere::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
   return rb_p->isCollidingWith(this, dt);
-}
-
-/**
- * Return the radius of the sphere
- */
-double Sphere::getRadius() const
-{
-  return this->radius;
 }

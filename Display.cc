@@ -83,7 +83,7 @@ void update()
     // Set an orthogonal perspective.
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-		int h = 10;
+		int h = 100;
 		gluPerspective(50, 1, 1, 200);
     //glOrtho(-h, h, -h, h, 1, 200);
 

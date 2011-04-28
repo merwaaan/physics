@@ -5,10 +5,11 @@
 extern Engine* engine_pg;
 
 RigidBody::RigidBody() :
-	coefficientOfRestitution(0.8),
+	restitution(0.8),
+	friction(0.9),
   fixed(false)
 {
-  // initial orientation (aligned with the axis)
+  // The initial orientation is aligned with the axis.
   this->orientation.set(0, 0, 1);
   this->orientation.set(1, 1, 1);
   this->orientation.set(2, 2, 1);
@@ -51,16 +52,22 @@ void RigidBody::applyOffCenterForce(Vector3 force, double dt, Vector3 poa)
   this->accumulatedTorques += (poa - this->position) ^ (force * dt) * (dt < 0 ? -1 : 1);
 }
 
+void RigidBody::computeAuxiliaryQuantities()
+{
+	this->linearVelocity = this->linearMomentum * this->inverseMass;
+
+  Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
+  this->angularVelocity = inverseInertia * this->angularMomentum;
+}
+
 void RigidBody::integrate(double dt)
 {
-  // short-circuit the integration of fixed bodies in order to use less ressources
+  // Short-circuit integration if the body is fixed.
   if(this->fixed)
     return;
 
-  /**
-	 * LINEAR MOVEMENT
-	 */
- 
+	// LINEAR COMPONENT
+
 	if(dt > 0)
 		this->linearMomentum += this->accumulatedForces;
 
@@ -70,28 +77,26 @@ void RigidBody::integrate(double dt)
 	if(dt < 0)
 		this->linearMomentum += this->accumulatedForces;
 
-	/**
-	 * ANGULAR MOVEMENT
-	 */
+	// ANGULAR COMPONENT
 
 	if(dt > 0)
 		this->angularMomentum += this->accumulatedTorques;
 
   Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
   Vector3 angularVelocity = inverseInertia * this->angularMomentum;
-  this->orientation += (angularVelocity.toStarMatrix() * this->orientation) * dt * (dt < 0 ? -1 : 1);
+  this->orientation += (angularVelocity.skew() * this->orientation) * dt * (dt < 0 ? -1 : 1);
 
 	if(dt < 0)
 		this->angularMomentum += this->accumulatedTorques;
 
-	// reorthogonalize and normalize the orientation matrix to avoid numerical drift
+	// Reorthogonalize and normalize the orientation matrix to avoid numerical drift.
   this->orientation = this->orientation.orthogonalize();
   this->orientation = this->orientation.normalize();
 
-  // clear the forces accumulated during the last frame
+  // Clear the forces accumulated during the last frame.
   this->clearAccumulators();
 
-  // cache the auxiliary quantities
+  // Cache the auxiliary quantities.
   this->computeAuxiliaryQuantities();
 }
 
@@ -103,14 +108,6 @@ void RigidBody::integrateBackward(double dt)
 	this->reverseTime();
 	this->integrate(-dt);
 	this->reverseTime();
-}
-
-void RigidBody::computeAuxiliaryQuantities()
-{
-	this->linearVelocity = this->linearMomentum * this->inverseMass;
-
-  Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
-  this->angularVelocity = inverseInertia * this->angularMomentum;
 }
 
 void RigidBody::reverseTime()
@@ -173,12 +170,22 @@ Vector3 RigidBody::getVelocity(const Vector3& point) const
 	return this->linearVelocity + (this->angularVelocity ^ (point - this->position));
 }
 
-void RigidBody::setCoefficientOfRestitution(double restitution)
+void RigidBody::setRestitution(double restitution)
 {
-	this->coefficientOfRestitution = restitution;
+	this->restitution = restitution;
 }
 
-double RigidBody::getCoefficientOfRestitution() const
+double RigidBody::getRestitution() const
 {
-	return this->coefficientOfRestitution;
+	return this->restitution;
+}
+
+void RigidBody::setFriction(double friction)
+{
+	this->friction = friction;
+}
+
+double RigidBody::getFriction() const
+{
+	return this->friction;
 }

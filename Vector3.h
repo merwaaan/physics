@@ -38,7 +38,7 @@ class Vector3
     double length() const;
     Vector3 normalize() const;
     Vector3 negate() const;
-    Matrix3 toStarMatrix() const;
+    Matrix3 skew() const;
 
     double X() const;
     double Y() const;

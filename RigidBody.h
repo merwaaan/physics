@@ -6,8 +6,6 @@
 #include "Matrix3.h"
 #include "Vector3.h"
 
-#define COLISION_TOLERANCE 0.001
-
 class Contact;
 class CustomRigidBody;
 class Sphere;
@@ -18,22 +16,11 @@ struct BoundingBox
   Vector3 b;
 };
 
-struct DerivativeState
-{
-  Vector3 deltaPosition;
-	Vector3 deltaLinearMomentum;
-
-	Matrix3 deltaOrientation;
-	Vector3 deltaAngularMomentum;
-};
-
 class RigidBody
 {
   public:
     double inverseMass;
     Matrix3 inverseInertiaTensor;
-
-    BoundingBox boundingBox;
 
     // linear component
     Vector3 position;
@@ -45,11 +32,14 @@ class RigidBody
     Vector3 angularMomentum;
     Vector3 accumulatedTorques;
 
+    BoundingBox boundingBox;
+
     // cached auxiliary quantities
     Vector3 linearVelocity;
     Vector3 angularVelocity;
 
-		double coefficientOfRestitution;
+		double restitution;
+		double friction;
 
     bool fixed;
 
@@ -66,9 +56,10 @@ class RigidBody
     void clearAccumulators();
     void applyCenterForce(Vector3 force, double dt);
     void applyOffCenterForce(Vector3 force, double dt, Vector3 poa);
+    void computeAuxiliaryQuantities();
+
     virtual void integrate(double dt);
 		void integrateBackward(double dt);
-    void computeAuxiliaryQuantities();
 		void reverseTime();
 
     virtual void draw() = 0;
@@ -82,7 +73,6 @@ class RigidBody
 
     void setPosition(Vector3 position);
     void setPosition(double x, double y, double z);
-    
     void setOrientation(Matrix3 orientation);
     void setFixed(bool fixed);
 
@@ -90,8 +80,10 @@ class RigidBody
     Vector3 getVelocity() const;
     Vector3 getVelocity(const Vector3& point) const;
 
-		void setCoefficientOfRestitution(double restitution);
-		double getCoefficientOfRestitution() const;
+		void setRestitution(double restitution);
+		double getRestitution() const;
+		void setFriction(double friction);
+		double getFriction() const;
 };
 
 #endif

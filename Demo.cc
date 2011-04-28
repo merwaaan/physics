@@ -230,7 +230,7 @@ void demoBoxes()
 
 int main(int argc, char** argv)
 {
-	srand(1);
+	srand(10091990);
 
   e = new Engine(&argc, argv, 0.01);
   
@@ -245,6 +245,7 @@ int main(int argc, char** argv)
 	//demoBalls();
 	//demoThrowBoxes();
   demoBoxes();
+	//demoMixed();
   
   delete e;
 

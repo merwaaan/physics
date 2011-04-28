@@ -162,7 +162,7 @@ Vector3 Vector3::negate() const
 /**
  * Transforms a Vector3 into a special kind of Matrix3 used in the simulation
  */
-Matrix3 Vector3::toStarMatrix() const
+Matrix3 Vector3::skew() const
 {
   Matrix3 result;
 

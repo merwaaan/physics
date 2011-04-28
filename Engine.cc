@@ -120,7 +120,7 @@ Vector3* Engine::computeImpulse(Contact contact)
 		double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
 		double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
 	
-		double restitution = this->timeStep > 0 ? 0.25 : 1.25;
+		double restitution = this->timeStep > 0 ? 0.2 : 1.25;
 		impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
 	}
 

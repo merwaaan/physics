@@ -46,8 +46,8 @@ class Engine
     void addEnvironmentalForce_p(Force* force_p);
 
 		void addConstraint_p(Constraint* constraint_p);
-		Constraint* getConstraint_p(int i);
-    int getConstraintCount();
+		Constraint* getConstraint_p(int i) { return this->constraints_p[i]; }
+		int getConstraintCount() { return this->constraints_p.size(); }
 		
 		Display* getDisplay_p() { return &this->display; }
 		bool areBoundingBoxesDrawn() { return this->display.areBoundingBoxesDrawn(); }

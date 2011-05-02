@@ -91,9 +91,9 @@ void update()
     glLoadIdentity();
     Camera* cam_p = E->getDisplay_p()->getCamera_p();
     gluLookAt(
-      cam_p->radius * cos(cam_p->angle),
-      7,
       cam_p->radius * sin(cam_p->angle),
+      7,
+      cam_p->radius * cos(cam_p->angle),
       0, 0, 0,
       0, 1, 0);
 		
@@ -121,7 +121,6 @@ void mouseMoved(int x, int y)
     cam_p->lastX = x;
 
   cam_p->angle += 0.01 * (x - cam_p->lastX);
-
   cam_p->lastX = x;
 }
 

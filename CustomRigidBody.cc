@@ -242,13 +242,11 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
   if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
   {
 	  std::cout << "separation plane found : no collision" << std::endl;
-    std::vector<Contact> contacts;
 
-    return contacts;
+    return std::vector<Contact>();
   }
 
-  std::cout << "CONTACT DETECTED" << std::endl;
-	std::cout << "(separating bodies)" << std::endl;
+  std::cout << "no separation plane found : collision" << std::endl;
 
 	double sdt = -dt / 10;
 	int backtrackings = 0;
@@ -273,21 +271,21 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 	rb_p->reverseTime();
 
 	std::cout << "NEXT STEP" << std::endl;
-	std::cout << *rb_p << std::endl;
   return this->resolveInterPenetration(rb_p, sdt * backtrackings);
 }
 
 /**
- * Return true if a separation plane exists between the two bodies
+ * Return true if a separation plane exists between the two bodies.
  */
 bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
 {
-  // compute a separation plane along each polygon of the first body
+  // Compute a separation plane along each polygon of the first body.
   for(int i = 0; i < this->structure.polygons.size(); ++i)
   {
     Plane sp = this->structure.polygons[i].getPlane();
 
-    // check if all the vertices of the second body are outside of the separation plane
+    // Check if all the vertices of the second body are in the
+    // negative half-space of the separation plane.
     for(int j = 0; j < rb_p->structure.vertices.size(); ++j)
     {
       double distance;
@@ -313,7 +311,7 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
   Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &interPenetration);
 
   std::cout << "d = " << distance.length() << " ip = " << interPenetration << std::endl;
-	std::cout << *rb_p << std::endl;
+
   // if the bodies are too far apart, integrate forward in time
   if(!interPenetration && distance.length() > E->getTolerance())
   {

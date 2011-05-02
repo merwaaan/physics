@@ -40,21 +40,16 @@ void Engine::run()
 
 void Engine::update()
 {
-	//std::cout << "---------------------------------------" << std::endl;
-	//std::cout << "simulation time = " << this->lastUpdateTime << "s" << std::endl;
-
-	// std::cout << std::endl << "--- COLLISION PHASE ---" << std::endl;
-
 	// Check for collisions.
 	for(int i = 1; i < this->bodies_p.size(); ++i)
 		for(int j = 0; j < i; ++j)
 		{
-			// Broad-phase test
+			// Broad-phase test.
 			if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
 			{
 				std::cout << "bounding box collision detected between #" << i << " and #" << j << std::endl;
 
-				// Narrow-phase test
+				// Narrow-phase test.
 				std::vector<Contact> contacts = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
         
 				if(contacts.size() > 0)
@@ -74,9 +69,7 @@ void Engine::update()
 
 	// Apply constraints.
 	for(int i = 0; i < this->constraints_p.size(); ++i)
-		this->constraints_p[i]->apply(0.5);
-
-	//std::cout << std::endl << "--- INTEGRATION PHASE ---" << std::endl;
+		this->constraints_p[i]->apply(1);
 
 	for(int i = 0; i < this->bodies_p.size(); ++i)
 	{      
@@ -86,8 +79,6 @@ void Engine::update()
 
 		// Integrate each body.
 		this->bodies_p[i]->integrate(this->timeStep);
-
-		//std::cout << "#" << i << std::endl << *bodies_p[i] << std::endl;
 	}
 
 	this->lastUpdateTime += this->timeStep;
@@ -151,17 +142,17 @@ double Engine::getLocalTime()
   return this->getAbsoluteTime() - this->startingTime;
 }
 
+double Engine::getTimeStep()
+{
+  return this->timeStep;
+}
+
 void Engine::reverseTime()
 {
   this->timeStep = -this->timeStep;
 
   for(int i = 0; i < this->bodies_p.size(); ++i)
 		this->bodies_p[i]->reverseTime();
-}
-
-double Engine::getTimeStep()
-{
-  return this->timeStep;
 }
 
 void Engine::cleanUp()
@@ -201,12 +192,3 @@ void Engine::addConstraint_p(Constraint* constraint_p)
   this->constraints_p.push_back(constraint_p);
 }
 
-Constraint* Engine::getConstraint_p(int i)
-{
-  return this->constraints_p[i];
-}
-
-int Engine::getConstraintCount()
-{
-  return this->constraints_p.size();
-}

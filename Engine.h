@@ -35,8 +35,9 @@ class Engine
 
     double getAbsoluteTime();
     double getLocalTime();
-    void reverseTime();
     double getTimeStep();
+    bool needUpdate() { return this->getLocalTime() > this->lastUpdateTime + this->timeStep; }
+    void reverseTime();
 
     void addRigidBody_p(RigidBody* rb_p);
     RigidBody* getBody_p(int i);

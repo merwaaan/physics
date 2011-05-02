@@ -169,7 +169,7 @@ double Geometry::edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, V
   double e = d2 * d2;
   double f = d2 * r;
 
-  if(a <= E->tolerance && e <= E->tolerance)
+  if(a <= E->getTolerance() && e <= E->getTolerance())
   {
     s = t = 0;
     *closest1_p = edge1.a;
@@ -178,7 +178,7 @@ double Geometry::edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, V
     return (*closest1_p - *closest2_p) * (*closest1_p - *closest2_p);
   }
 
-  if(a <= E->tolerance)
+  if(a <= E->getTolerance())
   {
     s = 0;
     t = Geometry::clamp(f / e, 0, 1);
@@ -187,7 +187,7 @@ double Geometry::edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, V
   {
     double c = d1 * r;
     
-    if(e <= E->tolerance)
+    if(e <= E->getTolerance())
     {
       t = 0;
       s = Geometry::clamp(-c / a, 0, 1);
@@ -480,7 +480,7 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
     // Find a support point along the direction from the closest point to the origin.
 		Vector3 support = rb1_p->getSupportPoint(-1 * closest) - rb2_p->getSupportPoint(closest);
 
-		if((closest-origin).length() < E->tolerance || (origin - support) * directionToOrigin >= (origin - closest) * directionToOrigin)
+		if((closest-origin).length() < E->getTolerance() || (origin - support) * directionToOrigin >= (origin - closest) * directionToOrigin)
 		{
 			if(interPenetration_p != NULL)
 				*interPenetration_p = false;
@@ -506,7 +506,7 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
       double distance;
       Vector3 point = Geometry::closestPointOfPolygon(vertex, face, &distance);
 
-      if(distance < E->tolerance)
+      if(distance < E->getTolerance())
       {
         Contact contact;
 
@@ -560,7 +560,7 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 				 (edges2[j].b - closest2).length() < 0.01)
 				continue;
 
-	    if(distance < E->tolerance)
+	    if(distance < E->getTolerance())
 			{
 		    Contact contact;
 
@@ -573,7 +573,7 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 		    contact.normal = (e1 ^ e2).normalize();
 
 				// Make sure the contact normal is directed toward the first body
-				Vector3 directionToFirst = contact.a->position - contact.position;
+		    Vector3 directionToFirst = contact.a->getPosition() - contact.position;
 				if(contact.normal * directionToFirst > contact.normal.negate() * directionToFirst)
 					contact.normal = contact.normal.negate();
 

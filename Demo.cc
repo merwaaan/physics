@@ -13,8 +13,7 @@ void input(unsigned char k, int x, int y)
   if(k == 97)
   {
 	  Cube* c = new Cube(2);
-	  c->setPosition((float)rand() / RAND_MAX * 8, 5, (float)rand() / RAND_MAX * 8);
-	  c->position += Vector3(-4, 0, -4);
+	  c->setPosition((float)rand() / RAND_MAX * 8 - 4, 5, (float)rand() / RAND_MAX * 8 - 4);
 	  c->prepare();
 	  e->addRigidBody_p(c);
   }
@@ -92,7 +91,7 @@ void testTimeReversing()
 
   Sphere* s = new Sphere(1);
   s->prepare();
-	s->angularMomentum = Vector3(1, 0, 0);
+  s->setAngularMomentum(1, 0, 0);
 
 	std::cout << *s << std::endl;
   s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
@@ -101,8 +100,8 @@ void testTimeReversing()
   s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
 
   std::cout << "reversing time..." << std::endl << std::endl;
-  s->linearMomentum *= -1;
-	s->angularMomentum *= -1;
+  s->setLinearMomentum(s->getLinearMomentum() * -1);
+  s->setAngularMomentum(s->getAngularMomentum() * -1);
 	dt *= -1;
 
   std::cout << *s << std::endl;

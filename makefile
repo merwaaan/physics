@@ -1,5 +1,5 @@
 EXEC=demo
-COMP=clang
+COMP=g++
 OBJ= \
 	Box.o \
 	Constraint.o \
@@ -22,4 +22,5 @@ $(EXEC): $(OBJ)
 	$(COMP) -o $@ -c $^
 
 clean:
-	rm *.o *~
+	rm *.o
+	rm *~

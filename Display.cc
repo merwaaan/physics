@@ -66,13 +66,12 @@ bool Display::areBoundingBoxesDrawn()
 
 void update()
 {
-	double t = E->getLocalTime();
-
 	// Update the simulation.
-	if(t > E->lastUpdateTime + E->getTimeStep())
+	if(E->needUpdate())
 		E->update();
 
 	// Display the simulation.
+	double t = E->getLocalTime();
   if(t > E->getDisplay_p()->lastDisplayTime + 0.001)
   {
     // Clear all.

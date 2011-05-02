@@ -19,6 +19,7 @@ struct BoundingBox
 class RigidBody
 {
   protected:
+
     double inverseMass;
     Matrix3 inverseInertiaTensor;
 
@@ -71,8 +72,8 @@ class RigidBody
     virtual std::vector<Contact> isCollidingWith(Sphere* s_p, double dt) = 0;
     virtual std::vector<Contact> isCollidingWith(CustomRigidBody* rb_p, double dt) = 0;
 
-    Vector3 getVelocity() const;
-    Vector3 getVelocity(const Vector3& point) const;
+    double getInverseMass() { return this->inverseMass; }
+    Matrix3 getInverseInertiaTensor() { return this->inverseInertiaTensor; }
 
     void setPosition(Vector3 position) { this->position = position; }
     void setPosition(double x, double y, double z) { this->position = Vector3(x, y, z); }
@@ -80,6 +81,17 @@ class RigidBody
 
     void setOrientation(Matrix3 orientation) { this->orientation = orientation; }
 		Matrix3 getOrientation() { return this->orientation; }
+
+    Vector3 getVelocity() const;
+    Vector3 getVelocity(const Vector3& point) const;
+
+    void setLinearMomentum(Vector3 momentum) { this->linearMomentum = momentum; }
+    void setLinearMomentum(double mx, double my, double mz) { this->linearMomentum = Vector3(mx, my, mz); }
+    Vector3 getLinearMomentum() { return this->linearMomentum; }
+
+    void setAngularMomentum(Vector3 momentum) { this->angularMomentum = momentum; }
+    void setAngularMomentum(double mx, double my, double mz) { this->angularMomentum = Vector3(mx, my, mz); }
+    Vector3 getAngularMomentum() { return this->angularMomentum; }
 
     void setFixed(bool fixed) { this->fixed = fixed; }
 		bool isFixed() { return this->fixed; }

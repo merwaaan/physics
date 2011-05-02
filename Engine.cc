@@ -110,13 +110,13 @@ Vector3* Engine::computeImpulse(Contact contact)
 	else
 	{		
 		// displacements of the contact point with respect to the center of mass of each body
-		Vector3 da = p - a->position;
-		Vector3 db = p - b->position;
+		Vector3 da = p - a->getPosition();
+		Vector3 db = p - b->getPosition();
 
-		Matrix3 inverseInertiaA = a->orientation * a->inverseInertiaTensor * a->orientation.transpose();
-		Matrix3 inverseInertiaB = b->orientation * b->inverseInertiaTensor * b->orientation.transpose();
+		Matrix3 inverseInertiaA = a->getOrientation() * a->getInverseInertiaTensor() * a->getOrientation().transpose();
+		Matrix3 inverseInertiaB = b->getOrientation() * b->getInverseInertiaTensor() * b->getOrientation().transpose();
 
-		double t1 = a->inverseMass + b->inverseMass;
+		double t1 = a->getInverseMass() + b->getInverseMass();
 		double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
 		double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
 	
@@ -169,7 +169,7 @@ void Engine::cleanUp()
 	Vector3 origin(0, 0, 0);
 
 	for(int i = 0; i < this->bodies_p.size(); ++i)
-		if((this->bodies_p[i]->position - origin).length() > 50)
+		if((this->bodies_p[i]->getPosition() - origin).length() > 100)
 		{
 			this->bodies_p.erase(this->bodies_p.begin() + i);
 			--i;

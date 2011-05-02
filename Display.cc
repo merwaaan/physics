@@ -36,7 +36,8 @@ Display::Display(int* argc, char** argv, int w, int h) :
   glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
   
   glutDisplayFunc(&update);
-  glutPassiveMotionFunc(&mouse);
+  glutMouseFunc(&mousePressed);
+  glutPassiveMotionFunc(&mouseMoved);
 
   this->camera.radius = 40;
   this->camera.angle = 45;
@@ -72,7 +73,7 @@ void update()
 
 	// Display the simulation.
 	double t = E->getLocalTime();
-  if(t > E->getDisplay_p()->lastDisplayTime + 0.001)
+	if(t > E->getDisplay_p()->getLastDisplayTime() + 0.001)
   {
     // Clear all.
     glClearColor(1.0, 1.0, 1.0, 1.0);
@@ -82,14 +83,13 @@ void update()
     // Set an orthogonal perspective.
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-		int h = 100;
 		gluPerspective(50, 1, 1, 200);
-    //glOrtho(-h, h, -h, h, 1, 200);
+    //glOrtho(-100, 100, -100, 100, 1, 200);
 
     // Set the camera.
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    Camera* cam_p = &E->getDisplay_p()->camera;
+    Camera* cam_p = E->getDisplay_p()->getCamera_p();
     gluLookAt(
       cam_p->radius * cos(cam_p->angle),
       7,
@@ -107,15 +107,15 @@ void update()
 
     glutSwapBuffers();
     
-    E->getDisplay_p()->lastDisplayTime = E->getLocalTime();
+    E->getDisplay_p()->setLastDisplayTime(t);
   }
 
   glutPostRedisplay();
 }
 
-void mouse(int x, int y)
+void mouseMoved(int x, int y)
 {
-  Camera* cam_p = &E->getDisplay_p()->camera;
+	Camera* cam_p = E->getDisplay_p()->getCamera_p();
   
   if(cam_p->lastX < 0)
     cam_p->lastX = x;
@@ -125,3 +125,13 @@ void mouse(int x, int y)
   cam_p->lastX = x;
 }
 
+void mousePressed(int button, int state, int x, int y)
+{
+	int dir;
+	if(button == 3)
+		dir = -1;
+	else if(button == 4)
+		dir = 1;
+
+	E->getDisplay_p()->getCamera_p()->radius += dir;
+}

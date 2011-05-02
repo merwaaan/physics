@@ -26,15 +26,16 @@ class Display
 
     void run();
 
+    Camera* getCamera_p() { return &this->camera; }
+
+    void setLastDisplayTime(double t) { this->lastDisplayTime = t; }
+    double getLastDisplayTime() { return this->lastDisplayTime; }
+
     void setBoundingBoxesDrawn(bool draw);
-
     bool areBoundingBoxesDrawn();
-
-    friend void update();
-    friend void mouse(int x, int y);
 };
 
 void update();
-void mouse(int x, int y);
-
+void mousePressed(int button, int state, int x, int y);
+void mouseMoved(int x, int y);
 #endif

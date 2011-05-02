@@ -223,7 +223,7 @@ void demoBoxes()
 
 int main(int argc, char** argv)
 {
-	srand(100);//123);
+	srand(123);
 
   e = new Engine(&argc, argv, 0.01);
   
@@ -233,7 +233,7 @@ int main(int argc, char** argv)
   //testGJK();
   //testTimeReversing();
 	
-	//demoConstraints();
+	demoConstraints();
 	//demoRestingBalls();
 	//demoBalls();
 	//demoThrowBoxes();

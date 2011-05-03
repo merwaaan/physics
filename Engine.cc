@@ -91,6 +91,15 @@ void Engine::applyConstraints(double dt)
 		this->constraints_p[i]->apply(1);
 }
 
+void Engine::emergencyPush(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p)
+{
+	Vector3 push = Geometry::gjkDistanceBetweenPolyhedra(rb1_p, rb2_p);
+	double totalInverseMass = rb1_p->getInverseMass() + rb2_p->getInverseMass();
+
+	rb1_p->move(push * rb1_p->getInverseMass() / totalInverseMass);
+	rb2_p->move(push * rb2_p->getInverseMass() / totalInverseMass * -1);
+}
+
 Vector3* Engine::computeImpulse(Contact contact)
 {
 	RigidBody* a = contact.a;

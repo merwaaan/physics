@@ -254,7 +254,8 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 	this->reverseTime();
 	rb_p->reverseTime();
 
-	while(!Geometry::findSeparatingPlane(this, rb_p))
+	// Separate the bodies to help speed up the penetration resolution.
+	while(!Geometry::findSeparatingPlane(this, rb_p) && backtrackings < 10)
 	{
     std::cout << "going backwarddddd " << sdt << "ms" << std::endl;
 
@@ -266,6 +267,10 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 
 		++backtrackings;
 	}
+
+	// Apply an emergency push if the bodies are stuck.
+	if(!Geometry::findSeparatingPlane(this, rb_p))
+		E->emergencyPush(this, rb_p);
 
 	this->reverseTime();
 	rb_p->reverseTime();

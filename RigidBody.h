@@ -75,6 +75,7 @@ class RigidBody
     double getInverseMass() { return this->inverseMass; }
     Matrix3 getInverseInertiaTensor() { return this->inverseInertiaTensor; }
 
+    void move(Vector3 displacement) { this->position += displacement; }
     void setPosition(Vector3 position) { this->position = position; }
     void setPosition(double x, double y, double z) { this->position = Vector3(x, y, z); }
     Vector3 getPosition() { return this->position; }

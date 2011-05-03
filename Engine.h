@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Constraint.h"
+#include "CustomRigidBody.h"
 #include "Display.h"
 #include "Force.h"
 #include "RigidBody.h"

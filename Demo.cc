@@ -223,7 +223,7 @@ void demoBoxes()
 
 int main(int argc, char** argv)
 {
-	srand(0);//123);
+	srand(1);//123);
 
   e = new Engine(&argc, argv, 0.01);
   

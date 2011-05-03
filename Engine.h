@@ -29,9 +29,12 @@ class Engine
 
     void run();
     void update();
-    Vector3* computeImpulse(Contact contact);
-		void applyEnvironmentalForces(RigidBody* rb_p, double dt);
+    void applyEnvironmentalForces(RigidBody* rb_p, double dt);
+		void applyConstraints(double dt);
 		void cleanUp();
+
+		Vector3* computeImpulse(Contact contact);
+		void emergencyPush(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
 
     double getAbsoluteTime();
     double getLocalTime();

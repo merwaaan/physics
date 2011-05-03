@@ -78,12 +78,17 @@ void Engine::update()
 	}
 
 	// Apply constraints.
-	for(int i = 0; i < this->constraints_p.size(); ++i)
-		this->constraints_p[i]->apply(1);
+	this->applyConstraints(this->timeStep);
 
 	this->lastUpdateTime += this->timeStep;
 
-	//this->cleanUp();
+	this->cleanUp();
+}
+
+void Engine::applyConstraints(double dt)
+{
+	for(int i = 0; i < this->constraints_p.size(); ++i)
+		this->constraints_p[i]->apply(1);
 }
 
 Vector3* Engine::computeImpulse(Contact contact)

@@ -8,6 +8,38 @@
 
 extern Engine* E;
 
+/**
+ * Return an integer representing the half-side of the plane on which
+ * the body is lying.
+ *
+ * -1 : negative half-space
+ * +1 : positive half-space
+ *  0 : the body lies in the two half-spaces
+ *
+ * (from The Method of Separating Axis - David Eberly)
+ */
+int Plane::whichHalfSpace(CustomRigidBody* rb_p)
+{
+	int pos = 0;
+	int neg = 0;
+	double distance;
+
+	for(int i = 0; i < rb_p->structure.vertices.size(); ++i)
+	{
+		Geometry::closestPointOfPlane(rb_p->structure.vertices[i].absPosition, *this, &distance);
+
+		if(distance < E->getTolerance())
+			++neg;
+		else if(distance > E->getTolerance())
+			++pos;
+
+		if(pos && neg)
+			return 0;
+	}
+
+	return pos ? 1 : -1;
+}
+
 Vector3 Triangle::getCenter() const
 {
 	return (this->a + this->b + this->c) / 3;
@@ -450,6 +482,62 @@ Vector3 Geometry::closestPointOfSphere(Vector3 point, Sphere sphere, double* dis
   return closest;
 }
 
+/**
+ * Check if a saparating plane between polyhedra rb1_p and rb2_p exists.
+ *
+ * (from The Method of Separating Axis - David Eberly)
+ */
+bool Geometry::findSeparatingPlane(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p)
+{
+	// Check for a separating plane along the polyhedra faces.
+  for(int i = 0; i < rb1_p->structure.polygons.size(); ++i)
+  {
+    Plane sp = rb1_p->structure.polygons[i].getPlane();
+    std::cout << sp.whichHalfSpace(rb2_p) << std::endl;
+    if(sp.whichHalfSpace(rb2_p) > 0)
+	    return true;
+  }
+
+  for(int i = 0; i < rb2_p->structure.polygons.size(); ++i)
+  {
+    Plane sp = rb2_p->structure.polygons[i].getPlane();
+    if(sp.whichHalfSpace(rb1_p) > 0)
+	    return true;
+  }
+
+  // Check for a separating plane formed by the cross product of
+  // each pair of edges.
+
+
+}
+
+/**
+ * Return true if a separation plane exists between the two bodies.
+ */
+/*bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
+{
+  // Compute a separation plane along each polygon of the first body.
+  for(int i = 0; i < this->structure.polygons.size(); ++i)
+  {
+    Plane sp = this->structure.polygons[i].getPlane();
+
+    // Check if all the vertices of the second body are in the
+    // negative half-space of the separation plane.
+    for(int j = 0; j < rb_p->structure.vertices.size(); ++j)
+    {
+      double distance;
+      Geometry::closestPointOfPlane(rb_p->structure.vertices[j].absPosition, sp, &distance);
+
+      if(distance < 0)
+        break;
+      else if(j == rb_p->structure.vertices.size() - 1)
+        return true;
+    }
+  }
+
+  return false;
+}
+*/
 Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool* interPenetration_p)
 {
 	Vector3 origin(0, 0, 0);

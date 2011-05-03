@@ -37,7 +37,6 @@ class CustomRigidBody : public RigidBody
     std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt);
     std::vector<Contact> isCollidingWith(Sphere* s_p, double dt);
     std::vector<Contact> isCollidingWith(CustomRigidBody* rb_p, double dt);
-    bool findSeparationPlane(CustomRigidBody* rb_p);
     std::vector<Contact> resolveInterPenetration(CustomRigidBody* rb_p, double dt);
     Vector3 getSupportPoint(Vector3 direction);
 
@@ -46,4 +45,3 @@ class CustomRigidBody : public RigidBody
 };
 
 #endif
-

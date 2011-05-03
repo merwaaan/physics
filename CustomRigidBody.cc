@@ -238,15 +238,15 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
  */
 std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
-  // If at least one separation plane exists, there is no collision.
-  if(this->findSeparationPlane(rb_p) || rb_p->findSeparationPlane(this))
+  // If at least one separating plane exists, there is no collision.
+	if(Geometry::findSeparatingPlane(this, rb_p))
   {
-	  std::cout << "separation plane found : no collision" << std::endl;
+	  std::cout << "separating plane found : no collision" << std::endl;
 
     return std::vector<Contact>();
   }
 
-  std::cout << "no separation plane found : collision" << std::endl;
+  std::cout << "no separating plane found : collision" << std::endl;
 
 	double sdt = -dt / 10;
 	int backtrackings = 0;
@@ -254,9 +254,9 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 	this->reverseTime();
 	rb_p->reverseTime();
 
-	while(!this->findSeparationPlane(rb_p) && !rb_p->findSeparationPlane(this))
+	while(!Geometry::findSeparatingPlane(this, rb_p))
 	{
-    std::cout << "going backward " << sdt << "ms" << std::endl;
+    std::cout << "going backwarddddd " << sdt << "ms" << std::endl;
 
 	  E->applyEnvironmentalForces(this, sdt);
 	  E->applyEnvironmentalForces(rb_p, sdt);
@@ -272,33 +272,6 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, dou
 
 	std::cout << "NEXT STEP" << std::endl;
   return this->resolveInterPenetration(rb_p, sdt * backtrackings);
-}
-
-/**
- * Return true if a separation plane exists between the two bodies.
- */
-bool CustomRigidBody::findSeparationPlane(CustomRigidBody* rb_p)
-{
-  // Compute a separation plane along each polygon of the first body.
-  for(int i = 0; i < this->structure.polygons.size(); ++i)
-  {
-    Plane sp = this->structure.polygons[i].getPlane();
-
-    // Check if all the vertices of the second body are in the
-    // negative half-space of the separation plane.
-    for(int j = 0; j < rb_p->structure.vertices.size(); ++j)
-    {
-      double distance;
-      Geometry::closestPointOfPlane(rb_p->structure.vertices[j].absPosition, sp, &distance);
-
-      if(distance < 0)
-        break;
-      else if(j == rb_p->structure.vertices.size() - 1)
-        return true;
-    }
-  }
-
-  return false;
 }
 
 /**

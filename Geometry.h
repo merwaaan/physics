@@ -31,6 +31,8 @@ struct Plane
 {
   Vector3 point;
   Vector3 normal;
+
+	int whichHalfSpace(CustomRigidBody* rb_p);
 };
 
 /**
@@ -140,6 +142,8 @@ namespace Geometry
   Vector3 closestPointOfPolygon(Vector3 point, Polygon polygon, double* distance = NULL);
   Vector3 closestPointOfTetrahedron(Vector3 point, Tetrahedron tetrahedron, double* distance = NULL);
   Vector3 closestPointOfSphere(Vector3 p, Sphere sphere, double* distance_p = NULL);
+
+  bool findSeparatingPlane(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
 
   Vector3 gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool* interPenetration_p = NULL);
 

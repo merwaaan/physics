@@ -122,7 +122,7 @@ void demoConstraints()
 	e->addRigidBody_p(s);	
 	prev = s;
 
-	for(int i = 0; i < 17; ++i)
+	for(int i = 0; i < 15; ++i)
 	{
 		s = new Sphere(1);
 		s->setPosition(i*1.3, 3 + i * 3, 0);
@@ -132,6 +132,43 @@ void demoConstraints()
 		e->addConstraint_p(c);
 
 		prev = s;
+	}
+
+  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  e->addEnvironmentalForce_p(g);
+
+	e->run();
+}
+
+void demoPendulum()
+{
+	Constraint* c;
+
+	Sphere* sf = new Sphere(1);
+	sf->setPosition(-2, 6, 0);
+	sf->setFixed(true);
+	e->addRigidBody_p(sf);
+
+	Sphere* sp = new Sphere(1);
+	sp->setPosition(-8, 6, 0);
+	e->addRigidBody_p(sp);
+	
+	c = new DistanceConstraint(sf, sp, 6);
+	e->addConstraint_p(c);
+
+	for(int i = 0; i < 4; ++i)
+	{
+		sf = new Sphere(1);
+		sf->setPosition(i*2, 6, 0);
+		sf->setFixed(true);
+		e->addRigidBody_p(sf);
+
+		sp = new Sphere(1);
+		sp->setPosition(i*2, 0, 0);
+		e->addRigidBody_p(sp);	
+
+		c = new DistanceConstraint(sf, sp, 6);
+		e->addConstraint_p(c);
 	}
 
   Force* g = new CenterForce(Vector3(0, -9.81, 0));
@@ -223,7 +260,7 @@ void demoBoxes()
 
 int main(int argc, char** argv)
 {
-	srand(1);//123);
+	srand(4);//123);
 
   e = new Engine(&argc, argv, 0.01);
   
@@ -234,11 +271,12 @@ int main(int argc, char** argv)
   //testTimeReversing();
 	
   //demoConstraints();
+  demoPendulum();
 	//demoRestingBalls();
 	//demoBalls();
 	//demoThrowBoxes();
-  demoBoxes();
 	//demoMixed();
+  demoBoxes();
   
   delete e;
 

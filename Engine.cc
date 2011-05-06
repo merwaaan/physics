@@ -67,6 +67,9 @@ void Engine::update()
 			}
 		}
 
+	// Apply constraints.
+	this->applyConstraints(this->timeStep);
+
 	for(int i = 0; i < this->bodies_p.size(); ++i)
 	{      
 		// Apply external forces.
@@ -76,9 +79,6 @@ void Engine::update()
 		// Integrate each body.
 		this->bodies_p[i]->integrate(this->timeStep);
 	}
-
-	// Apply constraints.
-	this->applyConstraints(this->timeStep);
 
 	this->lastUpdateTime += this->timeStep;
 

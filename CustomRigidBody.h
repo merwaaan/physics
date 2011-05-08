@@ -10,14 +10,19 @@ struct Structure
 {
   std::vector<CustomVertex> vertices;
   std::vector<CustomPolygon> polygons;
+};
 
-	std::vector<Edge> getEdges() const;
+struct CachedEdge
+{
+	int idA;
+	int idB;
 };
 
 class CustomRigidBody : public RigidBody
 {
   public:
     Structure structure;
+		std::vector<CachedEdge> cachedEdges;
 
   public:
     CustomRigidBody();
@@ -28,6 +33,7 @@ class CustomRigidBody : public RigidBody
     void prepare();
     void computeCenterOfMass();
     void computeInverseInertiaTensor();
+		void computeCachedEdges();
     void computeBoundingBox();
 
     void integrate(double t);
@@ -41,7 +47,7 @@ class CustomRigidBody : public RigidBody
     Vector3 getSupportPoint(Vector3 direction);
 
     CustomVertex* getVertexById_p(int id);
-    int getPolyCount();
+		std::vector<Edge> getEdges();
 };
 
 #endif

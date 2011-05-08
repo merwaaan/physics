@@ -605,8 +605,8 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 {
   std::vector<Contact> contacts;
 
-  std::vector<Edge> edges1 = rb1_p->structure.getEdges();
-  std::vector<Edge> edges2 = rb2_p->structure.getEdges();
+  std::vector<Edge> edges1 = rb1_p->getEdges();
+  std::vector<Edge> edges2 = rb2_p->getEdges();
 
   for(int i = 0; i < edges1.size(); ++i)
 	  for(int j = 0; j < edges2.size(); ++j)

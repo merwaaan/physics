@@ -1,14 +1,19 @@
 \section{Gestion des collisions}
 
-\subsection{Le cas des sphères}
+Maintenant que la première section nous a éclairé sur la façon dont les corps de la simulation évoluent indépendament les uns des autres, il est temps de les faire interagir entre eux. Cette phase se divise en trois étapes. Premièrement, le moteur physique doit être capable de déterminer si une collision a lieu entre deux corps. Ensuite, il doit pouvoir corriger leurs états afin de contre-balancer les décalages dû aux erreurs numériques et les limitations imposées par l'intégration discrète de l'environnement. Finalement, une force de séparation doit être calculée et appliquée aux deux objets.
 
-\subsubsection{Détection du point de contact}
+\subsection{Détection d'une collision}
 
-Nous allons dans un premier temps réduire le problème collisionnel aux interactions entre sphères. On sait que deux corps sont en collision si la distance qui sépare leurs centres est inférieure à la somme de leurs rayons. Cette simplification nous permet de nous concentrer sur la détermination des points de contact réels et d'éluder de nombreuses complications géométriques.
+\subsubsection{Détection fine}
+
+
+
+\subsubsection{Détection grossière}
+
+
+\subsection{Correction d'une collision}
 
 \`A chaque itération de la simulation, les corps présents dans l'environnement du moteur physique sont susceptibles de se déplacer et donc d'entrer en contact. Le moteur simule ces évolutions de manière non continue et il est très improbable qu'une collision soit détectée au moment précis o\`u elle se produit. On est donc régulièrement témoin de situations d'inter-pénétration au sein desquelles des corps rentrent l'un dans l'autre.
-
-DESSIN t0 sphères éloignées, t1 sphères interpénétrées
 
 On pourrait se satisfaire de cette imprécision et calculer les forces de rebond appropriées mais plusieurs situations critiques risquent d'apparaître. La force de séparation génération ne pourrait pas être suffisante pour séparer entièrement les deux sphères, ce qui les bloqueraient balbla. Pour trouver le point de contact réel entre deux sphères, il existe plusieurs approches. Les systèmes qui préfèrent favoriser le temps d'éxécution au détriment du réalisme se contente de repositionner les corps à un point de contact calculé par interpolation en fonction du temps de la dernière ntégration. Il est évident que des objets sujets à des déplacements non linéaires (variation de la vitesse pendant un pas de temps, trajectoire elliptique) seront mal replacés.
 
@@ -20,41 +25,9 @@ DESSIN
 
 Une fois ce processus achevé, la configuration de contact est retrouvé et les deux sphères ne sont plus en situation de pénétration mutuelle. Il reste à déterminer quelles forces appliquer aux corps pour qu'ils se séparent.
 
-\subsubsection{Réponse à une collision}
+\subsection{Réponse à une collision}
 
+Un coefficient de restitution $0 \leq \epsilon \leq 1$ détermine le taux de rebond d'un corps. Si $\epsilon = 1$, la balle rebondira avec autant d'énergie qu'elle est arrivée (une situation concrètement impossible à retrouver dans le monde réel). Si $\epsilon = 0$, la balle repartira avec une énergie nulle; autrement dit, elle restera collée au plan. Le coefficient de restitution dépend habituellement de la matière que l'on cherche à simuler : une balle en cahoutchouc aura un $\epsilon$ elevé tandis qu'un bloc d'argile aura un $\epsilon$ proche de zéro.
 
+Le coefficient de friction influe sur la réponse rotationnelle qu'une collision est susceptible de provoquer. Si la balle avait été laché, à partir d'une vitesse nulle, sur un plan droit, le rebond aura été purement linéaire. Dans le cas d'un plan incliné, un frottement non perpendiculaire a lieu et la balle va entrer en rotation. Plus le coefficient de friction est élevé et plus cet effet est puissant. On peut simplifier cette notion en disant que le coefficient de friction détermine si un corps est recouvert d'une matière qui accroche ou au contraire qui glisse.
 
-\subsection{Le cas général des corps rigides}
-
-\subsubsection{Détection précise d'une collision}
-
-Nous avons vu comment détecter une collision entre deux sphères, retrouver la configuration au temps de contact et les faire réagir de façon réaliste. Le procédé à suivre pour appliquer le même traitement à des corps rigides généralisés se base sur les mêmes principes mais nécessite des méthodes différentes, notamment du fait de leur structure géométrique plus complexe.
-
-Si pour les sphère on détectait une collision en comparant la distance entre les centres et la somme des rayons, il faudra utiliser une autre technique pour les polyhèdres. Heureusement, une loi géométrique naturelle va permettre de vérifier ce prédicat de manière simple et rapide. Cette loi dicte que deux corps ne sont pas en situation d'interpénétration s'il existe dans l'espace un plan les séparant. On nommera un tel plan, plan de séparation.
-
-En cas de non collision, il existe une infinité de plan de séparation entre deux polyhèdres mais on peut se limiter à vérifier les plans prolongeant les faces de chaque corps.
-
-DESSIN
-
-L'algorithme de détection d'une collision suivra donc le mode opératoire suivant :
-
-interpenetration(p1, p2)
--pour toutes les faces de p1
---pour tous les vertex de p2
----si v du mauvais côté
-----retourne vrai
--retourne faux
-
-r=i(p1, p2) || i(p2, p1)
-
-Cette méthode a pour avantage de savoir de manière certaine si deux polyhèdres sont entrés en collisions ou non mais sa complexité est de mauvaise augure pour la vitesse générale du moteur physique. Des corps composés de peu de faces, des boîtes par exemple, ne poseront pas de problème, mais des polyhèdres plus complexes risquent de ralentir fortement la détection d'une collision (une nouvelle raison d'avoir traîté le problème des sphères de façon différente). Si l'on ajoute à ce problème le fait que cette procédure est subit par chaque corps à chaque itération, blabla.
-
-\subsubsection{Détection d'une collision potentielle}
-
-Une méthode déterminant de façon certaine si des corps sont en contact a été présentée mais malgré la certitude de ses résultats, elle est trop coûteuse pour être utilisée pour chaque corps et à chaque itération. Nous allons utiliser une seconde technique de détection qui nous renseignera sur la possibilité d'une collision. Elle sera moins précise mais beaucoup plus économique. C'est seulement quand cette méthode nous avertira d'une collision possible que l'on utilisera la méthode plus coûteuse des plans de séparation.
-
-La méthode se basera sur l'utilisation de boîtes englobantes, ou \textit{bounding boxes}. Chaque corps est associé à une boîte que le contient entièrement et est alignée par rapport aux axes du repère global (on parle d'\textit{AABB}, pour \textit{axis-aligned bounding-box}). 
-
-\subsubsection{Détection du point de contact}
-
-\subsubsection{Réponse à une collision}

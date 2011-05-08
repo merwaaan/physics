@@ -9,36 +9,6 @@
 
 extern Engine* E;
 
-std::vector<Edge> Structure::getEdges() const
-{
-	std::vector<Edge> edges;
-
-	// List all the edges.
-	for(int i = 0; i < this->polygons.size(); ++i)
-	{
-		for(int j = 0; j < this->polygons[i].size - 1; ++j)
-		{
-			Vector3 a = this->polygons[i].vertices_p[j]->absPosition;
-			Vector3 b = this->polygons[i].vertices_p[j + 1]->absPosition;
-			edges.push_back((Edge){a, b});
-		}
-
-		// Connect the last and the first vertex.
-		Vector3 a = this->polygons[i].vertices_p[this->polygons[i].size - 1]->absPosition;
-		Vector3 b = this->polygons[i].vertices_p[0]->absPosition;
-		edges.push_back((Edge){a, b});
-	}
- 
-	// Remove redundant edges.
-	for(int i = 0; i < edges.size(); ++i)
-		for(int j = i + 1; j < edges.size(); ++j)
-			if(edges[i].a == edges[j].a && edges[i].b == edges[j].b ||
-			   edges[i].a == edges[j].b && edges[i].b == edges[j].a)
-				edges.erase(edges.begin() + j--);
-
-	return edges;
-}
-
 CustomRigidBody::CustomRigidBody()
 {
 }
@@ -122,6 +92,36 @@ void CustomRigidBody::computeCenterOfMass()
 void CustomRigidBody::computeInverseInertiaTensor()
 {
   // TODO
+}
+
+void CustomRigidBody::computeCachedEdges()
+{
+	std::vector<CachedEdge> cache;
+
+	// List all the edges.
+	for(int i = 0; i < this->structure.polygons.size(); ++i)
+	{
+		for(int j = 0; j < this->structure.polygons[i].size - 1; ++j)
+		{
+			int idA = this->structure.polygons[i].vertices_p[j]->id;
+			int idB = this->structure.polygons[i].vertices_p[j + 1]->id;
+			cache.push_back((CachedEdge){idA, idB});
+		}
+
+		// Connect the last and the first vertex.
+		int idA = this->structure.polygons[i].vertices_p[this->structure.polygons[i].size - 1]->id;
+		int idB = this->structure.polygons[i].vertices_p[0]->id;
+		cache.push_back((CachedEdge){idA, idB});
+	}
+ 
+	// Remove redundant edges.
+	for(int i = 0; i < cache.size(); ++i)
+		for(int j = i + 1; j < cache.size(); ++j)
+			if(cache[i].idA == cache[j].idA && cache[i].idA == cache[j].idB ||
+			   cache[i].idA == cache[j].idB && cache[i].idB == cache[j].idA)
+				cache.erase(cache.begin() + j--);
+
+	this->cachedEdges = cache;
 }
 
 /**
@@ -372,3 +372,16 @@ CustomVertex* CustomRigidBody::getVertexById_p(int id)
   return NULL;
 }
 
+std::vector<Edge> CustomRigidBody::getEdges()
+{
+	std::vector<Edge> edges;
+// TOOODOOOO: CONVERT VERTICES TO HASHMAP?
+	for(int i = 0; i < this->cachedEdges.size(); ++i)
+	{
+		Vector3 posA = this->structure.vertices[this->cachedEdges[i].idA].absPosition;
+		Vector3 posB = this->structure.vertices[this->cachedEdges[i].idB].absPosition;
+		edges.push_back((Edge){posA, posB});
+	}
+
+	return edges;
+}

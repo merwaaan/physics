@@ -1,29 +1,60 @@
 \section{Gestion des collisions}
 
-Maintenant que la première section nous a éclairé sur la façon dont les corps de la simulation évoluent indépendament les uns des autres, il est temps de les faire interagir entre eux. Cette phase se divise en trois étapes. Premièrement, le moteur physique doit être capable de déterminer si une collision a lieu entre deux corps. Ensuite, il doit pouvoir corriger leurs états afin de contre-balancer les décalages dû aux erreurs numériques et les limitations imposées par l'intégration discrète de l'environnement. Finalement, une force de séparation doit être calculée et appliquée aux deux objets.
+Maintenant que la première section nous a éclairé sur la façon dont les corps de la simulation évoluent indépendament les uns des autres, il est temps de les faire interagir entre eux. Cette phase se divise en trois étapes. Premièrement, le moteur physique doit être capable de déterminer si une collision a lieu entre deux corps. Ensuite, il doit pouvoir corriger leurs états afin de contre-balancer les décalages dû aux erreurs numériques et à l'intégration discrète de l'environnement. Finalement, une force de séparation doit être calculée et appliquée aux deux objets afin de simuler le rebond ou le repos.
 
 \subsection{Détection d'une collision}
 
-\subsubsection{Détection fine}
+Une collision fait entrer en jeu deux corps rigides dont l'intégrité physique a été corrompue, autrement dit : les corps rentrent l'un dans l'autre. Nous allons définir un traitement à appliquer à deux objets pour savoir si tel est le cas et de façon certaine. Néanmoins, bien que nous utilisions un algorithme ayant fait ses preuves dans le domaine, il faut garder à l'esprit que ce test sera éxécuté à chaque intégration de la simulation et ce, pour chaque paire de corps. Dans de telles circonstances, l'usage d'un algorithme a priori rapide peut se révéler désastreux au niveau des performances.
 
-
+Nous faisons donc le choix de séparer la détection de collision en deux étapes : une détection grossière et une détection fine. La détection grossière est un algorithme approximatif qui informe de la possibilité d'une collision, si le résultat est positif alors on exécute la détection fine (mais plus coûteuse) pour confirmer ou infirmer le contact de façon certaine.
 
 \subsubsection{Détection grossière}
 
+Le but de la phase de détection grossière (\textit{broad-phase collision}) est de renseigner sur la possibilité d'une collision et ce, à moindre coût. Si une collision a réellement lieu, le résultats sera toujours positif, néanmoins il est possible que le résultat soit positif sans qu'il y ait de collision réelle. Dans ce dernier cas, la détection fine invalidera la collision.
+
+On se base sur l'utilisation de boîtes englobantes, ou AABB (\textit{axis-aligned bounding-boxes}), pour détecter l'éventualité d'un contact. Les boîtes englobantes sont des volumes alignés avec les axes du repère global et contenant tous les points d'une corps. Pour savoir si deux corps rentrent possiblement en collision, on vérifie si leurs boîtes englobantes entrent en collision. Ce test est très rapide puisque que l'on peut tirer parti du fait que les boîtes sont alignées avec le repère absolu \cite{ericson05}.
+
+ALGORITHME ?
+
+DESSIN 1 : corps éloignés
+
+DESSIN 2 : boites en contact mais pas corps
+
+DESSIN 3 : corps en contact
+
+\subsubsection{Détection fine}
+
+La phase de détection fine (\textit{narrow-phase collision}) est moins rapide mais détermine de façon certaine si deux corps sont en collision.
+
+Nous allons employer la différence de Minkowski, une opération mathématique notée $A \ominus B = \{a - b \mid a \in A, b \in B\}$ avec $A$ et $B$ deux corps. La différence de Minkowski a comme propriété intéressante que sa distance par rapport à l'origine correspond à la distance minimum entre les deux corps qu'elle représente. En cas de collision entre les corps, l'origine est donc contenue dans la différence de Minkowski.
+
+DESSIN : différence de Minkowski entre deux figures simples (montrer que distance min = distance M vers origine)
+
+Une fois la différence de Minkowski calculée, il nous faut déterminer sa distance par rapport à l'origine afin de pouvoir retourner un résultat. Si cette distance est supérieure à zéro, alors aucune inter-pénétration n'a lieu, sinon une collision est détectée. On utilise pour cela l'algorithme de distance de Gilbert-Johnson-Keerthi, communément appelé GJK.
+
+L'algorithme GJK est chargé de calculer la plus faible distance entre un ensemble de points et un autre point précis. On va ici l'appliquer pour déterminer la distance entre la différence de Minkowski et l'origine du repère absolu. GJK se base sur l'utilisation de simplex blabla
+
+points de supports
+
+DESSIN : étapes de la recherche
 
 \subsection{Correction d'une collision}
 
-\`A chaque itération de la simulation, les corps présents dans l'environnement du moteur physique sont susceptibles de se déplacer et donc d'entrer en contact. Le moteur simule ces évolutions de manière non continue et il est très improbable qu'une collision soit détectée au moment précis o\`u elle se produit. On est donc régulièrement témoin de situations d'inter-pénétration au sein desquelles des corps rentrent l'un dans l'autre.
+\`A chaque itération de la simulation, les corps présents dans l'environnement du moteur physique sont susceptibles de se déplacer et donc d'entrer en contact. Le moteur simule ces évolutions de manière discrète et il est très improbable qu'une collision soit détectée au moment précis o\`u elle se produit. On est donc régulièrement témoin de situations d'inter-pénétration au sein desquelles des corps rentrent l'un dans l'autre.
 
-On pourrait se satisfaire de cette imprécision et calculer les forces de rebond appropriées mais plusieurs situations critiques risquent d'apparaître. La force de séparation génération ne pourrait pas être suffisante pour séparer entièrement les deux sphères, ce qui les bloqueraient balbla. Pour trouver le point de contact réel entre deux sphères, il existe plusieurs approches. Les systèmes qui préfèrent favoriser le temps d'éxécution au détriment du réalisme se contente de repositionner les corps à un point de contact calculé par interpolation en fonction du temps de la dernière ntégration. Il est évident que des objets sujets à des déplacements non linéaires (variation de la vitesse pendant un pas de temps, trajectoire elliptique) seront mal replacés.
+DESSIN : inter-pénétration
 
-Même si la vitesse d'éxecution est un facteur important dans nos choix de conception, nous allons prendre un chemin différent et sélectionner une méthode plus précise qui fonctionnera par retour en arrière. La fonction d'intégration du moteur prend comme seul argument le pas de temps duquel faire avancer la simulation et pour l'instant on utilisait un pas constant. Or, une caractéristique intéressante de cette fonction et qu'elle peut prendre en argument un pas de temps négatif et simuler en sens inverse ! Grâce à cette caractéristique, dés qu'une inter-pénétration est détectée, on peut revenir en arrière jusqu'à retrouver le temps de contact exact. Le terme "exact" est à prendre avec des pincettes puisque notre simulation est limité par l'arithmétique des nombres à virgules flottantes et que l'on devra se contente d'un résultat quasi-exact, validé par un seuil de tolérance adapté.
+On pourrait se satisfaire de cette imprécision et calculer les forces de rebond appropriées mais plusieurs situations critiques risquent d'apparaître. Pour trouver le point de contact réel entre deux objets, il existe plusieurs approches. Les systèmes préférant favoriser le temps d'éxécution au détriment du réalisme se contentent de repositionner les corps à un point de contact calculé par interpolation en fonction du temps de la dernière intégration. Il est évident que des objets sujets à des déplacements non linéaires (variation de la vitesse pendant un pas de temps, trajectoire elliptique) seront mal replacés.
+
+Même si la vitesse d'éxecution est un facteur important dans nos choix de conception, nous allons prendre un chemin différent et sélectionner une méthode plus précise qui fonctionnera par retour en arrière. La fonction d'intégration du moteur prend comme seul argument le pas de temps duquel faire avancer la simulation et pour l'instant on utilisait un pas constant. Or, une caractéristique intéressante de cette fonction et qu'elle peut prendre en argument un pas de temps négatif et simuler en sens inverse. Grâce à cette caractéristique, dés qu'une inter-pénétration est détectée, on peut revenir en arrière jusqu'à retrouver le temps de contact exact. Le terme "exact" est à prendre avec des pincettes puisque notre simulation est limité par l'arithmétique des nombres à virgules flottantes et que l'on devra se contente d'un résultat quasi-exact, validé par un seuil de tolérance adapté.
 
 Afin d'accélérer cette phase de recherche de la configuration de contact, le retour en arrière se fera par dichotomie. On recule en premier lieu de la moitié du pas de temps puis, si l'inter-pénétration est toujours présente, on recule d'un quart du pas de temps, sinon on avance d'un quart du pas de temps, et ainsi de suite jusqu'à obtenir une précision satisfaisante.
 
-DESSIN
+ALGORITHME
 
-Une fois ce processus achevé, la configuration de contact est retrouvé et les deux sphères ne sont plus en situation de pénétration mutuelle. Il reste à déterminer quelles forces appliquer aux corps pour qu'ils se séparent.
+DESSIN : recherche de la vraie position de contact
+
+Une fois ce processus achevé, la configuration de contact est retrouvée et les deux corps ne sont plus en situation de pénétration mutuelle. On remarque que grâce à cette technique, la position n'est pas la seule valeur à avoir été recalé : orientation, élans angulaire et linéaires sont eux aussi revenus à leurs valeurs au moment du contact.
 
 \subsection{Réponse à une collision}
 

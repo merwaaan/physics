@@ -1,0 +1,20 @@
+\documentclass{article}
+
+\usepackage{tikz}
+
+\begin{document}
+
+\begin{tikzpicture}[transform shape]
+  \usetikzlibrary{fit}
+
+  \input{repere.tikz}
+
+  \draw (9,2) node (A) {} --
+        (4,1) node (B) {} --
+        (1,4) node (C) {} --
+        (2,7) node (D) {} --
+        (7,7) node (E) {} -- cycle;
+
+\end{tikzpicture}
+
+\end{document}

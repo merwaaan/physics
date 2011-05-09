@@ -1,0 +1,21 @@
+\documentclass{article}
+
+\usepackage{tikz}
+
+\begin{document}
+
+\begin{tikzpicture}
+  \input{repere.tikz}
+
+  % figure
+  \coordinate (C) at ++(6,5);
+  \draw (C) circle (2);
+
+  % repère local  
+  \begin{scope}[rotate around={-30:(C)}]
+    \draw[->] (C) -- +(4,0);
+    \draw[->] (C) -- +(0,4);
+  \end{scope}
+\end{tikzpicture}
+
+\end{document}

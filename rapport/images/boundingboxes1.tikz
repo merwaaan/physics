@@ -1,0 +1,31 @@
+\documentclass{article}
+
+\usepackage{tikz}
+
+\begin{document}
+
+\begin{tikzpicture}[transform shape]
+  \usetikzlibrary{fit}
+
+  \input{repere.tikz}
+
+  \coordinate (R) at (7,3);
+  \node[rectangle,rotate=-30,minimum height=3cm, minimum width=2cm,inner sep=0pt,draw=black] (rect) at (R) {};
+  \coordinate (C) at (2,7);
+  \node[circle,minimum size=2cm,inner sep=0pt,draw=black] (cerc) at (C) {};
+
+  \begin{scope}[rotate around={-30:(C)}]
+    \path (R) node () {}
+          ++(-1,-1.5) node (a) {}
+          ++(2,0) node (b) {}
+          ++(0,3) node (c) {}
+          ++(-2,0) node (d) {};
+   \end{scope}
+
+  % bounding boxes
+  \node[fit=(a) (b) (c) (d),draw=green,dashed] {};
+  \node[fit=(cerc),draw=green,dashed] {};
+
+\end{tikzpicture}
+
+\end{document}

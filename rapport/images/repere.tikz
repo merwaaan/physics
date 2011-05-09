@@ -1,0 +1,8 @@
+% repère
+\draw[->] (-0.2,0) -- (10,0);
+\draw[->] (0,-0.2) -- (0,10);
+\foreach \i in {0,...,9}
+{
+  \draw[xshift=\i cm] (0,-1pt) -- (0,1pt);
+  \draw[yshift=\i cm] (-1pt,0) -- (1pt,0);
+}

@@ -16,7 +16,7 @@ On se base sur l'utilisation de boîtes englobantes, ou AABB (\textit{axis-align
 
 ALGORITHME ?
 
-DESSIN 1 : corps éloignés
+%\input{images/boundingboxes1.tikz}
 
 DESSIN 2 : boites en contact mais pas corps
 
@@ -34,9 +34,11 @@ Une fois la différence de Minkowski calculée, il nous faut déterminer sa dist
 
 L'algorithme GJK est chargé de calculer la plus faible distance entre un ensemble de points et un autre point précis. On va ici l'appliquer pour déterminer la distance entre la différence de Minkowski et l'origine du repère absolu. GJK se base sur l'utilisation de simplex blabla
 
+%\input{images/minkowski.tikz}
+
 points de supports
 
-DESSIN : étapes de la recherche
+\input{images/gjk.tikz}
 
 \subsection{Correction d'une collision}
 

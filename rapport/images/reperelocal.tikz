@@ -1,11 +1,5 @@
-\documentclass{article}
-
-\usepackage{tikz}
-
-\begin{document}
-
 \begin{tikzpicture}
-  \input{repere.tikz}
+  \input{images/repere.tikz}
 
   % figure
   \coordinate (C) at ++(6,5);
@@ -17,5 +11,3 @@
     \draw[->] (C) -- +(0,4);
   \end{scope}
 \end{tikzpicture}
-
-\end{document}

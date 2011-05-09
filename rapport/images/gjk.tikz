@@ -1,13 +1,7 @@
-\documentclass{article}
-
-\usepackage{tikz}
-
-\begin{document}
-
-\begin{tikzpicture}[transform shape]
+\begin{tikzpicture}
   \usetikzlibrary{fit}
 
-  \input{repere.tikz}
+  \input{images/repere.tikz}
 
   \draw (9,2) node (A) {} --
         (4,1) node (B) {} --
@@ -16,5 +10,3 @@
         (7,7) node (E) {} -- cycle;
 
 \end{tikzpicture}
-
-\end{document}

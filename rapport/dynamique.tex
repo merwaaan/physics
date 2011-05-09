@@ -59,7 +59,7 @@ On pourrait en premier lieu penser à représenter un tel corps par une liste de
 
 Introduisons en premier lieu la notion de repères absolu et local. Le repère absolu est le référentiel orthogonal dont l'origine sert de centre à l'environnement de la simulation. Un repère local est un référentiel qui est unique à chaque corps et dont le centre se situe à l'intérieur même de cet objet.
 
-DESSIN repère global + corps avec repère local
+\input{images/reperelocal.tikz}
 
 La position exacte du repère local dépend de la position des points qui forment l'objet mais il ne s'agit pas d'un simple centre géométrique puisque la masse de chaque point est aussi un facteur déterminant. Cette position se nomme le centre de masse, ou barycentre, et sera calculée par la formule suivante, o\`u $M$ représente la masse totale des points, et $m_i$ et $\vec{p}_i$ respectivement la masse et la position dans le repère absolu du point $i$.
 

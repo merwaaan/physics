@@ -1,13 +1,7 @@
-\documentclass{article}
-
-\usepackage{tikz}
-
-\begin{document}
-
 \begin{tikzpicture}[transform shape]
   \usetikzlibrary{fit}
 
-  \input{repere.tikz}
+  \input{images/repere.tikz}
 
   \coordinate (R) at (7,3);
   \node[rectangle,rotate=-30,minimum height=3cm, minimum width=2cm,inner sep=0pt,draw=black] (rect) at (R) {};
@@ -27,5 +21,3 @@
   \node[fit=(cerc),draw=green,dashed] {};
 
 \end{tikzpicture}
-
-\end{document}

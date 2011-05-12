@@ -1,5 +1,5 @@
 \begin{tikzpicture}
-  \usetikzlibrary{fit}
+	%  \usetikzlibrary{fit}
 
   \input{images/repere.tikz}
 

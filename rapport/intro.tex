@@ -2,14 +2,14 @@
 
 \subsection{Les moteurs physiques}
 
-Invisibles, les phénomènes physiques qui régissent le fonctionnement de notre univers sont pourtant omniprésents et universels. Etudiées depuis des siècles, les lois les décrivant ont été à maintes reprises redéfinies et affinnées et il est de nos jours indispensable de pouvoir les modéliser de façon fidèle ou tout du moins d'être capable de les approximer de façon plausible. 
-Une simulation industrielle visant par exemple à reproduire virtuellement les interactions entre les différentes pièces qui composent une automobile doit être capable de reproduire de façon réaliste la friction des pneumatiques sur le sol, l'influence de la gravité sur le véhicule, le comportement thermique et volumique des fluides qu'il contient ainsi que de nombreux autres aspects de son fonctionnement. Le système simulant tous ces facteurs est appellé moteur physique. Dans cet exemple, les enjeux de sécurité et de qualité sont grands et des résultats d'une précision extrême sont exigés. Les calculs à mettre en jeu pour les obtenir peuvent donc se permettre d'être très coûteux et de se baser sur des modélisations mathématiques complexes. Il n'est pas rare que ces processus de simulation soient réparties sur plusieurs machines et s'étalent sur une durée de calcul de plusieurs heures.
+Invisibles, les phénomènes physiques qui régissent le fonctionnement de notre univers sont pourtant omniprésents et universels. Étudiées depuis des siècles, les lois les décrivant ont été à maintes reprises redéfinies et affinnées et il est de nos jours indispensable de pouvoir les modéliser de façon fidèle ou tout du moins d'être capable de les approximer de façon plausible. 
+Une simulation industrielle visant par exemple à reproduire virtuellement les interactions entre les différentes pièces qui composent une automobile doit être capable de reproduire de façon réaliste la friction des pneumatiques sur le sol, l'influence de la gravité sur le véhicule, le comportement thermique et volumique des fluides qu'il contient ainsi que de nombreux autres aspects de son fonctionnement. Le système informatique simulant tous ces facteurs est appellé moteur physique. Dans cet exemple, les enjeux de sécurité et de qualité sont grands et des résultats d'une précision extrême sont exigés. Les calculs à mettre en jeu pour les obtenir peuvent donc se permettre d'être très coûteux et de se baser sur des modélisations mathématiques complexes. Il n'est pas rare que ces processus de simulation soient réparties sur plusieurs machines et s'étalent sur une durée de calcul de plusieurs heures.
 
-A contrario, les moteurs physiques d'autres types de système complexe ne peuvent se permettre une telle latence et doivent fonctionner en temps réel. La contrainte est encore plus forte lorsque lorsque le moteur physique doit cohabiter avec d'autres modules gérant différents aspects de l'application. On pense notamment aux jeux vidéo, qui partagent le temp de calcul alloué entre le moteur graphique, le moteur d'intelligence artificielle, la gestion du son, la gestion du réseau, et bien sûr le moteur physique. Dans le cadre de ce type d'application, auquel on peut greffer la réalité virtuelle et ses applications dérivées, la contrainte la plus importante est le temps d'éxecution et non la précision des résultats. On ne cherche plus à obtenir des données exactes mais une représentation plausible du réel. Ainsi, certains raccourcis pourront être tolérés et une part de réalisme est sacrifiée au profit de la vitesse.
+A contrario, les moteurs physiques d'autres types de système complexe ne peuvent se permettre une telle latence et doivent fonctionner en temps réel. La contrainte est encore plus forte lorsque le moteur physique doit cohabiter avec d'autres modules gérant différents aspects de l'application. On pense notamment aux jeux vidéo, qui partagent le temp de calcul alloué entre le moteur graphique, le moteur d'intelligence artificielle, la gestion du son, la gestion du réseau, et bien sûr le moteur physique. Dans le cadre de ce type d'application, auquel on peut greffer la réalité virtuelle et ses applications dérivées, la contrainte la plus importante est le temps d'éxecution et non la précision des résultats. On ne cherche plus à obtenir des données exactes mais une représentation plausible du réel. Ainsi, certains raccourcis pourront être tolérés et une part de réalisme est sacrifiée au profit de la vitesse.
 
 La physique est un champ très vaste dont les disciplines vont de l'acoustique à l'électronique. Néanmoins, le spectre d'action des moteurs physique se limite à la mécanique classique, dite mécanique newtonienne. Ce sous-domaine répond à des questions telles que : Comment réagira cette balle si on la lance sur un mur ? Quelle est l'influence d'une planète sur un objet spatial donné ? Pourquoi un liquide visqueux dispose-t-il d'une faible vitesse d'écoulement ? Quelles déformations engendrera un choc entre deux voitures ?
 
-La mécanique newtonienne est elle-même un champ très large et la précision d'une modélisation ne suffit pas à la différenciation entre tous les moteurs physiques. Souvent, un moteur physique sera spécialisé. Certains simuleront les interactions entre corps rigides comme une boîte en plastique tombant sur le sol. Certains simuleront le comportement d'objets déformables comme une balle de caoutchouc jeté sur un mur. D'autres se concentreront sur les réactions entre liquides ou entre gaz.
+La mécanique newtonienne est elle-même une vaste discipline et la précision d'une modélisation ne suffit pas à la différenciation entre tous les moteurs physiques. Souvent, un moteur physique sera spécialisé. Certains simuleront les interactions entre corps rigides comme une boîte en plastique tombant sur le sol. Certains simuleront le comportement d'objets déformables comme une balle de caoutchouc jeté sur un mur. D'autres se concentreront sur les réactions entre liquides ou entre gaz.
 
 \subsection{Travail à accomplir}
 
@@ -25,9 +25,9 @@ L'activité physique d'un corps se divise en plusieurs phases. Afin de les déta
 
 La main s'ouvre et laisse s'échapper la balle. Notre appréhension du monde qui nous entoure nous permet de prévoir que l'objet tombera et accélérera vers le bas. Ce phénomène est quantifié par la seconde loi de Newton.
 
-\[
-\vec{a} = \frac{1}{m} \sum{\vec{F}_i}
-\]
+\begin{align*}
+  \vec{a} = \frac{1}{m} \sum{\vec{F}_i}
+\end{align*}
 
 Cette règle décrit l'accélération $\vec{a}$ d'un corps comme étant le produit de l'inverse de sa masse $m$ et de la somme des forces $\vec{F}_i$ qui lui sont appliquées. Dans notre exemple, on lache la balle sans lui donner d'élan initial et la seule influence qu'elle subit au cours de sa chute est celle de la gravité. La gravité terrestre est une force de $9.81 N$ dirigée vers le noyau de la planète mais dans la simulation, on peut la réduire à une force dirigée vers le "bas" (dans la direction négative de l'axe $y$). Afin de bénéficier d'un moteur physique versatile, la puissance de la gravité pourra être modifiée, pour simuler une situation lunaire par exemple, ou être totalement annulée, pour simuler une situation en apesanteur. En réalité, la gravité ne sera pas codée "en dur" mais appartiendra à une liste de forces environnementales qui contiendra toutes les influences que le monde extérieur applique aux objets qu'il contient. On pourra par exemple modéliser, entre autres, la résistance de l'air ou le roulis irrégulier du vent.
 
@@ -55,13 +55,10 @@ Tout corps $A$ exerçant une force sur un corps $B$ subit une force d'intensité
 
 Autrement dit :
 
-\[
-\vec{F}_{A/B} = -\vec{F}_{B/A}
-\]
-
-\[
-\vec{F}_{A/B} + \vec{F}_{B/A} = 0
-\]
+\begin{align*}
+  &\vec{F}_{A/B} = -\vec{F}_{B/A} \\
+  &\vec{F}_{A/B} + \vec{F}_{B/A} = 0
+\end{align*}
 
 DESSIN
 

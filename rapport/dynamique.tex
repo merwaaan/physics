@@ -6,19 +6,27 @@ Nous allons pour l'instant nous concentrer sur l'aspect cinématique d'un corps 
 
 La quantité physique la plus perceptible visuellement pour un spectateur est la position $p$ d'un corps. Pour notre affichage final, c'est cette valeur à tout instant $t$ de la simulation que l'on veut déterminer. Le travail de cette partie du moteur physique revient donc à déterminer la nouvelle position d'un objet à partir de la connaissance des forces qui lui sont appliquées. Un corps possède aussi une vitesse $v$, qui correspond à la variation de sa position pour une unité de temps. On note cette relation sous la forme dérivée :
 
-\[\vec{v} = \frac{\delta \vec{p}}{\delta t}\]
+\begin{align*}
+  \vec{v} = \frac{\deriv \vec{p}}{\deriv t}
+\end{align*}
 
 Pareillement, l'accéleration $a$, qui apparaissaît plus tôt dans la seconde loi de Newton, correspond à la variation de la vitesse par rapport à une unité de temps.
 
-\[\vec{a} = \frac{\delta \vec{v}}{\delta t}\]
+\begin{align*}
+  \vec{a} = \frac{\deriv \vec{v}}{\deriv t}
+\end{align*}
 
 Par transitivité, on confirme que la position est dépendante de l'accélération.
 
-\[\vec{a} = \frac{\delta \vec{v}}{\delta t} = \frac{\delta^2 \vec{p}}{\delta t}\]
+\begin{align*}
+  \vec{a} = \frac{\deriv \vec{v}}{\deriv t} = \frac{\deriv^2 \vec{p}}{\deriv t}
+\end{align*}
 
 Grâce à cette équation, on peut calculer l'accélération d'un objet à partir de sa variation de position. Dans le moteur physique, ce sera en fait l'opération inverse qui devra être effectuée : on connaîtra les forces appliquées, on en déduira l'accélération induite par la seconde loi de Newton puis on calculera le changement de position. Il faut donc exploiter le fait que ces trois quantités partagent aussi des relations de primitive.
 
-\[\vec{p} = \int \vec{v}\; \delta t = \int \vec{a}\; \delta t^2\]
+\begin{align*}
+  \vec{p} = \int \vec{v}\; \deriv t = \int \vec{a}\; \deriv t^2
+\end{align*}
 
 Récapitulons. Chacun des corps rigides dont l'on veut simuler l'évolution possèdera ces trois quantités sous forme vectorielle et l'une des tâches de base du moteur physique sera de traduire l'application de forces en un changement de position. On sait qu'elles entretiennent des relations de dérivation, il faudra donc procéder par intégration pour calculer la position d'un objet à partir de son accélération.
 
@@ -26,28 +34,36 @@ Récapitulons. Chacun des corps rigides dont l'on veut simuler l'évolution poss
 
 Dans la sous-section précédente, les trois quantités physiques entrant en jeu dans les mouvements linéaires ont été présentées. \'Etudions maintenant de façon plus concrète sur quels calculs se basera la partie la plus élémentaire du moteur physique.
 
-Les phénomènes mécaniques du monde réel évoluent de façon continue mais notre simulation ne peut pas s'autoriser ce luxe. Le modèle du moteur physique sera donc discret et avancera par pas de temps fixe $\delta t$. \`A chaque mise à jour de la simulation, des intégrations doivent être réalisées pour déterminer le changement d'état d'un corps d'un instant $t_n$ à un instant $t_{n+1}$. Toujours pour des raisons d'efficacité, nous ne pouvont pas nous permettre d'allouer un temps de calcul trop important à cette phase de la mise à jour et nous devons trouver un moyen d'approximer ces intégrales.
+Les phénomènes mécaniques du monde réel évoluent de façon continue mais notre simulation ne peut pas s'autoriser ce luxe. Le modèle du moteur physique sera donc discret et avancera par pas de temps fixe $\deriv t$. \`A chaque mise à jour de la simulation, des intégrations doivent être réalisées pour déterminer le changement d'état d'un corps d'un instant $t_n$ à un instant $t_{n+1}$. Toujours pour des raisons d'efficacité, nous ne pouvont pas nous permettre d'allouer un temps de calcul trop important à cette phase de la mise à jour et nous devons trouver un moyen d'approximer ces intégrales.
 
 Parmi les techniques classiques d'intégration approximative, on trouve l'intégration d'Euler. Cette méthode part du principe que l'on dispose de la valeur initiale $x_0$ de la quantité que l'on souhaite faire évoluer ainsi que de son taux de changement $x'$ et de la variation de temps par rapport à l'état précédent.
 
-\[x_{n+1} = x_{n} + x' \delta t\]
+\begin{align*}
+  x_{n+1} = x_{n} + x' \deriv t
+\end{align*}
 
 Si l'on adapte cette idée à notre problème, on obtient la succession de calculs suivante :
 
-\[a_{n+1} = \frac{\sum \vec{F}_i}{m}\]
-\[\vec{v}_{n+1} = \vec{a}_n + \vec{a}_{n+1} \delta t\]
-\[\vec{p}_{n+1} = \vec{p}_n + \vec{v}_{n+1} \delta t\]
+\begin{align*}
+  a_{n+1} &= \frac{\sum \vec{F}_i}{m} \\
+  \vec{v}_{n+1} &= \vec{a}_n + \vec{a}_{n+1} \deriv t \\
+  \vec{p}_{n+1} &= \vec{p}_n + \vec{v}_{n+1} \deriv t
+\end{align*}
 
 On calcule l'accélération à un instant $t$ puis on intègre en fonction du temps jusqu'à obtenir la nouvelle position du corps. Ce processus doit être repété à chaque mise à jour du système et ce, pour chaque corps. On aurait pu choisir une autre méthode d'intégration, telle que l'intégration Runge-Kutta d'ordre 4 qui divise un pas de temps en plusieurs segments, ou bien telle que l'intégration de Verlet qui dispose d'une meilleure stabilité, mais Euler reste le choix le plus économique et fournit des résultats relativement corrects.
 
 Afin de réduire la complexité de la structure informatique qui représentera un corps rigide, nous allons introduire la notion d'élan linéaire. Pour un corps rigide, l'élan linéaire $\vec{L}$ est le produit de la masse et de la vitesse. Cette nouvelle quantité a pour avantage majeur de posséder comme primitive la variation de force exercée sur le corps.
 
-\[{\sum \vec{F}_i} = \frac{\delta \vec{L}}{\delta t} = \frac{\delta (m\vec{v})}{\delta t}\]
+\begin{align*}
+  {\sum \vec{F}_i} = \frac{\deriv \vec{L}}{\deriv t} = \frac{\deriv (m\vec{v})}{\deriv t}
+\end{align*}
 
 Ce qui signifie que l'on peut réduire l'intégration de l'état d'un corps à :
 
-\[\vec{L}_{n+1} = \vec{L}_n + {\sum F}\]
-\[\vec{p}_{n+1} = \vec{p}_n + \frac{\vec{L}_{n+1}}{m} t\]
+\begin{align*}
+  \vec{L}_{n+1} &= \vec{L}_n + {\sum F} \\
+  \vec{p}_{n+1} &= \vec{p}_n + \frac{\vec{L}_{n+1}}{m} t
+\end{align*}
 
 L'élan linéaire remplace l'accélération dans la définition d'un corps et permet de calculer sa vitesse. Cette organisation permet à première vue une intégration plus courte mais les avantages majeurs de ce choix prendront tous leurs sens lorsque le mouvement angulaire sera introduit.
 
@@ -59,17 +75,23 @@ On pourrait en premier lieu penser à représenter un tel corps par une liste de
 
 Introduisons en premier lieu la notion de repères absolu et local. Le repère absolu est le référentiel orthogonal dont l'origine sert de centre à l'environnement de la simulation. Un repère local est un référentiel qui est unique à chaque corps et dont le centre se situe à l'intérieur même de cet objet.
 
-\input{images/reperelocal.tikz}
+\begin{figure}
+  \input{images/reperelocal.tikz}
+  \caption{Le repère absolu et le repère local d'un cercle}
+\end{figure}
 
 La position exacte du repère local dépend de la position des points qui forment l'objet mais il ne s'agit pas d'un simple centre géométrique puisque la masse de chaque point est aussi un facteur déterminant. Cette position se nomme le centre de masse, ou barycentre, et sera calculée par la formule suivante, o\`u $M$ représente la masse totale des points, et $m_i$ et $\vec{p}_i$ respectivement la masse et la position dans le repère absolu du point $i$.
 
-\[C = \frac{1}{M} \sum m_i \vec{p}_i\]
+\begin{align*}
+  C = \frac{1}{M} \sum m_i \vec{p}_i
+\end{align*}
 
 Une fois le centre de masse défini, la position locale $\vec{r}_i$ d'une particule $i$ peut être calculée en fonction de sa position absolue $\vec{p}_i$ par :
 
 \[\vec{r}_i = \vec{p}_i - C\]
 
 Le processus de définition d'un corps se déroule comme suit :
+
 \begin{enumerate}
   \item{L'utilisateur entre les points de l'objet un par un, dans le repère absolu}
   \item{L'utilisateur renseigne les points qui sont reliés par des arête afin de former les faces de l'objet}

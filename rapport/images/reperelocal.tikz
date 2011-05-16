@@ -1,4 +1,4 @@
-\begin{tikzpicture}
+\begin{tikzpicture}[scale=0.7,transform shape]
   \input{images/repere.tikz}
 
   % figure
@@ -7,7 +7,7 @@
 
   % repère local  
   \begin{scope}[rotate around={-30:(C)}]
-    \draw[->] (C) -- +(4,0);
-    \draw[->] (C) -- +(0,4);
+    \draw[axe] (C) -- +(4,0);
+    \draw[axe] (C) -- +(0,4);
   \end{scope}
 \end{tikzpicture}

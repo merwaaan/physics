@@ -1,6 +1,4 @@
-\begin{tikzpicture}[transform shape]
-  \usetikzlibrary{fit}
-
+\begin{tikzpicture}[scale=0.7, transform shape]
   \input{images/repere.tikz}
 
   \coordinate (R) at (7,3);

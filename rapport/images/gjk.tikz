@@ -1,4 +1,4 @@
-\begin{tikzpicture}
+\begin{tikzpicture}[scale=0.7,transform shape]
 	%  \usetikzlibrary{fit}
 
   \input{images/repere.tikz}

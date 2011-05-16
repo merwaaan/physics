@@ -34,11 +34,17 @@ Une fois la différence de Minkowski calculée, il nous faut déterminer sa dist
 
 L'algorithme GJK est chargé de calculer la plus faible distance entre un ensemble de points et un autre point précis. On va ici l'appliquer pour déterminer la distance entre la différence de Minkowski et l'origine du repère absolu. GJK se base sur l'utilisation de simplex blabla
 
-%\input{images/minkowski.tikz}
+\begin{figure}
+  \input{images/minkowski.tikz}
+  \caption{La somme de Minkowski d'un cercle et d'un carré}
+\end{figure}
 
-points de supports
+points de supports blabla
 
-\input{images/gjk.tikz}
+\begin{figure}
+  \input{images/gjk.tikz}
+  \caption{{\'E}tapes de l'algorithme GJK}
+\end{figure}
 
 \subsection{Correction d'une collision}
 
@@ -63,4 +69,6 @@ Une fois ce processus achevé, la configuration de contact est retrouvée et les
 Un coefficient de restitution $0 \leq \epsilon \leq 1$ détermine le taux de rebond d'un corps. Si $\epsilon = 1$, la balle rebondira avec autant d'énergie qu'elle est arrivée (une situation concrètement impossible à retrouver dans le monde réel). Si $\epsilon = 0$, la balle repartira avec une énergie nulle; autrement dit, elle restera collée au plan. Le coefficient de restitution dépend habituellement de la matière que l'on cherche à simuler : une balle en cahoutchouc aura un $\epsilon$ elevé tandis qu'un bloc d'argile aura un $\epsilon$ proche de zéro.
 
 Le coefficient de friction influe sur la réponse rotationnelle qu'une collision est susceptible de provoquer. Si la balle avait été laché, à partir d'une vitesse nulle, sur un plan droit, le rebond aura été purement linéaire. Dans le cas d'un plan incliné, un frottement non perpendiculaire a lieu et la balle va entrer en rotation. Plus le coefficient de friction est élevé et plus cet effet est puissant. On peut simplifier cette notion en disant que le coefficient de friction détermine si un corps est recouvert d'une matière qui accroche ou au contraire qui glisse.
+
+\cite{newton87}
 

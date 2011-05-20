@@ -260,7 +260,7 @@ void demoBoxes()
 
 int main(int argc, char** argv)
 {
-	srand(4);//123);
+	srand(1);//123);
 
   e = new Engine(&argc, argv, 0.01);
   
@@ -271,7 +271,7 @@ int main(int argc, char** argv)
   //testTimeReversing();
 	
   //demoConstraints();
-  demoPendulum();
+  //demoPendulum();
 	//demoRestingBalls();
 	//demoBalls();
 	//demoThrowBoxes();

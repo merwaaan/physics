@@ -1,12 +1,11 @@
 \begin{tikzpicture}[scale=0.7,transform shape]
-	%  \usetikzlibrary{fit}
+  
+  \node (A) at (9,2) {A};
+  \node (B) at (4,1) {B};
+  \node (C) at (1,4) {C};
+  \node (D) at (2,7) {D};
+  \node (E) at (7,7) {E};
 
-  \input{images/repere.tikz}
-
-  \draw (9,2) node (A) {} --
-        (4,1) node (B) {} --
-        (1,4) node (C) {} --
-        (2,7) node (D) {} --
-        (7,7) node (E) {} -- cycle;
+  \path[draw=black] (A) -- (B) -- (C) -- (D) -- (E) -- cycle;
 
 \end{tikzpicture}

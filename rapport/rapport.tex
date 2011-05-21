@@ -1,16 +1,24 @@
 \documentclass[twocolumn]{article}
 
 \usepackage[francais]{babel}
-\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{tikz}
-\usepackage[adobe-utopia]{mathdesign}
+\usepackage{fontspec}
+\usepackage{xunicode}
+\usepackage{xltxtra}
+
+\setmainfont[Mapping=tex-text,
+  BoldFont={OptimaLTStd-DemiBold},
+  BoldFeatures={Color=882211}
+]{Optima LT Std}
+\setmonofont[Mapping=tex-text, Scale=MatchLowercase]{Inconsolata}
+\newfontface\titlefont[Mapping=tex-text]{OptimaLTStd-Bold}
 
 \usetikzlibrary{fit}
 \tikzset{axe/.style=very thick,->,}
 
-\newcommand{\deriv}{\partial \!\!}
+\newcommand{\deriv}{\partial \!}
 
 \title{TITRE}
 \author{Merwan Achibet}

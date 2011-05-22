@@ -1,12 +1,28 @@
 \section{Le moteur physique}
 
-\subsection{Structure générale}
+\subsection{Ordre des tâches}
 
-\subsection{Examples}
+\subsection{Démonstrations}
 
 \subsection{Limitations et perspectives d'évolution}
 
 \subsubsection{Tunneling}
 
+Le fait que ce moteur physique soit une simulation discrète nécessite une attention particulière afin d'éviter les situations imprécises menant à des résultats différents de ce à quoi on pourrait s'attendre. Comme vu plus tôt, une phase de recherche dichotomique est par exemple nécessaire pour recaler les corps à leur position réelle de contact lorsqu'une collision est détectée.
+
+Néanmoins, une éventualité n'a pas été envisagée : que se passerait-il si un objet en traversait entièrement un autre pendant un pas de temps ? On peut imaginer un objet $A$ lancé vers un autre objet $B$ fixe. \`A l'instant $t$, $A$ n'entre pas en collision avec $B$ mais se dirige dans sa direction. \`A l'instant $t+1$, $A$ a entièrement traversé $B$. \'A aucun de ces deux instants une collision n'a été détectée et pourtant $A$ est impunément passé à travers $B$ sans qu'aucun recalage n'ai été exécuté. Le pas de temps utilisé pour réguler l'intégration du système était donc trop faible pour s'assurer des collisions entre corps évoluant à haute vitesse. \`A l'heure de l'écriture de ce rapport, le moteur physique est sensible à ce genre de situation. Réellement, ce cas ne se produit jamais, puisque les simulations développées représentent des situations du terrestre qui font participer des forces d'opposition telles que le frottement de l'air et donc les corps n'atteignent jamais de vitesses démesurées. On souhaite tout de même disposer d'un moteur physique solide et versatile, évaluons les possibilités qui s'offrent à nous pour pallier ce problème.
+
+DESSIN
+
+On pourrait envisager diminuer la durée du pas de temps d'intégration afin de diminuer l'effet de tunneling, mais même si un pas de temps petit améliore la qualité des résultats, il ne pourra pas être indéfiniment réduit. Il est tout d'abord limité par le temps de calcul d'une mise à jour du système, puisqu'à partir du moment o\`u $\deriv t$ est inférieur au temps nécessaire à une machine pour calculer une mise à jour, le programme perdra son statut d'application temps réel.
+
+Une technique usuellement admise est le lancer des rayons (raycasting) entre les points de la position de départ du solide et les points de sa position d'arrivée. De cette façon si un rayon touche un autre corps, on sait qu'une collision aurait dûe être détectée et on peut revenir en arrière. Cette méthode présente pourtant une faiblesse de taille, le résultat de cette recherche dépend directement de la concentration de rayons. Peu de rayons risquent de ne pas toucher les corps de petite taille et donc de les laisser passer tandis qu'une concentration élevée de rayons serait regrettable en terme de coûts de calcul. 
+
+DESSIN
+
+La technique du ??? permet de ne laisser passer aucun phénomène de tunneling. L'idée est la suivante : soit deux corps $A$ et $B$ dont l'on veut détecter l'éventuelle collision. On construit deux volumes fantômes englobant tous les points par lesquels respectivement $A$ et $B$ sont passés. Ces volumes n'interviendront pas dans les collisions des autres objets de la simulation, et on vérifie simplement s'ils rentrent tous deux en collision. Si tel est le cas, alors on sait qu'il est possible qu'un tunneling se soit produit et donc on revient en arrière pour vérifier si tel est le cas. L'un des avantages majeurs de cette méthode, en plus du fait qu'elle ne rate aucun tunneling, est sa simplicité de mise en place puisque toutes les routines utilisées (détection de collision entre volumes retour en arrière) ont déjà été écrites et entrent en jeu dans le fonctionnement de base du moteur physique.
+
 \subsubsection{Partitionnement de l'espace}
+
+
 

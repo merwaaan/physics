@@ -1,10 +1,10 @@
 \begin{tikzpicture}[scale=0.7,transform shape]
-  
-  \node (A) at (9,2) {A};
-  \node (B) at (4,1) {B};
-  \node (C) at (1,4) {C};
-  \node (D) at (2,7) {D};
-  \node (E) at (7,7) {E};
+  \coordinate (A) at (9,2);
+  \coordinate (B) at (4,1);
+  \coordinate (C) at (1,4);
+  \coordinate (D) at (2,7);
+  \coordinate (E) at (7,7);
+  \coordinate (O) at (0,0);
 
   \path[draw=black] (A) -- (B) -- (C) -- (D) -- (E) -- cycle;
 

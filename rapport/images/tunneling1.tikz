@@ -1,0 +1,10 @@
+\begin{tikzpicture}[scale=0.7, transform shape]
+  \coordinate (AT1) at (4,4);
+  \coordinate (AT2) at (10,2);
+  \coordinate (B) at (7,3);
+
+  \draw[style=dashed] (AT1) circle (1cm);
+  \draw (AT2) circle (1cm);
+  \draw (B) circle (1cm);
+
+\end{tikzpicture}

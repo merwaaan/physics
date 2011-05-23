@@ -1,8 +1,8 @@
 all:
-	pdflatex rapport
+	xelatex rapport
 	bibtex rapport
-	pdflatex rapport
-	pdflatex rapport
+	xelatex rapport
+	xelatex rapport
 
 clean:
 	rm *~

@@ -1,17 +1,17 @@
 \documentclass[twocolumn]{article}
 
 \usepackage[francais]{babel}
-\usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{tikz}
+
 \usepackage{subfigure}
 \usepackage[adobe-utopia]{mathdesign}
 
-\usetikzlibrary{fit}
+\usetikzlibrary{fit,through}
 \tikzset{axe/.style=very thick,->,}
 
-\newcommand{\deriv}{\partial \!\!}
+\newcommand{\deriv}{\partial \!}
 
 \title{TITRE}
 \author{Merwan Achibet}
@@ -20,10 +20,12 @@
 \begin{document}
 
 \maketitle
+\tableofcontents
 
 \input{intro}
 \input{dynamique}
 \input{collision}
+\input{moteur}
 \input{annexes}
 
 \bibliographystyle{apalike}

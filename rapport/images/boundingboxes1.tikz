@@ -3,6 +3,7 @@
 
   \coordinate (R) at (7,3);
   \node[rectangle,rotate=-30,minimum height=3cm, minimum width=2cm,inner sep=0pt,draw=black] (rect) at (R) {};
+
   \coordinate (C) at (2,7);
   \node[circle,minimum size=2cm,inner sep=0pt,draw=black] (cerc) at (C) {};
 

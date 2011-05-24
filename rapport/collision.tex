@@ -17,18 +17,19 @@ Une collision fait entrer en jeu deux corps rigides dont l'intégrité
 physique a été corrompue, autrement dit : les corps rentrent l'un dans
 l'autre. Nous allons définir un traitement à appliquer à deux objets
 pour savoir si tel est le cas et de façon certaine. Néanmoins, bien
-que nous utilisions un algorithme ayant fait ses preuves dans le
-domaine, il faut garder à l'esprit que ce test sera éxécuté à chaque
-intégration de la simulation et ce, pour chaque paire de corps. Dans
-de telles circonstances, l'usage d'un algorithme a priori rapide peut
-se révéler désastreux au niveau des performances.
+que l'algorithme que nous allons fait ses preuves ait fait ses preuves
+dans le domaine des simulations physique, il faut garder à l'esprit
+que ce test sera éxécuté à chaque intégration de la simulation et ce,
+pour chaque paire de corps. Dans de telles circonstances, l'usage d'un
+algorithme a priori rapide peut se révéler désastreux au niveau des
+performances.
 
 Nous faisons donc le choix de séparer la détection de collision en
 deux étapes : une détection grossière et une détection fine. La
-détection grossière est un algorithme approximatif qui informe de la
-possibilité d'une collision, si le résultat est positif alors on
-exécute la détection fine (mais plus coûteuse) pour confirmer ou
-infirmer le contact de façon certaine.
+détection grossière fera usage d'un algorithme approximatif qui
+informe de la possibilité d'une collision, si le résultat est positif
+alors on exécute la détection fine (mais plus coûteuse) pour confirmer
+ou infirmer le contact de façon certaine.
 
 \subsubsection{Détection grossière}
 
@@ -44,63 +45,129 @@ On se base sur l'utilisation de boîtes englobantes, ou AABB
 d'un contact. Les boîtes englobantes sont des volumes alignés avec les
 axes du repère global et contenant tous les points d'un corps. Pour
 savoir si deux corps rentrent possiblement en collision, on vérifie si
-leurs boîtes englobantes entrent en collision. Ce test est très rapide
-puisque que l'on peut tirer parti du fait que les boîtes sont alignées
-avec le repère absolu \cite{ericson05}.
+leurs boîtes englobantes entrent en collision.
 
-ALGORITHME ?
+La construction d'une boîte englobante revient à enregistrer les deux
+points les plus extrêmes d'un corps (dans le sens négatif et dans le
+sens positif) et ce pour tous les axes de l'environnement de la simulation.
+
+\begin{verbatim}
+construire_boite_englobante :
+  boite.min = [ ]
+  boite.max = [ ]
+
+  Pour tous les points du corps
+    Pour tous les axes
+      Si point[axe] < boite.min[axe]
+        boite.min[axe] = point[axe]
+      Si point[axe] > boite.max[axe]
+        boite.max[axe] = point[axe]
+\end{verbatim}
+
+Le test vérifiant la collision entre deux boîtes englobantes est très
+rapide puisque qu'il tire parti du fait que les boîtes sont alignées
+avec le repère absolu et qu'on peut pour vérifier que deux AABB son en
+état d'interpénétration il suffit de vérifier qu'elles ne sont pas
+séparées sur tous les axes \cite{ericson05}.
+
+\begin{verbatim}
+detection_collision_grossiere :
+  Si b1.min[x] > b2.max[x] ou
+     b1.max[x] < b2.min[x] ou
+     b1.min[y] > b2.max[x] ou
+     b1.max[y] < b2.min[x] ou
+     b1.min[z] > b2.max[z] ou
+     b1.max[z] < b2.min[z]
+       retourner faux
+
+  retourner vrai
+\end{verbatim}
 
 \begin{figure}
-  \subfigure{ \input{images/boundingboxes1.tikz} } \subfigure{
-    \input{images/boundingboxes1.tikz} } \subfigure{
-    \input{images/boundingboxes1.tikz} }
+  \subfigure{ \input{images/boundingboxes1.tikz} }
+  \subfigure{ \input{images/boundingboxes2.tikz} }
+  \subfigure{ \input{images/boundingboxes3.tikz} }
 \end{figure}
-
-DESSIN 2 : boites en contact mais pas corps
-
-DESSIN 3 : corps en contact
 
 \subsubsection{Détection fine}
 
-La phase de détection fine (\textit{narrow-phase collision}) est moins
-rapide mais détermine de façon certaine si deux corps sont en
+La phase de détection fine (\textit{narrow-phase collision}) est plus
+coûteuse mais détermine de façon certaine si deux corps sont en
 collision.
 
-Nous allons employer la différence de Minkowski, une opération
-mathématique notée $A \ominus B = \{a - b \mid a \in A, b \in B\}$
-avec $A$ et $B$ deux corps. La différence de Minkowski a comme
-propriété intéressante que sa distance par rapport à l'origine
-correspond à la distance minimum entre les deux corps qu'elle
-représente. En cas de collision entre les corps, l'origine est donc
-contenue dans la différence de Minkowski.
-
-DESSIN : différence de Minkowski entre deux figures simples (montrer
-que distance min = distance M vers origine)
-
-Une fois la différence de Minkowski calculée, il nous faut déterminer
-sa distance par rapport à l'origine afin de pouvoir retourner un
-résultat. Si cette distance est supérieure à zéro, alors aucune
-inter-pénétration n'a lieu, sinon une collision est détectée. On
-utilise pour cela l'algorithme de distance de Gilbert-Johnson-Keerthi,
-communément appelé GJK.
-
-L'algorithme GJK est chargé de calculer la plus faible distance entre
-un ensemble de points et un autre point précis. On va ici l'appliquer
-pour déterminer la distance entre la différence de Minkowski et
-l'origine du repère absolu. GJK se base sur l'utilisation de simplex
-blabla
+Introduisons en premier lieu la somme de Minkowski, une opération
+mathématique notée $A \oplus B = \{a + b \mid a \in A, b \in B\}$ avec
+$A$ et $B$ deux corps. On peut résumer la somme de Minkowski en un
+balayage de chaque corps impliqué dans cette opération par l'autre.
 
 \begin{figure}
-  %\input{images/minkowski.tikz}
-  \caption{La somme de Minkowski d'un cercle et d'un carré}
+  \input{images/minkowskisum.tikz}
+  \caption{Somme de Minkowski entre un rectangle et un cercle}
 \end{figure}
 
-points de supports blabla
+Nous utilisons une variante de cette opération : la différence de
+Minkowski, notée $A \ominus B = A \oplus (-B)$. La propriété de cette
+opération qui nous intéresse le plus est le fait que la plus petite
+distance entre les points qui la forment et l'origine du repère absolu
+est égale à la plus petite distance entre les corps $A$ et $B$. Nous
+pouvons exploiter cette caractéristique pour déterminer si deux corps
+entrent en collision. En effet, si la distance minimum entre les deux
+corps est supérieure à zéro, alors aucune collision ne peut
+possiblement exister. Si au contraire, la distance minimum est
+inférieure à zéro, alors les deux objets sont état d'interpénétration.
+
+Le processus de détection fine passera donc par le calcul de la
+différence de Minkowski $M$ entre deux corps. Une fois $M$ calculée,
+il reste encore à calculer la distance séparant $M$ et l'origine du
+repère absolu. Dans cette optique, on utilise l'algorithme GJK, ou
+\textit{Gilbert-Johnson-Keerthi algorithm}. De façon générale, cet
+algorithme est capable de calculer efficacement la plus petite
+distance entre la coque formée par un nuage de points et un point
+précis de l'espace. Dans le cadre de notre problématique, le nuage de
+points correspond aux vertex de $M$ et le point cible correspond à
+l'origine du repère absolu.
+
+GJK se base sur l'utilisation de simplex. Un simplex d'un corps est
+une structure géométrique entièrement contenue dans ce dernier et
+étant caractérisée par une dimension. Un simplex de dimension 0 est un
+point, un simplex de dimension 1 est une ligne, une simplex de
+dimension 2 est un triangle et un simplex de dimension 3 est un
+tétrahèdre. Un corps de dimension $d$ peut contenir un simplex de
+dimension $d$ au maximum. Le principe de GJK est de partir d'un
+simplex de base choisi alétoirement (souvent un point, donc un simplex
+de dimension 0) et d'augmenter sa dimension pour se rapprocher
+progressivement du point de la figure le plus proche du point
+cible. \`A la fin de cette procédure, on a determiné, le point de $M$
+le plus proche de l'origine, et une simple soustraction vectorielle
+permet de calculer leur distance.
 
 \begin{figure}
   \input{images/gjk.tikz}
   \caption{{\'E}tapes de l'algorithme GJK}
+  \label{gjk}
 \end{figure}
+
+La figure \ref{gjk} illustre la succession d'étapes qui amène à la
+détermination du point le plus proche de l'origine $O$
+
+\begin{itemize}
+\item Le point $A$ est choisi aléatoirement pour faire office de
+  simplex de base. Le point actuellement le plus proche de l'origine
+  est naturellement $A$.
+\item On cherche le point de la figure le plus extrême dans la
+  direction du point actuellement le plus proche ($A$) à
+  l'origine. C'est le point $C$. On l'ajoute au simplex.
+\item On détermine le point du simplex le plus proche de l'origine
+  ($p_1$) et on calcule quel est le point de la figure le plus extrême
+  dans la direction de ce point à l'origine. C'est le point $B$.
+\item Le simplex a atteint une dimension de 2 mais le point $A$ n'est
+  plus utile à la définition du point actuellement le plus proche. On
+  le retire du simplex.
+\item On cherche le point du simplex le plus proche de l'origine et on
+  détermine quel est le point de la figure le plus extrême dans sa
+  direction vers l'origine. Aucun n'est plus extrême que le point
+  actuellement le plus proche, on peut donc arrêter la recherche.
+\end{itemize}
 
 \subsection{Correction d'une collision}
 

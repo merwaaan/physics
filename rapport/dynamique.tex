@@ -263,13 +263,13 @@ la quantité d'élan angulaire transmis par une force dépend de son
 point d'application; plus précisément de son excentricité par rapport
 au centre de masse. Imaginons une boîte cubique flottant en état
 d'apesanteur. Si l'on exerce une légère poussée sur le milieu d'une de
-ses faces alors la boîte subira une translation. Par contre, si l'on
-applique une pression toujours dans la même direction mais cette fois
-sur l'un des coins de la boîte, la même translation sera accompagné
-d'une rotation autour du centre de masse. On quantifie cette effet
-rotatif par le couple $\tau$, qui dépend de la position $\vec C$ du
-centre de masse et de la position $\vec x$ du point d'application de
-la force.
+ses faces alors la boîte subira une translation. Si l'on applique
+maintenant une pression toujours dans la même direction mais cette
+fois sur l'un des coins de la boîte, la même translation sera
+accompagné d'une rotation autour du centre de masse. On quantifie
+cette effet rotatif par le couple $\tau$, qui dépend de la position
+$\vec C$ du centre de masse et de la position $\vec x$ du point
+d'application de la force.
 
 \begin{align}
   \tau = (\vec{x} - \vec{C}) \times \vec{F}
@@ -293,7 +293,8 @@ dernier. Pour le calculer on doit effectuer des calculs d'intégration
 par rapport au volume du corps considéré. Les tenseurs d'inertie des
 volumes usuels sont souvent donnés dans les manuel de physique.
 
-Le tenseur d'inertie instantané est
+Le tenseur d'inertie instantanée est le pendant local du torseur
+d'inertie. blabla
 
 \begin{align*}
   I(t) = R(t) I R(t)^T
@@ -305,6 +306,8 @@ Le tenseur d'inertie instantané est
   I(t) = R(t) I R(t)^T \\ \vec{w}_{n+1} = \frac{\vec{A}}{I(t)} \\ R =
   \vec{w} R \deriv t
 \end{align*}
+
+\subsubsection{Correction de l'intégration}
 
 Notre processus d'intégration est désormais complet et nous pouvons
 simuler les réactions de corps soumis à des forces externes. Il reste
@@ -323,11 +326,11 @@ dessiner, et à cause de cette erreur de précision les solides déssinés
 sont déformés.
 
 Afin de contrer cet effet indésirable, on ajoutera deux étapes
-supplémentaires à la fin de chaque intégration/ Premièrement, il nous
+supplémentaires à la fin de chaque intégration. Premièrement, il nous
 faudra normaliser les axes du repère local. Chaque axe correspondand à
 un vecteur colonne de la matrice d'orientation, il faudra les extraire
-un par un et les transformer pour s'assurer de leur normalité. En
-second lieu, il sera nécessaire de réorthogonaliser le repère local,
-autrement dit s'assurer que ses axes restent orthognaux entre
-eux. Pour cela, il faut orthogonaliser la matrice de rotation par
-l'algorithme de Gram-Schmidt blabla
+un par un et recalculer leur magnitude pour s'assurer de leur
+normalité. En second lieu, il sera nécessaire de réorthogonaliser le
+repère local, autrement dit s'assurer que ses axes restent orthognaux
+entre eux. Pour cela, on orthogonalisera la matrice de rotation
+par l'algorithme de Gram-Schmidt. blabla

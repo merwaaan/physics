@@ -84,9 +84,12 @@ detection_collision_grossiere :
 \end{verbatim}
 
 \begin{figure}
-  \subfigure{ \input{images/boundingboxes1.tikz} }
-  \subfigure{ \input{images/boundingboxes2.tikz} }
-  \subfigure{ \input{images/boundingboxes3.tikz} }
+  \centering
+  \subfloat[]{ \input{images/boundingboxes1.tikz} }
+  \qquad
+  \subfloat[]{ \input{images/boundingboxes2.tikz} }
+  \qquad
+  \subfloat[]{ \input{images/boundingboxes3.tikz} }
 \end{figure}
 
 \subsubsection{Détection fine}
@@ -142,7 +145,17 @@ le plus proche de l'origine, et une simple soustraction vectorielle
 permet de calculer leur distance.
 
 \begin{figure}
-  \input{images/gjk.tikz}
+  \centering
+
+  \subfloat[]{ \input{images/gjk1a.tikz} }
+  \subfloat[]{ \input{images/gjk1b.tikz} }
+  \qquad
+  \subfloat[]{ \input{images/gjk2a.tikz} }
+  \subfloat[]{ \input{images/gjk2b.tikz} }
+  \qquad
+  \subfloat[]{ \input{images/gjk3a.tikz} }
+  \subfloat[]{ \input{images/gjk3b.tikz} }
+
   \caption{{\'E}tapes de l'algorithme GJK}
   \label{gjk}
 \end{figure}

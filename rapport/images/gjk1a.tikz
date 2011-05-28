@@ -1,6 +1,7 @@
 \begin{tikzpicture}[scale=0.7,transform shape]
 	\input{images/gjk_base.tikz}
 
-	\node[gjknode,fill=red] (a) at (A) {};
-  
+	\node[gjknode] (a) at (A) {};
+
+  \path[gjkdir,] (a) -- (O);
 \end{tikzpicture}

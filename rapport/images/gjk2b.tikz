@@ -1,10 +1,10 @@
 \begin{tikzpicture}[scale=0.7,transform shape]
 	\input{images/gjk_base.tikz}
 
-	\node[draw=red, circle] (a) at (A) {};
-	\node[draw=red, circle] (c) at (C) {};
-	\node[draw=red, circle] (b) at (B) {};
+	\node[gjknode] (a) at (A) {};
+	\node[gjknode] (c) at (C) {};
+	\node[gjknode] (b) at (B) {};
 
-	\path[draw=green] (a) -- (c) -- (b) -- cycle;
+	\path[gjkpath] (a) -- (c) -- (b) -- (a);
   
 \end{tikzpicture}

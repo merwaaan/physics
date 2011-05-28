@@ -5,5 +5,5 @@
 \coordinate (E) at (7,7);
 \coordinate (O) at (2,2);
 
-\node[origin,draw=black] (origin) at (O) {};
+\node[origine] (origin) at (O) {};
 \path[draw=black] (A) -- (B) -- (C) -- (D) -- (E) -- cycle;

@@ -3,15 +3,37 @@
 \usepackage[francais]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
+\usepackage{color}
 \usepackage{tikz}
 \usepackage{subfig}
 \usepackage[adobe-utopia]{mathdesign}
 
+% Colors from famfamfam.com
+\definecolor{vert}{HTML}{C1FF2D}
+\definecolor{bleu}{HTML}{0BCEFF}
+\definecolor{rose}{HTML}{FF0B5B}
+\definecolor{gris}{gray}{0.7}
+
 \usetikzlibrary{shapes,fit,through}
-\tikzset{axe/.style=thin,->}
-\tikzset{fig/.style=thick}
-\tikzset{origin/.style=cross out}
-\tikzset{gjknode/.style=circle}
+\tikzset{axe/.style={
+    ->,
+    thin}}
+\tikzset{fig/.style={
+    thick}}
+\tikzset{origine/.style={
+    draw=black,
+    cross out}}
+\tikzset{gjknode/.style={
+    fill=rose,
+    circle}}
+\tikzset{gjkpath/.style={
+    draw=bleu,
+    thick}}
+\tikzset{gjkdir/.style={
+    ->,
+    draw=vert,
+    very thick,
+    dashed}}
 
 \newcommand{\deriv}{\partial \!}
 

@@ -2,21 +2,28 @@
   \input{images/repere.tikz}
 
   \coordinate (R) at (5,4);
-  \node[rectangle,rotate=-30,minimum height=3cm, minimum width=2cm,inner sep=0pt,draw=black] (rect) at (R) {};
+  \node[fig,
+    rectangle,
+    rotate=-30,
+    minimum height=3cm,
+    minimum width=2cm,
+    draw=black] (rect) at (R) {};
 
   \coordinate (C) at (3,6);
-  \node[circle,minimum size=2cm,inner sep=0pt,draw=black] (cerc) at (C) {};
+  \node[fig,
+    circle,
+    minimum size=2cm,
+    inner sep=0pt,
+    draw=black] (cerc) at (C) {};
 
-  \begin{scope}[rotate around={-30:(C)}]
-    \path (R) node () {}
-          ++(-1,-1.5) node (a) {}
-          ++(2,0) node (b) {}
-          ++(0,3) node (c) {}
-          ++(-2,0) node (d) {};
-   \end{scope}
-
-  % bounding boxes
-  \node[fit=(a) (b) (c) (d),draw=green,dashed] {};
-  \node[fit=(cerc),draw=green,dashed] {};
+  \node[
+    fit=(rect.north west) (rect.north east) (rect.south east) (rect.south west),
+    draw=green,
+    dashed,
+    inner sep=0] {};
+  \node[fit=(cerc),
+    draw=green,
+    dashed,
+    inner sep=0] {};
 
 \end{tikzpicture}

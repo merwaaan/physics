@@ -1,9 +1,8 @@
 \coordinate (A) at (9,2);
 \coordinate (B) at (4,1);
 \coordinate (C) at (1,4);
-\coordinate (D) at (2,7);
-\coordinate (E) at (7,7);
+\coordinate (D) at (7,5);
 \coordinate (O) at (2,2);
 
 \node[origine] (origin) at (O) {};
-\path[draw=black] (A) -- (B) -- (C) -- (D) -- (E) -- cycle;
+\path[draw=black] (A) -- (B) -- (C) -- (D) -- cycle;

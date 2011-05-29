@@ -1,0 +1,26 @@
+% Figures
+\node[fig,
+  rectangle,
+  rotate=-30,
+  minimum height=4cm,
+  minimum width=3cm,
+  draw=black] (rect) at (R) {};
+
+\node[fig,
+  circle,
+  minimum size=3cm,
+  inner sep=0pt,
+  draw=black] (cerc) at (C) {};
+
+% Bounding boxes
+\node[
+  fit=(rect.north west) (rect.north east) (rect.south east) (rect.south west),
+  draw=bleu,
+  dashed,
+  very thick,
+  inner sep=0] {};
+\node[fit=(cerc),
+  draw=bleu,
+  dashed,
+  very thick,
+  inner sep=0] {};

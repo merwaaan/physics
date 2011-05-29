@@ -14,7 +14,7 @@
 \definecolor{rose}{HTML}{FF0B5B}
 \definecolor{gris}{gray}{0.7}
 
-\usetikzlibrary{shapes,fit,through}
+\usetikzlibrary{shapes,fit,calc}
 \tikzset{axe/.style={
     ->,
     thin}}
@@ -26,14 +26,17 @@
 \tikzset{gjknode/.style={
     fill=rose,
     circle}}
-\tikzset{gjkpath/.style={
-    draw=bleu,
+\tikzset{gjkedge/.style={
+    draw=rose,
     thick}}
 \tikzset{gjkdir/.style={
     ->,
-    draw=vert,
+    draw=bleu,
     very thick,
     dashed}}
+\tikzset{rayon/.style={
+    ->,
+    draw=red}}
 
 \newcommand{\deriv}{\partial \!}
 

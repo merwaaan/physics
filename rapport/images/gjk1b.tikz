@@ -4,5 +4,5 @@
 	\node[gjknode] (a) at (A) {};
 	\node[gjknode] (c) at (C) {};
   
-  \path[gjkpath] (a) -- (c);
+  \path[gjkedge] (a) -- (c);
 \end{tikzpicture}

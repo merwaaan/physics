@@ -1,0 +1,12 @@
+\begin{tikzpicture}[scale=0.7, transform shape]
+  \input{images/tunneling_base.tikz}
+
+  \coordinate (a1n) at ($(a1.north)+(0,0.2)$);
+  \coordinate (a2s) at ($(a2.south)+(0,-0.2)$);
+
+  \draw (a1n) arc (90:270:1.2cm) --
+  (a2s) arc (-90:90:1.2cm) --
+  (a1n);
+
+  \draw (B) circle (0.7cm);
+\end{tikzpicture}

@@ -40,37 +40,45 @@ sera toujours positif, néanmoins il est possible que le résultat soit
 positif sans qu'il y ait de collision réelle. Dans ce dernier cas, la
 détection fine invalidera la collision.
 
-On se base sur l'utilisation de boîtes englobantes, ou AABB
+On se base sur l'utilisation de boîtes englobantes, ou \textit{AABB}
 (\textit{axis-aligned bounding-boxes}), pour détecter l'éventualité
 d'un contact. Les boîtes englobantes sont des volumes alignés avec les
-axes du repère global et contenant tous les points d'un corps. Pour
+axes du repère global qui contiennent tous les points d'un corps. Pour
 savoir si deux corps rentrent possiblement en collision, on vérifie si
 leurs boîtes englobantes entrent en collision.
 
-La construction d'une boîte englobante revient à enregistrer les deux
-points les plus extrêmes d'un corps (dans le sens négatif et dans le
-sens positif) et ce pour tous les axes de l'environnement de la simulation.
+Le processus de construction d'une boîte englobante est simple : on
+enregistre pour chaque axe les deux points du corps qui sont les plus
+éloignés dans les direction positives et négatives.
 
 \begin{verbatim}
-construire_boite_englobante :
-  boite.min = [ ]
-  boite.max = [ ]
+entrée : le corps C
+sortie : la boîte englobant C
 
-  Pour tous les points du corps
-    Pour tous les axes
-      Si point[axe] < boite.min[axe]
-        boite.min[axe] = point[axe]
-      Si point[axe] > boite.max[axe]
-        boite.max[axe] = point[axe]
+boite_englobante :
+  boite.min = [_, _, _]
+  boite.max = [_, _, _]
+
+  Pour tous les axes
+    Pour tous les points P de C
+      Si P[axe] < boite.min[axe]
+        boite.min[axe] = P[axe]
+      Si P[axe] > boite.max[axe]
+        boite.max[axe] = P[axe]
+
+  retourner boite
 \end{verbatim}
 
 Le test vérifiant la collision entre deux boîtes englobantes est très
 rapide puisque qu'il tire parti du fait que les boîtes sont alignées
-avec le repère absolu et qu'on peut pour vérifier que deux AABB son en
-état d'interpénétration il suffit de vérifier qu'elles ne sont pas
-séparées sur tous les axes \cite{ericson05}.
+avec le repère absolu et que pour vérifier que deux AABB sont en état
+d'interpénétration, il suffit de vérifier qu'elles ne sont séparées
+sur aucun axe \cite{ericson05} [détails: SAT].
 
 \begin{verbatim}
+entrée : deux boîtes englobantes b1 et b2
+sortie : booléen
+
 detection_collision_grossiere :
   Si b1.min[x] > b2.max[x] ou
      b1.max[x] < b2.min[x] ou
@@ -82,6 +90,17 @@ detection_collision_grossiere :
 
   retourner vrai
 \end{verbatim}
+
+La figure \ref{aabb} illustre les trois situation possibles impliquant
+deux corps. Sur la sous figure $a$, les boîtes ne rentrent pas en
+collision (elle sont séparées sur l'axe abscisses), et il est donc
+impossible que les corps qu'elles contiennent soient eux-mêmes en état
+de collision. La sous-figure $b$ montre que si les entrent l'une dans
+l'autre, il n'en est pas forcément de même pour les corps. Dans ce
+cas, la détection grossière est validée et c'est l'algorithme de
+détection fine qui réfutera la collision. La sous-figure $c$ illustre
+un troisième cas de figure dans lequel les boîtes entrent en collision
+et les corps aussi.
 
 \begin{figure}
   \centering

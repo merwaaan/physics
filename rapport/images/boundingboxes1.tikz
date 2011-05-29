@@ -2,28 +2,7 @@
   \input{images/repere.tikz}
 
   \coordinate (R) at (7,3);
-  \node[fig,
-    rectangle,
-    rotate=-30,
-    minimum height=3cm,
-    minimum width=2cm,
-    draw=black] (rect) at (R) {};
-
   \coordinate (C) at (2,7);
-  \node[fig,
-    circle,
-    minimum size=2cm,
-    inner sep=0pt,
-    draw=black] (cerc) at (C) {};
 
-  \node[
-    fit=(rect.north west) (rect.north east) (rect.south east) (rect.south west),
-    draw=green,
-    dashed,
-    inner sep=0] {};
-  \node[fit=(cerc),
-    draw=green,
-    dashed,
-    inner sep=0] {};
-
+  \input{images/boundingboxes_base.tikz}
 \end{tikzpicture}

@@ -1,0 +1,19 @@
+\coordinate (AT1) at (0,0);
+\coordinate (AT2) at (8,0);
+\coordinate (B) at (4,0);
+
+\draw node[fig,
+  circle,
+  minimum size=2cm,
+  draw=blue,
+  dashed] (a1) at (AT1) {};
+
+\node[fig,
+  circle,
+  minimum size=2cm,
+  draw=blue] (a2) at (AT2) {};
+
+\node[fig,
+  circle,
+  minimum size=1cm,
+  draw=rose] (b) at (B) {};

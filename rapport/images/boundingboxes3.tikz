@@ -1,4 +1,4 @@
-\begin{tikzpicture}[scale=0.7, transform shape]
+\begin{tikzpicture}[scale=0.5, transform shape]
   \input{images/repere.tikz}
 
   \coordinate (R) at (5.5,4);

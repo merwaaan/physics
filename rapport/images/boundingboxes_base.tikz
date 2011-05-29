@@ -18,9 +18,26 @@
   draw=bleu,
   dashed,
   very thick,
-  inner sep=0] {};
+  inner sep=0] (bbrect) {};
 \node[fit=(cerc),
   draw=bleu,
   dashed,
   very thick,
-  inner sep=0] {};
+  inner sep=0] (bbcerc) {};
+
+% Separation axis
+\draw[sat] let \p1=(bbrect.north) in 
+  let \p2=(bbrect.south) in
+    (-1,\y1) -- (-1,\y2);
+
+\draw[sat] let \p1=(bbcerc.north) in 
+  let \p2=(bbcerc.south) in
+    (-0.5,\y1) -- (-0.5,\y2);
+
+\draw[sat] let \p1=(bbrect.west) in 
+  let \p2=(bbrect.east) in
+    (\x1,-1) -- (\x2,-1);
+
+\draw[sat] let \p1=(bbcerc.west) in 
+  let \p2=(bbcerc.east) in
+    (\x1,-0.5) -- (\x2,-0.5);

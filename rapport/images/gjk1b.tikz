@@ -5,4 +5,6 @@
 	\node[gjknode] (c) at (C) {};
   
   \path[gjkedge] (a) -- (c);
+
+  \node[gjkclosest] (closest) at ($(A)!(O)!(C)$) {};
 \end{tikzpicture}

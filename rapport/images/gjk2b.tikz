@@ -7,4 +7,6 @@
 
 	\draw[gjkedge] (a) -- (c) -- (b) -- (a);
   \fill[rose,opacity=0.1] (A) -- (C) -- (B);
+
+  \node[gjkclosest] (closest) at ($(C)!(O)!(B)$) {};
 \end{tikzpicture}

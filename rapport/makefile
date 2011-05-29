@@ -5,7 +5,6 @@ all:
 	xelatex rapport
 
 clean:
-	rm *~
 	rm *.log
 	rm *.aux
 	rm *.blg

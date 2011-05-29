@@ -4,6 +4,8 @@
 	\node[gjknode] (c) at (C) {};
 	\node[gjknode] (b) at (B) {};
 
-	\path[gjkedge] (c) -- (b);
-  
+	\draw[gjkedge] (c) -- (b);
+
+  \draw[gjkdir] ($(C)!(O)!(B)$) -- (O);
+  \node[gjkclosest] (closest) at ($(C)!(O)!(B)$) {};
 \end{tikzpicture}

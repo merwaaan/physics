@@ -3,5 +3,5 @@
 
 	\node[gjknode] (a) at (A) {};
 
-  \path[gjkdir,] (a) -- (O);
+  \draw[gjkdir] (a) -- (O);
 \end{tikzpicture}

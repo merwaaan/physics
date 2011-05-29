@@ -1,9 +1,5 @@
 \begin{tikzpicture}[scale=0.4,transform shape]
 	\input{images/gjk_base.tikz}
 
-	\node[gjknode] (c) at (C) {};
-	\node[gjknode] (b) at (B) {};
-
-	\path[gjkedge] (c) -- (b);
-  
+  \node[gjkclosest] (closest) at ($(C)!(O)!(B)$) {};  
 \end{tikzpicture}

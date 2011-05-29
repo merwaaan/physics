@@ -1,6 +1,6 @@
 \documentclass[twocolumn]{article}
 
-\usepackage[francais]{babel}
+%\usepackage[francais]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{color}
@@ -15,6 +15,12 @@
 \definecolor{gris}{gray}{0.7}
 
 \usetikzlibrary{shapes,fit,calc}
+
+\tikzset{line/.style={
+    shorten >= -#1,
+    shorten <= -#1}}
+\tikzset{halfline/.style={
+    shorten >= -#1}}
 \tikzset{axe/.style={
     ->,
     thin}}
@@ -32,10 +38,13 @@
     draw=rose,
     thick}}
 \tikzset{gjkdir/.style={
-    ->,
-    draw=bleu,
+    halfline=0.5cm,
+    draw=gris,
     very thick,
     dashed}}
+\tikzset{gjkclosest/.style={
+    circle,
+    fill=bleu}}
 \tikzset{rayon/.style={
     ->,
     draw=red}}

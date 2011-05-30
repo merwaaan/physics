@@ -5,24 +5,24 @@
 Invisibles, les phénomènes physiques qui régissent le fonctionnement
 de notre univers sont pourtant omniprésents et universels. \'Etudiées
 depuis des siècles, les lois les décrivant ont été à maintes reprises
-redéfinies et affinnées et il est de nos jours indispensable de
-pouvoir les modéliser de façon fidèle ou tout du moins d'être capable
-de les approximer de façon plausible.
+redéfinies et affinées et il est de nos jours indispensable de pouvoir
+les modéliser de façon fidèle ou tout du moins d'être capable de les
+approximer de façon plausible.
 
 Une simulation industrielle visant par exemple à reproduire
 virtuellement les interactions entre les différentes pièces qui
 composent une automobile doit être capable de reproduire de façon
 réaliste la friction des pneumatiques sur le sol, l'influence de la
 gravité sur le véhicule, le comportement thermique et volumique des
-fluides qu'il contient ainsi que de nombreux autres aspects de son
-fonctionnement. Le système informatique simulant tous ces facteurs est
-appellé moteur physique. Dans cet exemple, les enjeux de sécurité et
-de qualité sont grands et des résultats d'une précision extrême sont
-exigés. Les calculs à mettre en jeu pour les obtenir peuvent donc se
-permettre d'être très coûteux et de se baser sur des modélisations
-mathématiques complexes. Il n'est pas rare que ces processus de
-simulation soient répartis sur plusieurs machines et s'étalent sur une
-durée de calcul de plusieurs heures.
+fluides qu'il contient ainsi que de nombreux autres aspects mécaniques
+de son fonctionnement. Le système informatique simulant tous ces
+facteurs est appellé moteur physique. Dans cet exemple, les enjeux de
+sécurité et de qualité sont grands et des résultats d'une précision
+extrême sont exigés. Les calculs à mettre en jeu pour les obtenir
+peuvent donc se permettre d'être très coûteux et de se baser sur des
+modélisations mathématiques complexes. Il n'est pas rare que ces
+processus de simulation soient répartis sur plusieurs machines et
+s'étalent sur une durée de calcul de plusieurs heures.
 
 A contrario, les moteurs physiques d'autres types de système complexe
 ne peuvent se permettre une telle latence et doivent fonctionner en
@@ -31,13 +31,13 @@ physique doit cohabiter avec d'autres modules gérant différents
 aspects de l'application. On pense notamment aux jeux vidéo, qui
 partagent le temps de calcul alloué entre le moteur graphique, le
 moteur d'intelligence artificielle, la gestion du son, la gestion du
-réseau, et bien sûr le moteur physique. Dans le cadre de ce type
-d'application, auquel on peut greffer la réalité virtuelle et ses
-applications dérivées, la contrainte la plus importante est le temps
-d'éxecution et non la précision des résultats. On ne cherche plus à
-obtenir des données exactes mais une représentation plausible du
-réel. Ainsi, certains raccourcis pourront être tolérés et une part de
-réalisme est sacrifiée au profit de la vitesse.
+réseau, et bien sûr le moteur physique. Dans ce cadre, auquel on peut
+greffer la réalité virtuelle et ses applications dérivées, la
+contrainte la plus importante est le temps d'éxecution et non la
+précision des résultats. On ne cherche plus à obtenir des données
+exactes mais une représentation plausible du réel. Ainsi, certains
+raccourcis pourront être tolérés et une part de réalisme est sacrifiée
+au profit de la vitesse.
 
 La physique est un champ très vaste dont les disciplines vont de
 l'acoustique à l'électronique. Néanmoins, le spectre d'action des
@@ -53,27 +53,28 @@ précision d'une modélisation ne suffit pas à la différenciation entre
 tous les moteurs physiques. Souvent, un moteur physique sera
 spécialisé. Certains simuleront les interactions entre corps rigides
 comme une boîte en plastique tombant sur le sol. Certains simuleront
-le comportement d'objets déformables comme une balle de caoutchouc
-jetée sur un mur. D'autres se concentreront sur les réactions entre
-liquides ou entre gaz.
+le comportement d'objets déformables comme deux véhicules se
+percutant. D'autres se concentreront sur les réactions entre liquides
+ou entre gaz.
 
 \subsection{Travail à accomplir}
 
 L'objectif de ce projet est de concevoir un moteur physique de base
-permettant de gérer les interactions entre corps rigides convexes. On
-parle de corps rigides dans la mesure o\`u les objets mis en jeu
-seront indéformables et incassables. Dans un tel contexte, une tasse
-en porcelaine surmontée d'un bloc de granite d'une tonne ne serait
-aucunement endommagée. On parle de corps convexes car se limiter dans
-un premier temps à ce type de structure autorise certaines facilités
-dans les calculs. Une piste pour étendre la simulation aux solides
-concaves sera présentée dans la dernière partie.
+permettant de gérer les interactions entre des corps rigides et
+convexes. On parle de corps rigides dans la mesure o\`u les objets mis
+en jeu seront indéformables et incassables. Dans un tel contexte, une
+tasse en porcelaine surmontée d'un bloc de granite d'une tonne ne
+serait aucunement endommagée. On parle de corps convexes car se
+limiter dans un premier temps à ce type de structure autorise
+certaines facilités dans les calculs. Une piste pour étendre la
+simulation aux solides concaves sera présentée dans la dernière
+partie.
 
 La contrainte principale de notre application sera le temps. On veut
 concevoir une simulation éxecutable en temps réel de telle façon que
 si l'utilisateur modifie l'environnement de la simulation à un instant
 quelconque, une réaction à cette interaction soit immédiatement
-générée. Certains raccourcis dans les calculs ainsi que plusieurs
+perceptible. Certains raccourcis dans les calculs ainsi que plusieurs
 approximations seront acceptés. Le fonctionnement du moteur se base
 néanmoins sur des lois bien connues de la mécanique de Newton et ses
 résultats ne devront pas s'éloigner de façon demesurée de ceux que
@@ -100,7 +101,7 @@ de Newton.
 
 Cette règle décrit l'accélération $\vec{a}$ d'un corps comme étant le
 produit de l'inverse de sa masse $m$ et de la somme des forces
-$\vec{F}_i$ qui lui sont appliquées. Dans notre exemple, on lache la
+$\vec{F}_i$ qui lui sont appliquées. Dans notre exemple, on lâche la
 balle sans lui donner d'élan initial et la seule influence qu'elle
 subit au cours de sa chute est celle de la gravité. La gravité
 terrestre est une force de $9.81 N$ dirigée vers le noyau de la
@@ -108,21 +109,22 @@ planète mais dans la simulation, on peut la réduire à une force
 dirigée vers le "bas" (dans la direction négative de l'axe $y$). Afin
 de bénéficier d'un moteur physique versatile, la puissance de la
 gravité pourra être modifiée, pour simuler une situation lunaire par
-exemple, ou être totalement annulée, pour simuler une situation en
-apesanteur. En réalité, la gravité ne sera pas codée "en dur" mais
-appartiendra à une liste de forces environnementales qui contiendra
-toutes les influences que le monde extérieur applique aux objets qu'il
-contient. On pourra par exemple modéliser, entre autres, la résistance
-de l'air ou le roulis irrégulier du vent.
+exemple, ou être totalement annulée, pour simuler une situation
+d'apesanteur. En réalité, la gravité ne sera même pas codée "en dur"
+mais appartiendra à une liste de forces environnementales qui
+contiendra toutes les influences que le monde extérieur fait subir aux
+corps qu'il contient. On pourra par exemple modéliser, entre autres,
+la résistance de l'air ou le roulis irrégulier du vent.
 
-Cette observation nous oriente sur la façon dont l'on pourra modéliser
-les déplacements d'objets soumis à des forces extérieures. \`A chaque
-corps seront associées des quantités physiques telles que la position,
-la vitesse et l'accélération. C'est la façon dont ces variables
-évolueront et s'influenceront entres elles qui déterminera la qualité
-du rendu du moteur physique. Dans la première partie de ce
-compte-rendu, on précisera donc les méthodes employées pour simuler la
-dynamique des corps.
+Cette observation du comportement de la balle nous oriente sur la
+façon dont l'on pourra modéliser les déplacements d'objets soumis à
+des forces extérieures. \`A chaque corps seront associées des
+quantités physiques telles que la position, la vitesse et
+l'accélération. C'est la façon dont ces variables évolueront et
+s'influenceront entres elles qui déterminera la qualité du rendu du
+moteur physique. Dans la première partie de ce compte-rendu, on
+précisera donc les méthodes employées pour simuler la dynamique des
+corps.
 
 \subsubsection{Le rebond}
 
@@ -179,14 +181,11 @@ le corps $B$.
 Autrement dit :
 
 \begin{align*}
-  &\vec{F}_{A/B} = -\vec{F}_{B/A} \\ &\vec{F}_{A/B} + \vec{F}_{B/A} =
-  0
+  &\vec{F}_{A/B} = -\vec{F}_{B/A} \\ &\vec{F}_{A/B} + \vec{F}_{B/A} = 0
 \end{align*}
-
-DESSIN
 
 Ici, la balle subit toujours la gravité mais le plan produit une force
 inverse qui permet d'annuler tout mouvement. Même si un spectateur
 aura l'impression que la balle est inactive, des micro-collisions lui
 permettent de rester à la surface du plan et d'équilibrer le
-système. On retrouvera ce phénomène dans le moteur physique.
+système. Ce phénomène sera reproductible dans le moteur physique. [détails]

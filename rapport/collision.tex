@@ -17,8 +17,8 @@ Une collision fait entrer en jeu deux corps rigides dont l'intégrité
 physique a été corrompue, autrement dit : les corps rentrent l'un dans
 l'autre. Nous allons définir un traitement à appliquer à deux objets
 pour savoir si tel est le cas et de façon certaine. Néanmoins, bien
-que l'algorithme que nous allons fait ses preuves ait fait ses preuves
-dans le domaine des simulations physique, il faut garder à l'esprit
+que l'algorithme que nous allons présenter ait fait ses preuves
+dans le domaine des simulations physiques, il faut garder à l'esprit
 que ce test sera éxécuté à chaque intégration de la simulation et ce,
 pour chaque paire de corps. Dans de telles circonstances, l'usage d'un
 algorithme a priori rapide peut se révéler désastreux au niveau des
@@ -98,16 +98,24 @@ detection_collision_grossiere :
 \end{verbatim}
 
 La figure \ref{aabb} illustre les trois situation possibles impliquant
-deux corps. Sur la sous figure $a$, les boîtes ne rentrent pas en
-collision (elles sont séparées sur l'axe des abscisses), et il est
-donc impossible que les corps qu'elles contiennent soient eux-mêmes en
-état de collision. La sous-figure $b$ montre qu'il est possible dans
-certaines configurations que les boîtes englobantes entrent en
-collision sans que ce soit nécessairement le cas pour les corps. Dans
-ce cas, la détection grossière est validée et c'est l'algorithme de
-détection fine qui réfutera la collision. La sous-figure $c$ illustre
-un troisième cas de figure dans lequel les boîtes entrent en collision
-et les corps aussi.
+deux corps.
+
+Sur la sous-figure $a$, les boîtes englobantes ne rentrent pas en
+collision car leur projection sur l'axe des abscisses ne se
+superposent pas. Il est donc impossible que les corps qu'elles
+contiennent soient eux-mêmes en état de collision, il est inutile
+d'aller plus loin et de lancer la détection fine.
+
+La sous-figure $b$ montre qu'il est possible dans certaines
+configurations que les boîtes englobantes entrent en collision sans
+que ce soit nécessairement le cas pour les corps qu'elles
+contiennent. Les boîtes sont en état d'interpénetration puisque leurs
+projections ne se séparent sur aucun axe. Ici, la détection grossière
+renvoit un résultat positif et c'est l'algorithme de détection fine
+qui réfutera la collision.
+
+La sous-figure $c$ illustre quant à elle un troisième cas de figure
+dans lequel les boîtes entrent en collision et les corps aussi.
 
 \begin{figure}
   \centering
@@ -129,23 +137,27 @@ collision.
 Introduisons en premier lieu la somme de Minkowski, une opération
 mathématique notée $A \oplus B = \{a + b \mid a \in A, b \in B\}$ avec
 $A$ et $B$ deux corps. On peut résumer la somme de Minkowski en un
-balayage de chaque corps impliqué dans cette opération par l'autre.
+balayage de chaque corps par l'autre.
 
 \begin{figure}
-  \input{images/minkowskisum.tikz}
-  \caption{Somme de Minkowski entre un rectangle et un cercle}
+  \centering
+  \subfloat[]{ \input{images/minkowski1.tikz} }
+  \subfloat[]{ \input{images/minkowski2.tikz} }
+  \label{minkowski}
+  \caption{Différence de Minkowski entre un rectangle et un triangle}
 \end{figure}
 
 Nous utilisons une variante de cette opération : la différence de
 Minkowski, notée $A \ominus B = A \oplus (-B)$. La propriété de cette
 opération qui nous intéresse le plus est le fait que la plus petite
 distance entre les points qui la forment et l'origine du repère absolu
-est égale à la plus petite distance entre les corps $A$ et $B$. Nous
-pouvons exploiter cette caractéristique pour déterminer si deux corps
-entrent en collision. En effet, si la distance minimum entre les deux
-corps est supérieure à zéro, alors aucune collision ne peut
-possiblement exister. Si au contraire, la distance minimum est
-inférieure à zéro, alors les deux objets sont état d'interpénétration.
+est égale à la plus petite distance entre les corps $A$ et $B$ (figure
+\ref{minkowski}). Nous pouvons exploiter cette caractéristique pour
+déterminer si deux corps entrent en collision. En effet, si la
+distance minimum entre les deux corps est supérieure à zéro, alors
+aucune collision ne peut possiblement exister. Si au contraire, la
+distance minimum est inférieure à zéro, alors les deux objets sont
+état d'interpénétration.
 
 Le processus de détection fine passera donc par le calcul de la
 différence de Minkowski $M$ entre deux corps. Une fois $M$ calculée,
@@ -192,22 +204,23 @@ La figure \ref{gjk} illustre la succession d'étapes qui amène à la
 détermination du point le plus proche de l'origine $O$
 
 \begin{itemize}
-\item Le point $A$ est choisi aléatoirement pour faire office de
-  simplex de base. Le point actuellement le plus proche de l'origine
-  est naturellement $A$.
-\item On cherche le point de la figure le plus extrême dans la
-  direction du point actuellement le plus proche ($A$) à
-  l'origine. C'est le point $C$. On l'ajoute au simplex.
-\item On détermine le point du simplex le plus proche de l'origine
-  ($p_1$) et on calcule quel est le point de la figure le plus extrême
-  dans la direction de ce point à l'origine. C'est le point $B$.
-\item Le simplex a atteint une dimension de 2 mais le point $A$ n'est
-  plus utile à la définition du point actuellement le plus proche. On
-  le retire du simplex.
-\item On cherche le point du simplex le plus proche de l'origine et on
-  détermine quel est le point de la figure le plus extrême dans sa
-  direction vers l'origine. Aucun n'est plus extrême que le point
-  actuellement le plus proche, on peut donc arrêter la recherche.
+\item Le vertex $A$ est choisi aléatoirement pour faire office de
+  simplex de base. Le point du simplex actuellement le plus proche de
+  l'origine ne peu que être $A$. On cherche le vertex de la figure le
+  plus extrême dans la direction du point le plus proche ($A$) à
+  l'origine.
+\item Le vertex le plus extrême est $C$, on l'ajoute au simplex. Le
+  point du simplex le plus proche de l'origine est ???.
+\item On cherche le vertex le plus extrême dans la direction de ??? à
+  l'origine.
+\item Le vertex le plus extrême est $B$, on l'ajoute au simplex. Le
+  point du simplex le plus proche de l'origine est ???2.
+\item Le vertex $A$ n'est plus utile à la définition du simplex
+  contenant le point le point le plus proche de l'origine. On le
+  retire du simplex. On cherche le vertex le plus extrême dans la
+  direction de ???2 à l'origine.
+\item Aucun vertex n'est plus extrême que ???2, on a donc le point de
+  la figure le plus proche de l'origine.
 \end{itemize}
 
 \subsection{Correction d'une collision}
@@ -220,7 +233,7 @@ moment précis o\`u elle se produit. On est donc régulièrement témoin
 de situations d'inter-pénétration au sein desquelles des corps
 rentrent l'un dans l'autre.
 
-DESSIN : inter-pénétration
+DESSIN imprécision
 
 On pourrait se satisfaire de cette imprécision et calculer les forces
 de rebond appropriées mais plusieurs situations critiques risquent
@@ -231,22 +244,22 @@ repositionner les corps à un point de contact calculé par
 interpolation en fonction du temps de la dernière intégration. Il est
 évident que des objets sujets à des déplacements non linéaires
 (variation de la vitesse pendant un pas de temps, trajectoire
-elliptique) seront mal replacés.
+elliptique) seront mal replacés. Même si la vitesse d'éxecution est un
+facteur important dans nos choix de conception, nous allons prendre un
+chemin différent et sélectionner une méthode plus précise qui
+fonctionnera par retour en arrière.
 
-Même si la vitesse d'éxecution est un facteur important dans nos choix
-de conception, nous allons prendre un chemin différent et sélectionner
-une méthode plus précise qui fonctionnera par retour en arrière. La
-fonction d'intégration du moteur prend comme seul argument le pas de
-temps duquel faire avancer la simulation et pour l'instant on
+La fonction d'intégration du moteur prend comme seul argument le pas
+de temps duquel faire avancer la simulation et pour l'instant on
 utilisait un pas constant. Or, une caractéristique intéressante de
 cette fonction et qu'elle peut prendre en argument un pas de temps
-négatif et simuler en sens inverse. Grâce à cette caractéristique, dés
-qu'une inter-pénétration est détectée, on peut revenir en arrière
-jusqu'à retrouver le temps de contact exact. Le terme "exact" est à
-prendre avec des pincettes puisque notre simulation est limitée par
-l'arithmétique des nombres à virgules flottantes et que l'on devra se
-contenter d'un résultat quasi-exact, validé par un seuil de tolérance
-adapté.
+variable et négatif et simuler en sens inverse. Grâce à cette
+caractéristique, dés qu'une inter-pénétration est détectée, on peut
+revenir en arrière jusqu'à retrouver le temps de contact exact. Le
+terme "exact" est à prendre avec des pincettes puisque notre
+simulation est limitée par l'arithmétique des nombres à virgules
+flottantes et que l'on devra se contenter d'un résultat validé par un
+seuil de tolérance adapté.
 
 Afin d'accélérer cette phase de recherche de la configuration de
 contact, le retour en arrière se fera par dichotomie. On recule en
@@ -255,9 +268,21 @@ est toujours présente, on recule d'un quart du pas de temps, sinon on
 avance d'un quart du pas de temps, et ainsi de suite jusqu'à obtenir
 une précision satisfaisante.
 
-ALGORITHME
+\begin{verbatim}
+entrée: deux corps A et B, le pas de temps
+sortie: deux corps en collision exacte
 
-DESSIN : recherche de la vraie position de contact
+correction:
+  si collision_exacte(A,B)
+    retourner A et B
+  sinon si collision(A,B) alors
+    A.integrer(-dt/2)
+    B.integrer(-dt/2)
+  sinon
+    A.integrer(dt/2)
+    B.integrer(dt/2)
+
+\end{verbatim}
 
 Une fois ce processus achevé, la configuration de contact est
 retrouvée et les deux corps ne sont plus en situation de pénétration

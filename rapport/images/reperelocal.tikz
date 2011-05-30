@@ -1,13 +1,26 @@
 \begin{tikzpicture}[scale=0.7,transform shape]
-  \input{images/repere.tikz}
-
-  % figure
-  \coordinate (C) at ++(6,5);
-  \draw (C) circle (2);
+  % Figure
+  \coordinate (R) at (5,5);
+  \node[fig,
+    draw=black,
+    rotate=-30,
+    minimum width=3cm,
+    minimum height=5cm] at (R) (rect) {};
 
   % repère local  
-  \begin{scope}[rotate around={-30:(C)}]
-    \draw[axe] (C) -- +(4,0);
-    \draw[axe] (C) -- +(0,4);
+  \begin{scope}[shift=(R),scale=0.5,rotate around={-30:(R)}]
+    \input{images/repere.tikz}
   \end{scope}
+
+  \node[fill=black,circle] at (rect.south east) (p) {};
+
+  \draw[->,bleu,thick] (0,0) -- node[auto,color=black]{$\vec{p}_{abs}$} (p);
+  \draw[bleu,thick] (2,0) arc (0:22:2);
+
+  \draw[->,rose,thick] (R) -- node[auto,color=black]{$\vec{p}_{loc}$} (p);
+  \begin{scope}[rotate around={-30:(R)}]
+    \draw[rose,thick] ($(R)+(0.5,0)$) arc (0:300:0.5);
+  \end{scope}
+
+  \input{images/repere.tikz}
 \end{tikzpicture}

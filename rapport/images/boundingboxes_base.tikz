@@ -13,31 +13,26 @@
   draw=black] (cerc) at (C) {};
 
 % Bounding boxes
-\node[
+\node[aabb,
   fit=(rect.north west) (rect.north east) (rect.south east) (rect.south west),
-  draw=bleu,
-  dashed,
-  very thick,
-  inner sep=0] (bbrect) {};
-\node[fit=(cerc),
-  draw=bleu,
-  dashed,
-  very thick,
-  inner sep=0] (bbcerc) {};
+  draw=bleu] (bbrect) {};
+\node[aabb,
+  fit=(cerc),
+  draw=rose] (bbcerc) {};
 
 % Separation axis
-\draw[sat] let \p1=(bbrect.north) in 
+\draw[bleu,thick] let \p1=(bbrect.north) in 
   let \p2=(bbrect.south) in
-    (-1,\y1) -- (-1,\y2);
-
-\draw[sat] let \p1=(bbcerc.north) in 
-  let \p2=(bbcerc.south) in
     (-0.5,\y1) -- (-0.5,\y2);
 
-\draw[sat] let \p1=(bbrect.west) in 
-  let \p2=(bbrect.east) in
-    (\x1,-1) -- (\x2,-1);
+\draw[rose,thick] let \p1=(bbcerc.north) in 
+  let \p2=(bbcerc.south) in
+    (-0.25,\y1) -- (-0.25,\y2);
 
-\draw[sat] let \p1=(bbcerc.west) in 
-  let \p2=(bbcerc.east) in
+\draw[bleu,thick] let \p1=(bbrect.west) in 
+  let \p2=(bbrect.east) in
     (\x1,-0.5) -- (\x2,-0.5);
+
+\draw[rose,thick] let \p1=(bbcerc.west) in 
+  let \p2=(bbcerc.east) in
+    (\x1,-0.25) -- (\x2,-0.25);

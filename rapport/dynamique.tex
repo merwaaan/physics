@@ -7,9 +7,9 @@ d'un corps rigide, c'est à dire son mouvement lorsqu'il n'est soumis à
 aucune force extérieure. Dans un premier temps, seule la composante
 linéaire du mouvement sera étudiée et les objets dont nous allons
 simuler le comportement seront réduits à de simples particules. Les
-figures présentées sont en deux dimensions pour des raisons de clarté
-mais le principe reste similaire lorsqu'il est étendu à la troisième
-dimension.
+figures présentées tout au long de ce rapport sont en deux dimensions
+pour des raisons de clarté mais le principe reste similaire lorsqu'il
+est étendu à la troisième dimension.
 
 La quantité physique la plus perceptible visuellement pour un
 spectateur est la position $\vec p$ d'un corps. Pour notre affichage
@@ -54,29 +54,30 @@ des relations de primitive.
 \end{align*}
 
 Récapitulons. Chacun des corps rigides dont l'on veut simuler
-l'évolution possèdera ces trois quantités sous forme vectorielle et
-l'une des tâches de base du moteur physique sera de traduire
-l'application de forces en un changement de position. On sait qu'elles
-entretiennent des relations de dérivation, il faudra donc procéder par
-intégration pour calculer la nouvelle position d'un objet à partir de
-son accélération.
+l'évolution possèdera trois quantités sous forme vectorielle :
+position $\vec p$, vitesse $\vec v$ et accélération $\vec a$. L'une
+des tâches de base du moteur physique sera de traduire l'application
+de forces sur un corps en un changement de sa position. On sait que
+les quantités énoncées entretiennent des relations de dérivation, il
+faudra donc procéder par intégration pour calculer la nouvelle
+position d'un objet à partir de son accélération.
 
 \subsection{Intégration}
 
-Dans la sous-section précédente, les trois quantités physiques entrant
-en jeu dans les mouvements linéaires ont été présentées. \'Etudions
-maintenant de façon plus concrète sur quels calculs se basera le
-travail le plus élémentaire du moteur physique.
+Les trois quantités physiques entrant en jeu dans les mouvements
+linéaires ont été présentées. \'Etudions maintenant de façon plus
+concrète sur quels calculs se basera l'exercice le plus élémentaire du
+moteur physique.
 
 Les phénomènes mécaniques du monde réel évoluent de façon continue
 mais notre simulation ne peut pas s'autoriser ce luxe. Le modèle du
 moteur physique sera donc discret et avancera par pas de temps fixe
 $\deriv t$. \`A chaque mise à jour de la simulation, des intégrations
 doivent être réalisées pour déterminer le changement d'état d'un corps
-d'un instant $t_n$ à un instant $t_{n+1}$. Toujours pour des raisons
-d'efficacité, nous ne pouvons pas nous permettre d'allouer un temps de
-calcul trop important à cette phase de la mise à jour et nous devons
-trouver un moyen d'approximer ces intégrales.
+d'un instant $t_n$ à un instant $t_{n+1} = t_n + \deriv t$. Toujours
+pour des raisons d'efficacité, nous ne pouvons pas nous permettre
+d'allouer un temps de calcul trop important à cette phase de la mise à
+jour et nous devons trouver un moyen d'approximer ces intégrales.
 
 Parmi les techniques classiques d'intégration approximative, on trouve
 l'intégration d'Euler. Cette méthode part du principe que l'on dispose
@@ -88,8 +89,8 @@ temps par rapport à l'état précédent.
   x_{n+1} = x_{n} + x' \deriv t
 \end{align*}
 
-Si l'on adapte cette idée à notre problème, on obtient la succession
-de calculs suivante :
+Si l'on adapte cette méthode à notre problème, on obtient la
+succession de calculs suivante :
 
 \begin{align*}
   \vec{a}_{n+1} &= \frac{\sum \vec{F}_i}{m} \\ \vec{v}_{n+1} &=
@@ -102,9 +103,10 @@ du temps jusqu'à obtenir la nouvelle position du corps. Ce processus
 doit être repété à chaque mise à jour du système et ce, pour chaque
 corps. On aurait pu choisir une autre méthode d'intégration, telle que
 l'intégration Runge-Kutta d'ordre 4 qui divise un pas de temps en
-plusieurs segments, ou bien telle que l'intégration de Verlet qui
-dispose d'une meilleure stabilité, mais Euler reste le choix le plus
-économique et fournit des résultats relativement corrects.
+plusieurs segments [source], ou bien telle que l'intégration de Verlet
+qui dispose d'une meilleure stabilité [source], mais Euler reste le
+choix le plus économique et fournit des résultats relativement
+corrects.
 
 Afin de réduire la complexité de la structure informatique qui
 représentera un corps rigide, nous allons introduire la notion d'élan
@@ -114,8 +116,7 @@ avantage majeur de posséder comme primitive la variation de force
 exercée sur le corps.
 
 \begin{align*}
-  {\sum \vec{F}_i} = \frac{\deriv \vec{L}}{\deriv t} = \frac{\deriv
-    (m\vec{v})}{\deriv t}
+  {\sum \vec{F}_i} = \frac{\deriv \vec{L}}{\deriv t} = \frac{\deriv (m\vec{v})}{\deriv t}
 \end{align*}
 
 Ce qui signifie que l'on peut réduire l'intégration de l'état d'un
@@ -123,14 +124,14 @@ corps à :
 
 \begin{align*}
   \vec{L}_{n+1} &= \vec{L}_n + {\sum \vec{F}_i} \\ \vec{p}_{n+1} &=
-  \vec{p}_n + \frac{\vec{L}_{n+1}}{m} t
+  \vec{p}_n + \frac{\vec{L}_{n+1}}{m} \deriv t
 \end{align*}
 
 L'élan linéaire remplace l'accélération dans la définition d'un corps
-et permet de calculer sa vitesse. Cette organisation permet à première
-vue une intégration plus courte mais les avantages majeurs de ce choix
-prendront tous leurs sens lorsque le mouvement angulaire sera
-introduit.
+et permet de calculer sa vitesse si besoin en est. Cette organisation
+permet à première vue une intégration plus courte et une occupation
+moindre de la mémoire mais les avantages majeurs de ce choix prendront
+tous leurs sens lorsque le mouvement angulaire sera introduit.
 
 \subsection{Modélisation d'un corps rigide}
 
@@ -161,8 +162,10 @@ référentiel qui est unique à chaque corps et dont le centre se situe à
 l'intérieur même de cet objet.
 
 \begin{figure}
+  \centering
   \input{images/reperelocal.tikz}
-  \caption{Le repère absolu et le repère local d'un cercle}
+  \label{reperelocal}
+  \caption{Les repères absolu et local d'un rectangle}
 \end{figure}
 
 La position exacte de l'origine du repère local dépend de la position
@@ -194,10 +197,10 @@ prend pas en compte la composante rotationnelle des mouvements dont
 l'on peut être témoin dans un environnement réel. Les particules étant
 de simples points flottants dans l'espace, cela ne posait pas de
 problème précédemment mais le moteur physique que l'on conçoit doit
-gérer des corps rigiques plus complexes. Imaginons une boîte cubique
-que l'on lancerait en l'air, si aucune rotation n'apparaît (si la base
-de la boîte reste parallèle au sol), l'imitation du réel que l'on
-souhaite reproduire perd toute crédibilité.
+gérer des volumes plus complexes. Imaginons une boîte cubique que l'on
+lancerait en l'air, si aucune rotation n'apparaît (si la base de la
+boîte reste parallèle au sol), l'imitation du réel que l'on souhaite
+reproduire perd toute crédibilité.
 
 Les quantités physiques entrant en jeu dans la décomposition d'un
 déplacement angulaire sont analogues à celles présentées dans la
@@ -217,10 +220,10 @@ Le repère local d'un corps a été introduit dans la partie précédente
 et se résumait à un centre de masse faisant office d'origine, mais un
 repère possède aussi des axes et ceux du repère local ne sont pas
 nécessairement alignés avec ceux du repère absolu. Pour représenter la
-direction des axes du repère local, et donc l'orientation, on
-utilisera une matrice de dimension 3 au sein de laquelle chaque
-vecteur colonne correspondra à un des axes du repère local
-\cite{witkit97}. Pour illustrer ces propos, analysons la matrice
+direction des axes du repère local, et donc l'orientation du corps à
+qui il appartient, on utilisera une matrice de dimension 3 dans
+laquelle chaque vecteur colonne correspondra à un des axes du repère
+local \cite{witkit97}. Pour illustrer ces propos, analysons la matrice
 d'orientation égale à la matrice identité d'ordre 3.
 
 \[
@@ -243,7 +246,7 @@ Si l'on isole les vecteurs colonnes de cette matrice identité, on
 remarque que chacun correspond à un des axes du repère global. Le
 premier vecteur colonne d'une matrice d'orientation correspond donc à
 l'axe $x$ du repère local. Il en est de même pour la seconde colonne
-avec l'axe $y$ et la troisième colonne avec l'axe $z$.
+avec l'axe $y$ et la troisième colonne avec l'axe $z$. [détails]
 
 \subsubsection{\'Elan angulaire}
 
@@ -255,9 +258,9 @@ exercée sur un corps. Mais attention, sa définition diffère de l'élan
 linéaire dans la mesure o\`u il n'est en relation qu'avec la
 composante angulaire d'une force.
 
-En effet, il est très important de faire la distinction entre
-l'influence linéaire et l'influence angulaire qu'une force exerce sur
-un corps. Quel que soit le point d'un objet sur lequel une force est
+En effet, il est primordial de faire la distinction entre l'influence
+linéaire et l'influence angulaire qu'une force exerce sur un
+corps. Quel que soit le point d'un objet sur lequel une force est
 exercée, la quantité d'élan linéaire ajoutée est la même. Par contre,
 la quantité d'élan angulaire transmis par une force dépend de son
 point d'application; plus précisément de son excentricité par rapport
@@ -271,9 +274,9 @@ cette effet rotatif par le couple $\tau$, qui dépend de la position
 $\vec C$ du centre de masse et de la position $\vec x$ du point
 d'application de la force.
 
-\begin{align}
+\begin{align*}
   \tau = (\vec{x} - \vec{C}) \times \vec{F}
-\end{align}
+\end{align*}
 
 \subsection{Quantités auxiliaires}
 
@@ -300,7 +303,7 @@ d'inertie. blabla
   I(t) = R(t) I R(t)^T
 \end{align*}
 
-\subsection{Intégration}
+\subsection{Intégration complète}
 
 \begin{align*}
   I(t) = R(t) I R(t)^T \\ \vec{w}_{n+1} = \frac{\vec{A}}{I(t)} \\ R =
@@ -313,24 +316,24 @@ Notre processus d'intégration est désormais complet et nous pouvons
 simuler les réactions de corps soumis à des forces externes. Il reste
 pourtant un problème à résoudre : à cause de l'utilisation de nombres
 à virgule flottante, de légères erreurs de précision apparaîssent à
-chaque intégration du système et s'accumulent. L'erreur la plus
-flagrante touche l'orientation des objets (l'intégration linéaire ne
-passant que par des opérations de base, peu d'erreurs se font
-ressentir). Le problème principal vient du fait que la matrice
+chaque intégration du système et s'accumulent. L'intégration linéaire
+ne passe que par des opérations de base et peu d'erreur se font
+ressentir. Par contre, l'erreur la plus flagrante touche l'orientation
+des objets. Le problème principal vient du fait que la matrice
 d'orientation $R$, qui détermine la direction des axes du repère
 local, perd progressivement de son orthonormalité : les axes ne sont
 plus orthogonaux entre eux et leur longueur n'est plus égale à 1. Lors
 du rendu graphique de la simulation, on utilise la liste des points
 qui forment un corps ainsi que sa matrice de rotation pour le
-dessiner, et à cause de cette erreur de précision les solides déssinés
+dessiner, et à cause de cette erreur de précision les solides dessinés
 sont déformés.
 
 Afin de contrer cet effet indésirable, on ajoutera deux étapes
 supplémentaires à la fin de chaque intégration. Premièrement, il nous
 faudra normaliser les axes du repère local. Chaque axe correspondand à
-un vecteur colonne de la matrice d'orientation, il faudra les extraire
-un par un et recalculer leur magnitude pour s'assurer de leur
+un vecteur colonne de la matrice d'orientation, il faudra donc les
+extraire un par un et recalculer leur magnitude pour s'assurer de leur
 normalité. En second lieu, il sera nécessaire de réorthogonaliser le
 repère local, autrement dit s'assurer que ses axes restent orthognaux
-entre eux. Pour cela, on orthogonalisera la matrice de rotation
-par l'algorithme de Gram-Schmidt. blabla
+entre eux. Pour cela, on orthogonalisera la matrice de rotation par
+l'algorithme de Gram-Schmidt. [détails]

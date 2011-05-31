@@ -1,0 +1,21 @@
+\draw node[fig,
+  circle,
+  minimum size=2cm,
+  draw=blue,
+  dotted] (a1) at (A1) {};
+
+\node[fig,
+  circle,
+  minimum size=2cm,
+  draw=blue] (a2) at (A2) {};
+
+\node[fig,
+  circle,
+  minimum size=2cm,
+  draw=rose] (b) at (B) {};
+
+\node[
+  circle,
+  dashed,
+  minimum size=2.5cm,
+  draw=rose] (btol) at (B) {};

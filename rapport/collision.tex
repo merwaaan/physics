@@ -223,7 +223,7 @@ détermination du point le plus proche de l'origine $O$
   la figure le plus proche de l'origine.
 \end{itemize}
 
-\subsection{Correction d'une collision}
+\subsection{Correction du contact}
 
 \`A chaque itération de la simulation, les corps présents dans
 l'environnement du moteur physique sont susceptibles de se déplacer et
@@ -267,6 +267,14 @@ premier lieu de la moitié du pas de temps puis, si l'inter-pénétration
 est toujours présente, on recule d'un quart du pas de temps, sinon on
 avance d'un quart du pas de temps, et ainsi de suite jusqu'à obtenir
 une précision satisfaisante.
+
+
+\begin{figure}
+  \centering
+  \input{images/dichotomie.tikz}
+  \label{dichotomie}
+  \caption{Correction dichotomique de la configuration de contact}
+\end{figure}
 
 \begin{verbatim}
 entrée: deux corps A et B, le pas de temps

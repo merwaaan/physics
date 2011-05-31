@@ -6,7 +6,7 @@
   circle,
   minimum size=2cm,
   draw=blue,
-  dashed] (a1) at (AT1) {};
+  dotted] (a1) at (AT1) {};
 
 \node[fig,
   circle,
@@ -17,3 +17,4 @@
   circle,
   minimum size=1cm,
   draw=rose] (b) at (B) {};
+

@@ -1,3 +1,9 @@
+\begin{tikzpicture}[scale=0.7, transform shape]
+
+\coordinate (A1) at (0,0);
+\coordinate (A2) at (6.7,0);
+\coordinate (B) at (8,0);
+
 \draw node[fig,
   circle,
   minimum size=2cm,
@@ -14,8 +20,6 @@
   minimum size=2cm,
   draw=rose] (b) at (B) {};
 
-\node[
-  circle,
-  dashed,
-  minimum size=2.5cm,
-  draw=rose] (btol) at (B) {};
+\draw[->,thick,vert] (A1) to node[black,auto] {$+ \deriv t$} (A2);
+
+\end{tikzpicture}

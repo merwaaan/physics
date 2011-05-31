@@ -124,8 +124,8 @@ dans lequel les boîtes entrent en collision et les corps aussi.
   \subfloat[]{ \input{images/boundingboxes2.tikz} }
   \qquad
   \subfloat[]{ \input{images/boundingboxes3.tikz} }
-  \label{aabb}
   \caption{blabla}
+  \label{aabb}
 \end{figure}
 
 \subsubsection{Détection fine}
@@ -143,8 +143,8 @@ balayage de chaque corps par l'autre.
   \centering
   \subfloat[]{ \input{images/minkowski1.tikz} }
   \subfloat[]{ \input{images/minkowski2.tikz} }
-  \label{minkowski}
   \caption{Différence de Minkowski entre un rectangle et un triangle}
+  \label{minkowski}
 \end{figure}
 
 Nous utilisons une variante de cette opération : la différence de
@@ -225,55 +225,77 @@ détermination du point le plus proche de l'origine $O$
 
 \subsection{Correction du contact}
 
-\`A chaque itération de la simulation, les corps présents dans
-l'environnement du moteur physique sont susceptibles de se déplacer et
-donc d'entrer en contact. Le moteur simule ces évolutions de manière
-discrète et il est très improbable qu'une collision soit détectée au
-moment précis o\`u elle se produit. On est donc régulièrement témoin
-de situations d'inter-pénétration au sein desquelles des corps
-rentrent l'un dans l'autre.
+\`A chaque mise à jour de la simulation, des corps sont susceptibles
+de se déplacer et donc d'entrer en contact les uns avec les autres. Le
+moteur simule ces évolutions par pas de temps fixe et il est donc
+improbable qu'une collision soit détectée au moment exact o\`u elle se
+produit (c'est à dire à l'instant précis o\`u les deux corps sont
+posés l'un contre l'autre). On est donc en permanence témoin de
+situations d'interpénétration au sein desquelles deux objets rentrent
+l'un dans l'autre.  On pourrait ignorer cette imprécision et malgré
+tout calculer les forces de rebond appropriées à ce contact mais
+plusieurs situations critiques risquent d'apparaître. On pense
+notamment au fait que la force de séparation calculée soit sensible à
+cette erreur et ne déplace pas assez les corps à l'itération suivante
+pour qu'ils soient séparés.
 
-DESSIN imprécision
+\begin{figure}
+  \centering
+  \input{images/interpenetration.tikz}
+  \caption{Situation d'interpénétration}
+\end{figure}
 
-On pourrait se satisfaire de cette imprécision et calculer les forces
-de rebond appropriées mais plusieurs situations critiques risquent
-d'apparaître. Pour trouver le point de contact réel entre deux objets,
+Pour trouver le point de contact réel entre deux objets en collision,
 il existe plusieurs approches. Les systèmes préférant favoriser le
 temps d'éxécution au détriment du réalisme se contentent de
-repositionner les corps à un point de contact calculé par
-interpolation en fonction du temps de la dernière intégration. Il est
-évident que des objets sujets à des déplacements non linéaires
-(variation de la vitesse pendant un pas de temps, trajectoire
-elliptique) seront mal replacés. Même si la vitesse d'éxecution est un
-facteur important dans nos choix de conception, nous allons prendre un
-chemin différent et sélectionner une méthode plus précise qui
-fonctionnera par retour en arrière.
+repositionner les corps à un point de contact calculé en fonction de
+la profondeur de l'interpénétration. Mais même si la position de
+contact est corrigée par cette technique, il n'en sera pas de même
+pour les autres quantités physiques. Le corps recalé aura une position
+correcte mais son élan linéaire, par exemple, restera le même qu'à la
+fin de l'intégration.  Même si la vitesse d'éxecution est un facteur
+important dans nos choix de conception, nous allons prendre un chemin
+différent et sélectionner une méthode plus précise qui fonctionnera
+par retour en arrière.
 
 La fonction d'intégration du moteur prend comme seul argument le pas
 de temps duquel faire avancer la simulation et pour l'instant on
 utilisait un pas constant. Or, une caractéristique intéressante de
 cette fonction et qu'elle peut prendre en argument un pas de temps
-variable et négatif et simuler en sens inverse. Grâce à cette
-caractéristique, dés qu'une inter-pénétration est détectée, on peut
-revenir en arrière jusqu'à retrouver le temps de contact exact. Le
-terme "exact" est à prendre avec des pincettes puisque notre
-simulation est limitée par l'arithmétique des nombres à virgules
-flottantes et que l'on devra se contenter d'un résultat validé par un
-seuil de tolérance adapté.
+négatif et simuler l'évolution d'un système en sens inverse. Cette
+possibilité nous permet notamment de revenir en arrière dans la
+simulation dés qu'une interpénétration est détectée et ce jusqu'à
+retrouver le point de contact exact. Le terme "exact" est à prendre
+avec des pincettes puisque le moteur physique est limitée par
+l'arithmétique des nombres à virgules flottantes et que l'on doit se
+contenter d'un résultat validé par un seuil de tolérance adapté. Le
+pas de temps choisi devra correspondre à une fraction du pas de temps
+originel puisque le but de cette man\oe uvre est de déterminer à quel
+moment du pas de temps les corps sont réellement entrés en contact.
 
-Afin d'accélérer cette phase de recherche de la configuration de
-contact, le retour en arrière se fera par dichotomie. On recule en
-premier lieu de la moitié du pas de temps puis, si l'inter-pénétration
-est toujours présente, on recule d'un quart du pas de temps, sinon on
-avance d'un quart du pas de temps, et ainsi de suite jusqu'à obtenir
-une précision satisfaisante.
+Usuellement, ce retour en arrière s'effectue en intégrant plusieurs
+fois la simulation pas un pas de temps négatif et fixe, par exemple
+$-\frac{\deriv t}{10}$. Néanmoins cette méthode s'adapte mal aux
+simulations contenant des objets évoluant à hautes vitesses puisqu'en
+utilisant cette même fraction du pas de temps, un corps s'étant
+déplacé de dix mètres pendant l'intégration sera au moins recalé un
+mètre avant tout contact réel, même si la profondeur de pénétration
+n'était que de quelques centimètres.
 
+Afin d'accélérer la phase de recherche on fait le choix de procéder
+par dichotomie. \`A chaque étape $i$ de cette recherche, on recule de
+$\frac{\deriv t}{2i}$ unité de temps si les corps s'interpénétrent,
+sinon on avance de cette même durée. On considère qu'une position de
+contact valide a été déterminée lorsqu'il n'y a plus
+d'interpénétration et que la distance entre les objets est inférieure
+à un seuil de tolérance choisi au préalable. Le processus est visible
+sur la figure \ref{dichotomie}.
 
 \begin{figure}
   \centering
   \input{images/dichotomie.tikz}
-  \label{dichotomie}
   \caption{Correction dichotomique de la configuration de contact}
+  \label{dichotomie}
 \end{figure}
 
 \begin{verbatim}
@@ -296,8 +318,8 @@ Une fois ce processus achevé, la configuration de contact est
 retrouvée et les deux corps ne sont plus en situation de pénétration
 mutuelle. On remarque que grâce à cette technique, la position n'est
 pas la seule valeur à avoir été recalée : orientation, élans angulaire
-et linéaires sont eux aussi revenus à leurs valeurs au moment du
-contact.
+et linéaires sont eux aussi revenus aux valeurs qu'ils auraient dû
+atteindre à l'instant du contact.
 
 \subsection{Réponse à une collision}
 

@@ -75,6 +75,7 @@ void testGeometry()
 void testGJK()
 {
   Cube* c1 = new Cube(2);
+  c1->setPosition(0, 0, 0);
   c1->prepare();
 
   Cube* c2 = new Cube(2);

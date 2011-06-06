@@ -506,6 +506,7 @@ bool Geometry::findSeparatingPlane(CustomRigidBody* rb1_p, CustomRigidBody* rb2_
 
   // Check for a separating plane formed by the cross product of
   // each pair of edges.
+	// TODO
 
   return false;
 }
@@ -514,43 +515,50 @@ Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigi
 {
 	Vector3 origin(0, 0, 0);
 
-  // Initialize the simplex to a random point.
-  Simplex simplex;
-	Vector3 start = rb1_p->getSupportPoint(-1 * Vector3(0,1,0)) - rb2_p->getSupportPoint(Vector3(0,1,0));
-	simplex.points.push_back(start);
+	// Initialize the simplex to a random point from the Minkowski difference.
+	Simplex simplex;
+	Vector3 startDir(0, -1, 0);
+	Vector3 startVertex = rb1_p->getSupportPoint(startDir) - rb2_p->getSupportPoint(-1 * startDir);
+	simplex.points.push_back(startVertex);
 
-	// The closest point from the origin can only be the unique simplex's point.
-  Vector3 closest = simplex.points[0];
+	while(true)
+	{
+		// Compute the closest point.
+		//std::cout << "dim " << simplex.points.size() << std::endl;
+		Vector3 closest = simplex.getClosestPoint();
+		//std::cout << "closest " << closest << std::endl;
 
-  while(true)
-  {
-		// If the closest point is the origin, the bodies are interpenetrating.
+		// Return an intersection if the closest point is the origin.
 		if(closest == origin)
 		{
 			if(interPenetration_p != NULL)
 				*interPenetration_p = true;
-
-			return closest;
+			//std::cout << "interpenetration" << std::endl;
+			return origin;
 		}
 
-		// Compute the closest point of the simplex.
-		closest = simplex.getClosestPointAndReduce();
-		Vector3 directionToOrigin = origin - closest;
+		// Reduce the simplex to its minimum form.
+		//std::cout << "before " << simplex.points.size() << std::endl;
+		simplex.reduce(closest);
+		//std::cout << "after " << simplex.points.size() << std::endl;
 
-    // Find a support point along the direction from the closest point to the origin.
+		// Compute a support point along the direction from the closest point to the origin.
 		Vector3 support = rb1_p->getSupportPoint(-1 * closest) - rb2_p->getSupportPoint(closest);
+		//std::cout << "support " << support << std::endl;
 
-		if((closest-origin).length() < E->getTolerance() || (origin - support) * directionToOrigin >= (origin - closest) * directionToOrigin)
+		// Return a non-intersection if
+		//std::cout << ((-1 * closest) * closest) << " VS " << ((-1 * closest) * support) << std::endl;
+		if((-1 * closest) * closest + 0.01 >= (-1 * closest) * support)
 		{
 			if(interPenetration_p != NULL)
 				*interPenetration_p = false;
-
+			//std::cout << "no interpenetration" << std::endl;
 			return closest;
 		}
 
-		// Add the support point to the simplex.
+		// Add the closest point to the simplex.
 		simplex.points.push_back(support);
-  }
+	}
 }
 
 std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool second)
@@ -608,19 +616,29 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
   std::vector<Edge> edges1 = rb1_p->getEdges();
   std::vector<Edge> edges2 = rb2_p->getEdges();
 
+	std::cout << "edges " << edges1.size() << " " << edges2.size() <<  std::endl;
   for(int i = 0; i < edges1.size(); ++i)
 	  for(int j = 0; j < edges2.size(); ++j)
     {
 	    Vector3 closest1, closest2;
 	    double distance = Geometry::edgeEdgeDistance(edges1[i], edges2[j], &closest1, &closest2);
+			std::cout << distance << std::endl;
 
+			if(
+				edges1[i].a == closest1 ||
+				edges1[i].b == closest1 ||
+				edges2[j].a == closest2 ||
+				edges2[j].b == closest2)
+				continue;
+/*
 			if((edges1[i].a - closest1).length() < 0.01 ||
 				 (edges1[i].b - closest1).length() < 0.01 ||
 				 (edges2[j].a - closest2).length() < 0.01 ||
 				 (edges2[j].b - closest2).length() < 0.01)
 				continue;
-
-	    if(distance < E->getTolerance())
+*/
+	
+			if(distance < E->getTolerance())
 			{
 		    Contact contact;
 

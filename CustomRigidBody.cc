@@ -65,6 +65,7 @@ void CustomRigidBody::prepare()
   }
 
   this->computeVerticesAbsolutePositions();
+	this->computeCachedEdges();
   this->computeBoundingBox();
 }
 
@@ -238,45 +239,60 @@ std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
  */
 std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
 {
-  // If at least one separating plane exists, there is no collision.
-	if(Geometry::findSeparatingPlane(this, rb_p))
+	bool ip;
+	Vector3 dist = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &ip);
+	std::cout << "ip " << ip << " dist " << dist << std::endl;
+
+  // Check for a true collision.
+	if(!ip)
   {
-	  std::cout << "separating plane found : no collision" << std::endl;
+	  std::cout << "Narrow-phase detection : NO " << std::endl;
 
     return std::vector<Contact>();
   }
+ 
+	std::cout << "Narrow-phase detection : YES " << std::endl;
 
-  std::cout << "no separating plane found : collision" << std::endl;
-
-	double sdt = -dt / 10;
-	int backtrackings = 0;
+	int sdiv = 5;
+	double sdt = -dt / sdiv;
 
 	this->reverseTime();
 	rb_p->reverseTime();
 
-	// Separate the bodies to help speed up the penetration resolution.
-	while(!Geometry::findSeparatingPlane(this, rb_p) && backtrackings < 10)
+	// Separate the bodies to speed up the penetration resolution.
+	int backtracks = 0;
+	for(int i = 0; i < sdiv; ++i)
 	{
-    std::cout << "going backwarddddd " << sdt << "ms" << std::endl;
+    std::cout << "going backward " << sdt << "ms" << std::endl;
 
 	  E->applyEnvironmentalForces(this, sdt);
 	  E->applyEnvironmentalForces(rb_p, sdt);
 
 		this->integrate(sdt);
-    rb_p->integrate(sdt);
+		rb_p->integrate(sdt);
 
-		++backtrackings;
+		++backtracks;
+		std::cout << rb_p->position << std::endl;
+
+    // Exit the loop when no more interpenetration.
+		Vector3 dist = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &ip);
+		std::cout << "ip " << ip << " dist " << dist << std::endl;
+		if(!ip)
+			break;
 	}
-
-	// Apply an emergency push if the bodies are stuck.
-	if(!Geometry::findSeparatingPlane(this, rb_p))
-		E->emergencyPush(this, rb_p);
 
 	this->reverseTime();
 	rb_p->reverseTime();
 
+	// Apply an emergency push if the bodies are stuck.
+/*	if(!Geometry::findSeparatingPlane(this, rb_p))
+	{
+		std::cout << "push!!!" << std::endl;
+		E->emergencyPush(this, rb_p);
+	}
+*/
 	std::cout << "NEXT STEP" << std::endl;
-  return this->resolveInterPenetration(rb_p, sdt * backtrackings);
+  return this->resolveInterPenetration(rb_p, sdt * backtracks);
 }
 
 /**
@@ -335,8 +351,11 @@ std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* r
 
 	// recompute auxiliary quantities as they could have been
 	// corrupted during the binary search
-	vfContacts[0].a->computeAuxiliaryQuantities();
-	vfContacts[0].b->computeAuxiliaryQuantities();
+	if(vfContacts.size() > 0)
+	{
+		vfContacts[0].a->computeAuxiliaryQuantities();
+		vfContacts[0].b->computeAuxiliaryQuantities();
+	}
 
 	return vfContacts;
 }
@@ -375,7 +394,7 @@ CustomVertex* CustomRigidBody::getVertexById_p(int id)
 std::vector<Edge> CustomRigidBody::getEdges()
 {
 	std::vector<Edge> edges;
-// TOOODOOOO: CONVERT VERTICES TO HASHMAP?
+
 	for(int i = 0; i < this->cachedEdges.size(); ++i)
 	{
 		Vector3 posA = this->structure.vertices[this->cachedEdges[i].idA].absPosition;

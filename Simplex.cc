@@ -4,12 +4,9 @@
 
 /**
  * Determine the closest point from the origin within the simplex.
- * Reduce the simplex's dimension if possible.
  */
-Vector3 Simplex::getClosestPointAndReduce()
+Vector3 Simplex::getClosestPoint()
 {
-	Vector3 closest;
-
 	// The simplex has four points : find the closest point on the tetrahedron formed by these vertices.
   if(this->points.size() == 4)
 	{
@@ -19,18 +16,15 @@ Vector3 Simplex::getClosestPointAndReduce()
 		Triangle d = {this->points[0], this->points[1], this->points[2]};
 		Tetrahedron tetrahedron = {a, b, c, d};
 
-		closest =  Geometry::closestPointOfTetrahedron(Vector3(0, 0, 0), tetrahedron);
-
-		this->reduceToTriangle(closest, tetrahedron);
+		return Geometry::closestPointOfTetrahedron(Vector3(0, 0, 0), tetrahedron);
 	}
 
 	// The simplex has three points : find the closest point on the triangle formed by theses vertices.
 	if(this->points.size() == 3)
   {
 	  Triangle triangle = {this->points[0], this->points[1], this->points[2]};
-		closest = Geometry::closestPointOfTriangle(Vector3(0, 0, 0), triangle);
 
-		this->reduceToEdge(closest, triangle);
+		return Geometry::closestPointOfTriangle(Vector3(0, 0, 0), triangle);
   }
 
 	// The simplex has two points : find the closest point on the edge formed by these vertices.
@@ -38,16 +32,36 @@ Vector3 Simplex::getClosestPointAndReduce()
   {
     Edge edge = {this->points[0], this->points[1]};
 
-		closest = Geometry::closestPointOfEdge(Vector3(0, 0, 0), edge);
-
-		this->reduceToPoint(closest);
+		return Geometry::closestPointOfEdge(Vector3(0, 0, 0), edge);
 	}
 
   // The simplex only has one point : return the point.
   if(this->points.size() == 1)
-    closest = this->points[0];
+		return this->points[0];
+}
 
-	return closest;
+void Simplex::reduce(Vector3 closest)
+{
+  if(this->points.size() == 4)
+	{
+		Triangle a = {this->points[1], this->points[2], this->points[3]};
+		Triangle b = {this->points[0], this->points[2], this->points[3]};
+		Triangle c = {this->points[0], this->points[1], this->points[3]};
+		Triangle d = {this->points[0], this->points[1], this->points[2]};
+		Tetrahedron tetrahedron = {a, b, c, d};
+
+		this->reduceToTriangle(closest, tetrahedron);
+	}
+
+	if(this->points.size() == 3)
+	{
+	  Triangle triangle = {this->points[0], this->points[1], this->points[2]};
+
+		this->reduceToEdge(closest, triangle);
+	}
+
+  if(this->points.size() == 2)
+		this->reduceToPoint(closest);
 }
 
 bool Simplex::reduceToPoint(Vector3 closest)

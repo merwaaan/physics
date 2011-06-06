@@ -1,4 +1,5 @@
 \begin{tikzpicture}[scale=0.7, transform shape]
   \input{images/tunneling_base.tikz}
 
+  \draw[->,thick,vert] (AT1) to node[black,auto] {$\deriv t$} (AT2);
 \end{tikzpicture}

@@ -26,13 +26,13 @@ détectée et pourtant $A$ est impunément passé à travers $B$. Le pas de
 temps utilisé pour réguler l'intégration du système était donc trop
 faible pour s'assurer des collisions entre corps évoluant à haute
 vitesse. \`A l'heure de l'écriture de ce rapport, le moteur physique
-est sensible à ce genre de situation. Réellement ce cas ne se produit
-jamais, puisque les simulations développées représentent des
-situations terrestres qui font participer des forces d'opposition
-telles que le frottement de l'air et donc les corps n'atteignent
-jamais de vitesses démesurées. On souhaite tout de même disposer d'un
-moteur physique solide et versatile, évaluons les possibilités qui
-s'offrent à nous pour pallier ce problème.
+est sensible à ce genre de situation. Réellement, ce cas ne se produit
+pas, puisque les simulations développées représentent des situations
+terrestres qui font participer des forces d'opposition telles que le
+frottement de l'air et donc les corps n'atteignent jamais de vitesses
+démesurées. On souhaite tout de même disposer d'un moteur physique
+solide et versatile, évaluons les possibilités qui s'offrent à nous
+pour pallier ce problème.
 
 \begin{figure}
   \centering
@@ -46,20 +46,20 @@ afin de diminuer le risque de tunneling, mais même si un pas de temps
 faible améliore la qualité des résultats, il ne pourra pas être
 indéfiniment réduit. Il est principalement limité par le temps de
 calcul d'une mise à jour du système, puisqu'à partir du moment o\`u
-$\deriv t$ est inférieur au temps nécessaire à une machine pour
+$\deriv t$ est inférieur au temps moyen nécessaire à une machine pour
 calculer une itération de la simulation, le programme perdra son
 statut d'application temps réel.
 
 Une technique usuellement admise est le lancer de rayons
 (\textit{raycasting}) entre les points de la position de départ du
-solide et les points de sa position d'arrivée. Si un des rayons touche
-un autre corps, on sait qu'une collision aurait dûe être détectée et
-on peut revenir en arrière. Cette méthode présente pourtant une
-faiblesse de taille, car le résultat de cette recherche dépend
-directement de la concentration de rayons. Si on lance peu de rayons,
-on risque de ne pas détecter les corps de petite taille et donc de les
-traverser tandis qu'une concentration élevée de rayons pourrait se
-réveler regrettable en terme de coûts de calcul.
+solide et les points de sa position d'arrivée. Si l'un des rayons
+touche un autre corps, on sait qu'une collision aurait dûe être
+détectée et on peut revenir en arrière. Cette méthode présente
+pourtant une faiblesse de taille, car le résultat de cette recherche
+dépend directement de la concentration de rayons. Si on lance peu de
+rayons, on risque de ne pas détecter les corps de petite taille et
+donc de les traverser tandis qu'une concentration élevée de rayons
+pourrait se réveler regrettable en terme de coûts de calcul.
 
 \begin{figure}
   \centering
@@ -68,20 +68,20 @@ réveler regrettable en terme de coûts de calcul.
   \label{tunneling2}
 \end{figure}
 
-La technique du ??? permet de ne laisser passer aucun phénomène de
-tunneling. L'idée est la suivante : soit deux corps $A$ et $B$ dont
-l'on veut détecter l'éventuelle collision. On construit deux volumes
-fantômes $C_A$ et $C_B$ englobant tous les points par lesquels passent
-respectivement $A$ et $B$ entre deux intégrations. Ces volumes
-n'interviendront pas dans les collisions des autres objets de la
-simulation, et on vérifie simplement s'ils rentrent tous deux en
-collision. Si tel est le cas, alors on sait qu'il est possible qu'un
-tunneling se soit produit. L'un des avantages majeurs de cette
-méthode, en plus du fait qu'elle ne rate aucun tunneling, est sa
-simplicité de mise en place puisque toutes les routines utilisées
-(détection de collision entre volumes, retour en arrière) ont été
-écrites et entrent déjà en jeu dans le fonctionnement de base du
-moteur physique.
+La technique du ??? permet de contrôler de façon certain tout
+phénomène de tunneling. L'idée est la suivante : soit deux corps $A$
+et $B$ dont l'on veut détecter l'éventuelle collision. On construit
+deux volumes fantômes $F_A$ et $F_B$ englobant tous les points par
+lesquels passent respectivement $A$ et $B$ entre deux
+intégrations. Ces volumes n'interviendront pas dans les collisions des
+autres objets de la simulation, et on vérifie simplement s'ils
+rentrent tous deux en collision. Si tel est le cas, alors on sait
+qu'il est possible qu'un tunneling se soit produit. L'un des avantages
+majeurs de cette méthode, en plus du fait qu'elle ne rate aucun
+tunneling, est sa simplicité de mise en place puisque toutes les
+routines utilisées (détection de collision entre volumes, retour en
+arrière) ont été écrites et entrent déjà en jeu dans le fonctionnement
+de base du moteur physique.
 
 \begin{figure}
   \centering
@@ -92,8 +92,52 @@ moteur physique.
 
 \subsubsection{Partitionnement de l'espace}
 
-Quad-tree, Octree, ...
+Comme mis en avant tout au long de ce rapport, on cherche à concevoir
+un moteur physique dont la rapidité d'éxécution est un facteur
+déterminant. Dans cette optique, il est primordial d'optimiser les
+routines géométriques entrant en jeu mais aussi d'éviter leur
+éxécution inutile dés que possible. La détection des collisions entre
+les corps qui peuplent notre système se déroule en deux étapes : une
+détection grossière visant à vérifier de façon économique si deux
+objets se touchent et une détection fine servant à confirmer ou à
+infirmer de façon sûre ce résultat. Bien que la détection grossière
+soit peu coûteuse en termes de calcul, elle est éxécutée $???$ à
+chaque itération, o\`u $n$ est le nombre de corps actifs dans la
+simulation. Pourtant, il est très souvent inutile de détecter si deux
+objets sont en situation d'interpénétration, par exemple lorsqu'ils
+sont très éloignés l'un de l'autre. Il serait tout à notre avantage
+d'ajouter au moteur une couche supplémentaire tenant compte de ces
+disparités spatiales pour accélérer la détection de collisions.
+
+Le principe général du partitionnement de l'espace (\textit{Spatial
+  partitioning}) est de subdiviser l'environnement de la simulation en
+sous-espaces. La répartition des corps dans ces sous-espaces dépend
+bien évidemment de leur position dans le repère global mais aussi du
+volume qu'ils occupent. On est certain que seules les entités
+appartenant à un même sous-espace peuvent interagir entres elles, on
+dispose donc d'une aide quant au choix des objets entre lesquels
+vérifier si collision il y a.
+
+Sous sa forme la plus simple, le partitionnement de l'espace prend la
+forme d'une grille de taille fixe dans les cases de laquelle les corps
+de la simulation sont répartis. L'aspect statique d'une telle
+structure présente plusieurs inconvénients majeurs, notamment le fait
+que le gain de performance variera fortement selon le nombre d'objets
+considérés, leur taille et la finesse de la grille. Par exemple, si
+une grille a des cases trop grandes, chacune contiendra de nombreux
+objets, et le gain de performance sera peu flagrant. Si au contraire
+les cases de la grille sont trop petites, les plus grands objets ne
+pourront pas rentrer dans leur intégralité à l'intérieur d'une unique
+case. Une solution à ce problème est de ranger un même objet dans
+plusieurs cases différentes de la grille, mais une fois encore, si des
+corps sont démultipliés de la sorte, le temps de maintenance d'une
+telle structure sera augmentée.
+
+Une variante plus subtile de partitionnement de l'espace est le
+partionnement binaire blabla.
+
+Quatree, octree, blabla
 
 \subsubsection{Extension aux corps concaves}
 
-blabla
+

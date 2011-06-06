@@ -1,6 +1,6 @@
 \coordinate (AT1) at (0,0);
 \coordinate (AT2) at (8,0);
-\coordinate (B) at (4,0);
+\coordinate (B) at (6,0);
 
 \draw node[fig,
   circle,

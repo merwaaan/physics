@@ -2,7 +2,7 @@
 
 #include "Engine.h"
 
-extern Engine* engine_pg;
+extern Engine* E;
 
 RigidBody::RigidBody() :
 	restitution(0.8),
@@ -128,6 +128,127 @@ bool RigidBody::isBoundingBoxCollidingWith(RigidBody* rb_p)
     return false;
 
   return true;
+}
+
+/**
+ * Check for a collision with another rigid body
+ */
+std::vector<Contact> RigidBody::isCollidingWith(RigidBody* rb_p, double dt)
+{
+	bool ip;
+	Vector3 dist = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &ip);
+	std::cout << "ip " << ip << " dist " << dist << std::endl;
+
+  // Check for a true collision.
+	if(!ip)
+  {
+	  std::cout << "Narrow-phase detection : NO " << std::endl;
+
+    return std::vector<Contact>();
+  }
+ 
+	std::cout << "Narrow-phase detection : YES " << std::endl;
+
+	int sdiv = 5;
+	double sdt = -dt / sdiv;
+
+	this->reverseTime();
+	rb_p->reverseTime();
+
+	// Separate the bodies to speed up the penetration resolution.
+	int backtracks = 0;
+	for(int i = 0; i < sdiv; ++i)
+	{
+    std::cout << "going backward " << sdt << "ms" << std::endl;
+
+	  E->applyEnvironmentalForces(this, sdt);
+	  E->applyEnvironmentalForces(rb_p, sdt);
+
+		this->integrate(sdt);
+		rb_p->integrate(sdt);
+
+		++backtracks;
+		std::cout << rb_p->position << std::endl;
+
+    // Exit the loop when no more interpenetration.
+		Vector3 dist = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &ip);
+		std::cout << "ip " << ip << " dist " << dist << std::endl;
+		if(!ip)
+			break;
+	}
+
+	this->reverseTime();
+	rb_p->reverseTime();
+
+	// Apply an emergency push if the bodies are stuck.
+/*	if(!Geometry::findSeparatingPlane(this, rb_p))
+	{
+		std::cout << "push!!!" << std::endl;
+		E->emergencyPush(this, rb_p);
+	}
+*/
+	std::cout << "NEXT STEP" << std::endl;
+  return this->resolveInterPenetration(rb_p, sdt * backtracks);
+}
+
+/**
+ * Determine the exact contact point by integrating backward in time
+ */
+std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double dt)
+{
+  // compute the distance between the two bodies
+	bool interPenetration;
+  Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &interPenetration);
+
+  std::cout << "d = " << distance.length() << " ip = " << interPenetration << std::endl;
+
+  // if the bodies are too far apart, integrate forward in time
+  if(!interPenetration && distance.length() > E->getTolerance())
+  {
+		double sdt = dt / 2;
+
+	  std::cout << "going forward " << sdt << "ms" << std::endl;
+
+	  E->applyEnvironmentalForces(this, sdt);
+	  E->applyEnvironmentalForces(rb_p, sdt);
+
+    this->integrate(sdt);
+    rb_p->integrate(sdt);
+
+    std::cout << *rb_p << std::endl;
+
+    return this->resolveInterPenetration(rb_p, sdt);
+  }
+  // else if the bodies are inter-penetrating, integrate backward in time
+  else if(interPenetration)
+  {
+		double sdt = dt / 2;
+
+	  std::cout << "going backward " << sdt << "ms" << std::endl;
+
+	  E->applyEnvironmentalForces(this, sdt);
+	  E->applyEnvironmentalForces(rb_p, sdt);
+
+    this->integrateBackward(sdt);
+    rb_p->integrateBackward(sdt);
+
+		std::cout << *rb_p << std::endl;
+
+    return this->resolveInterPenetration(rb_p, sdt);
+  }
+
+  // If bodies are within the tolerance area, compute the real contact points.
+	std::vector<Contact> contacts = this->getContacts(rb_p);
+
+	// recompute auxiliary quantities as they could have been
+	// corrupted during the binary search
+	if(contacts.size() > 0)
+	{
+		contacts[0].a->computeAuxiliaryQuantities();
+		contacts[0].b->computeAuxiliaryQuantities();
+	}
+
+	return contacts;
 }
 
 BoundingBox RigidBody::getBoundingBox()

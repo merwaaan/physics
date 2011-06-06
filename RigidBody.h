@@ -68,9 +68,10 @@ class RigidBody
     bool isBoundingBoxCollidingWith(RigidBody* rb_p);
     BoundingBox getBoundingBox();
     
-    virtual std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt) = 0;
-    virtual std::vector<Contact> isCollidingWith(Sphere* s_p, double dt) = 0;
-    virtual std::vector<Contact> isCollidingWith(CustomRigidBody* rb_p, double dt) = 0;
+    std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt);
+		std::vector<Contact> resolveInterPenetration(RigidBody* rb_p, double dt);
+		virtual std::vector<Contact> getContacts(RigidBody* rb_p) = 0;
+		virtual Vector3 getSupportPoint(Vector3 direction) = 0;
 
     double getInverseMass() { return this->inverseMass; }
     Matrix3 getInverseInertiaTensor() { return this->inverseInertiaTensor; }

@@ -218,144 +218,25 @@ void CustomRigidBody::computeVerticesAbsolutePositions()
     this->structure.vertices[i].absPosition = this->orientation * this->structure.vertices[i].localPosition + this->position;
 }
 
-/**
- * Double-dispatch
- */
-std::vector<Contact> CustomRigidBody::isCollidingWith(RigidBody* rb_p, double dt)
+std::vector<Contact> CustomRigidBody::getContacts(RigidBody* rb_p)
 {
-  return rb_p->isCollidingWith(this, dt);
+	return this->getContacts(rb_p);
 }
 
-/**
- * Check for a collision with a sphere
- */
-std::vector<Contact> CustomRigidBody::isCollidingWith(Sphere* s_p, double dt)
+std::vector<Contact> CustomRigidBody::getContacts(Sphere* s_p)
 {
 	return std::vector<Contact>();
 }
 
-/**
- * Check for a collision with a custom rigid body
- */
-std::vector<Contact> CustomRigidBody::isCollidingWith(CustomRigidBody* rb_p, double dt)
+std::vector<Contact> CustomRigidBody::getContacts(CustomRigidBody* rb_p)
 {
-	bool ip;
-	Vector3 dist = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &ip);
-	std::cout << "ip " << ip << " dist " << dist << std::endl;
-
-  // Check for a true collision.
-	if(!ip)
-  {
-	  std::cout << "Narrow-phase detection : NO " << std::endl;
-
-    return std::vector<Contact>();
-  }
- 
-	std::cout << "Narrow-phase detection : YES " << std::endl;
-
-	int sdiv = 5;
-	double sdt = -dt / sdiv;
-
-	this->reverseTime();
-	rb_p->reverseTime();
-
-	// Separate the bodies to speed up the penetration resolution.
-	int backtracks = 0;
-	for(int i = 0; i < sdiv; ++i)
-	{
-    std::cout << "going backward " << sdt << "ms" << std::endl;
-
-	  E->applyEnvironmentalForces(this, sdt);
-	  E->applyEnvironmentalForces(rb_p, sdt);
-
-		this->integrate(sdt);
-		rb_p->integrate(sdt);
-
-		++backtracks;
-		std::cout << rb_p->position << std::endl;
-
-    // Exit the loop when no more interpenetration.
-		Vector3 dist = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &ip);
-		std::cout << "ip " << ip << " dist " << dist << std::endl;
-		if(!ip)
-			break;
-	}
-
-	this->reverseTime();
-	rb_p->reverseTime();
-
-	// Apply an emergency push if the bodies are stuck.
-/*	if(!Geometry::findSeparatingPlane(this, rb_p))
-	{
-		std::cout << "push!!!" << std::endl;
-		E->emergencyPush(this, rb_p);
-	}
-*/
-	std::cout << "NEXT STEP" << std::endl;
-  return this->resolveInterPenetration(rb_p, sdt * backtracks);
-}
-
-/**
- * Determine the exact contact point by integrating backward in time
- */
-std::vector<Contact> CustomRigidBody::resolveInterPenetration(CustomRigidBody* rb_p, double dt)
-{
-  // compute the distance between the two bodies
-	bool interPenetration;
-  Vector3 distance = Geometry::gjkDistanceBetweenPolyhedra(this, rb_p, &interPenetration);
-
-  std::cout << "d = " << distance.length() << " ip = " << interPenetration << std::endl;
-
-  // if the bodies are too far apart, integrate forward in time
-  if(!interPenetration && distance.length() > E->getTolerance())
-  {
-		double sdt = dt / 2;
-
-	  std::cout << "going forward " << sdt << "ms" << std::endl;
-
-	  E->applyEnvironmentalForces(this, sdt);
-	  E->applyEnvironmentalForces(rb_p, sdt);
-
-    this->integrate(sdt);
-    rb_p->integrate(sdt);
-
-    std::cout << *rb_p << std::endl;
-
-    return this->resolveInterPenetration(rb_p, sdt);
-  }
-  // else if the bodies are inter-penetrating, integrate backward in time
-  else if(interPenetration)
-  {
-		double sdt = dt / 2;
-
-	  std::cout << "going backward " << sdt << "ms" << std::endl;
-
-	  E->applyEnvironmentalForces(this, sdt);
-	  E->applyEnvironmentalForces(rb_p, sdt);
-
-    this->integrateBackward(sdt);
-    rb_p->integrateBackward(sdt);
-
-		std::cout << *rb_p << std::endl;
-
-    return this->resolveInterPenetration(rb_p, sdt);
-  }
-
-  // If bodies are within the tolerance area, compute the real contact points.
 	std::vector<Contact> vfContacts = Geometry::vertexFaceContacts(this, rb_p);
 	std::vector<Contact> eeContacts = Geometry::edgeEdgeContacts(this, rb_p);
+
 	std::cout << vfContacts.size() << " v/f and " << eeContacts.size() << " e/e" << std::endl;
 
 	for(int i = 0; i < eeContacts.size(); ++i)
 		vfContacts.push_back(eeContacts[i]);
-
-	// recompute auxiliary quantities as they could have been
-	// corrupted during the binary search
-	if(vfContacts.size() > 0)
-	{
-		vfContacts[0].a->computeAuxiliaryQuantities();
-		vfContacts[0].b->computeAuxiliaryQuantities();
-	}
 
 	return vfContacts;
 }

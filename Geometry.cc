@@ -482,36 +482,7 @@ Vector3 Geometry::closestPointOfSphere(Vector3 point, Sphere sphere, double* dis
   return closest;
 }
 
-/**
- * Check if a saparating plane between polyhedra rb1_p and rb2_p exists.
- *
- * (from The Method of Separating Axis - David Eberly)
- */
-bool Geometry::findSeparatingPlane(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p)
-{
-	// Check for a separating plane along the polyhedra faces.
-  for(int i = 0; i < rb1_p->structure.polygons.size(); ++i)
-  {
-    Plane sp = rb1_p->structure.polygons[i].getPlane();
-    if(sp.whichHalfSpace(rb2_p) > 0)
-	    return true;
-  }
-
-  for(int i = 0; i < rb2_p->structure.polygons.size(); ++i)
-  {
-    Plane sp = rb2_p->structure.polygons[i].getPlane();
-    if(sp.whichHalfSpace(rb1_p) > 0)
-	    return true;
-  }
-
-  // Check for a separating plane formed by the cross product of
-  // each pair of edges.
-	// TODO
-
-  return false;
-}
-
-Vector3 Geometry::gjkDistanceBetweenPolyhedra(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool* interPenetration_p)
+Vector3 Geometry::gjkDistanceBetweenPolyhedra(RigidBody* rb1_p, RigidBody* rb2_p, bool* interPenetration_p)
 {
 	Vector3 origin(0, 0, 0);
 
@@ -630,14 +601,7 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 				edges2[j].a == closest2 ||
 				edges2[j].b == closest2)
 				continue;
-/*
-			if((edges1[i].a - closest1).length() < 0.01 ||
-				 (edges1[i].b - closest1).length() < 0.01 ||
-				 (edges2[j].a - closest2).length() < 0.01 ||
-				 (edges2[j].b - closest2).length() < 0.01)
-				continue;
-*/
-	
+
 			if(distance < E->getTolerance())
 			{
 		    Contact contact;

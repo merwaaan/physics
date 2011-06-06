@@ -19,10 +19,10 @@ class Sphere : public RigidBody
     void integrate(double dt);
     void draw();
 
-    std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt);
-    std::vector<Contact> isCollidingWith(Sphere* s_p, double dt);
-    std::vector<Contact> resolveInterPenetration(Sphere* s_p, double dt);
-    std::vector<Contact> isCollidingWith(CustomRigidBody* rb_p, double dt);
+		std::vector<Contact> getContacts(RigidBody* rb_p);
+		std::vector<Contact> getContacts(Sphere* s_p);
+		std::vector<Contact> getContacts(CustomRigidBody* s_p);
+    Vector3 getSupportPoint(Vector3 direction);
 
 		void setRadius(double radius) { this->radius = radius; }
     double getRadius() const { return this->radius; }

@@ -78,113 +78,39 @@ void Sphere::draw()
   glPopMatrix();
 }
 
-/**
- * Double-dispatch
- */
-std::vector<Contact> Sphere::isCollidingWith(RigidBody* rb_p, double dt)
+std::vector<Contact> Sphere::getContacts(RigidBody* rb_p)
 {
-  return rb_p->isCollidingWith(this, dt);
+	return this->getContacts(rb_p);
 }
 
-std::vector<Contact> Sphere::isCollidingWith(Sphere* s_p, double dt)
+std::vector<Contact> Sphere::getContacts(Sphere* s_p)
 {
-  double distance = (this->position - s_p->position).length();
-  double radii = this->radius + s_p->radius;
- 
-	// NO COLLISION
-  if(distance > radii)
-  {
-    std::cout << "No contact detected" << std::endl;
-    std::vector<Contact> contacts;
+	std::vector<Contact> contacts;
 
-    return contacts;
-  }
+	Vector3 from1to2 = s_p->getPosition() - this->position;
+	Vector3 closest1 = this->position + from1to2.normalize() * this->radius;
+	Vector3 closest2 = s_p->getPosition() + (-1 * from1to2).normalize() * s_p->getRadius();
 
-	// COLLISION
-  std::cout << "contact detected" << std::endl;
-
-	double sdt = -dt / 10;
-
-	this->reverseTime();
-	s_p->reverseTime();
-
-	while(distance < radii)
+	if((closest1 - closest2).length() < E->getTolerance())
 	{
-		std::cout << "distance " << distance << std::endl;
-    std::cout << "going backward " << sdt << "ms" << std::endl;
+		Contact c;
+		c.a = this;
+		c.b = s_p;
+		c.position = closest1 + (closest2 - closest1) / 2;
+		c.normal = from1to2.normalize();
 
-	  E->applyEnvironmentalForces(this, sdt);
-	  E->applyEnvironmentalForces(s_p, sdt);
-
-		this->integrate(sdt);
-    s_p->integrate(sdt);
-
-		distance = (this->position - s_p->position).length();
+		contacts.push_back(c);
 	}
 
-	this->reverseTime();
-	s_p->reverseTime();
-
-  return this->resolveInterPenetration(s_p, dt);
+	return contacts;
 }
 
-std::vector<Contact> Sphere::resolveInterPenetration(Sphere* s_p, double dt)
+std::vector<Contact> Sphere::getContacts(CustomRigidBody* rb_p)
 {
-	//if(dt < 0.00000000001)
-	//exit(0);
-  
-	double distance = (this->position - s_p->position).length();
-  double radii = this->radius + s_p->radius;
-	bool interPenetration = distance < radii;
-
-	std::cout << "distance = " << distance << " radii = " << radii << " ip = " << interPenetration << std::endl;
-
-  if(distance > radii + E->getTolerance())
-  {
-		double sdt = dt / 2;
-
-    std::cout << "going forward " << sdt << "ms" << std::endl;
-
-		E->applyEnvironmentalForces(this, sdt);
-		E->applyEnvironmentalForces(s_p, sdt);
-    
-		this->integrate(sdt);
-    s_p->integrate(sdt);
-    
-    return this->resolveInterPenetration(s_p, sdt);
-  }
-  else if(distance < radii)
-  {
-		double sdt = dt / 2;
-
-    std::cout << "going backward " << sdt << "ms" << std::endl;
-
-	  E->applyEnvironmentalForces(this, sdt);
-	  E->applyEnvironmentalForces(s_p, sdt);
-
-    this->integrateBackward(sdt);
-    s_p->integrateBackward(sdt);
-
-    return this->resolveInterPenetration(s_p, dt / 2);
-  }
-
-  Contact contact;
-  contact.a = this;
-  contact.b = s_p;
-  contact.position = this->position + (s_p->position - this->position) * (this->radius / radii);
-  contact.normal = (s_p->position - this->position).normalize();
-
-  std::vector<Contact> contacts;
-  contacts.push_back(contact);
-
-  // Recompute auxiliary quantities.
-  contacts[0].a->computeAuxiliaryQuantities();
-  contacts[0].b->computeAuxiliaryQuantities();
-
-  return contacts;
+	return rb_p->getContacts(this);
 }
 
-std::vector<Contact> Sphere::isCollidingWith(CustomRigidBody* rb_p, double dt)
+Vector3 Sphere::getSupportPoint(Vector3 direction)
 {
-  return rb_p->isCollidingWith(this, dt);
+	return this->position + direction.normalize() * this->radius;
 }

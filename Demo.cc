@@ -112,7 +112,7 @@ void testTimeReversing()
   s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
 }
 
-void demoConstraints()
+void demoRope()
 {
 	Sphere* s;
 	Constraint* c;
@@ -145,7 +145,7 @@ void demoPendulum()
 {
 	Constraint* c;
 
-	Sphere* sf = new Sphere(1);
+	Sphere* sf = new Sphere(0.1);
 	sf->setPosition(-2, 6, 0);
 	sf->setFixed(true);
 	e->addRigidBody_p(sf);
@@ -159,7 +159,7 @@ void demoPendulum()
 
 	for(int i = 0; i < 4; ++i)
 	{
-		sf = new Sphere(1);
+		sf = new Sphere(0.1);
 		sf->setPosition(i*2, 6, 0);
 		sf->setFixed(true);
 		e->addRigidBody_p(sf);
@@ -176,27 +176,6 @@ void demoPendulum()
   e->addEnvironmentalForce_p(g);
 
 	e->run();
-}
-
-void demoRestingBalls()
-{
-  Sphere* s1 = new Sphere(1);
-	s1->setPosition(0, 4, 0);
-	e->addRigidBody_p(s1);
-   
-  Sphere* s2 = new Sphere(1);
-	s2->setPosition(0, 0, 0);
-	s2->setFixed(true);
-	e->addRigidBody_p(s2);
-
-/*  Sphere* s3 = new Sphere(1);
-	s3->setPosition(0, 7, 0);
-	e->addRigidBody_p(s3);
-*/
-  Force* g = new CenterForce(Vector3(0, -9.81, 0));
-  e->addEnvironmentalForce_p(g);
-
-  e->run();
 }
 
 void demoBalls()
@@ -224,17 +203,20 @@ void demoBalls()
   e->run();
 }
 
-void demoThrowBoxes()
+void demoMixed()
 {
-	Cube* c1 = new Cube(2);
-	c1->setPosition(-5, 1, 1);
-	c1->applyOffCenterForce(Vector3(30,25,0), Vector3(-6,-1,0), 1);
-  e->addRigidBody_p(c1);
+	Cube* c = new Cube(2);
+	c->setPosition(0, 5, 0);
+  e->addRigidBody_p(c);
 
-	Cube* c2 = new Cube(2);
-	c2->setPosition(5, 0, 0);
-	c2->applyOffCenterForce(Vector3(-30,25,0), Vector3(4, 0.25, 1), 1);
-  e->addRigidBody_p(c2);
+	Sphere* s = new Sphere(1);
+	s->setPosition(0, 4, 4);
+  e->addRigidBody_p(s);
+
+	Box* sol = new Box(30, 0.5, 30);
+	sol->setPosition(0, -2.5, 0);
+  sol->setFixed(true);
+  e->addRigidBody_p(sol);
 
   Force* g = new CenterForce(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);
@@ -271,12 +253,10 @@ int main(int argc, char** argv)
   //testGJK();
   //testTimeReversing();
 	
-  //demoConstraints();
-  //demoPendulum();
-	//demoRestingBalls();
+  //demoRope();
 	//demoBalls();
-	//demoThrowBoxes();
-	//demoMixed();
+  //demoPendulum();
+	demoMixed();
   demoBoxes();
   
   delete e;

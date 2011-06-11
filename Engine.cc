@@ -8,7 +8,7 @@
 Engine* E = NULL;
 
 Engine::Engine(int* argc, char** argv, double timeStep) :
-	tolerance(0.01),
+	tolerance(0.09),
   timeStep(timeStep),
 	startingTime(getAbsoluteTime()),
 	lastUpdateTime(0),
@@ -51,11 +51,11 @@ void Engine::update()
 
 				// Narrow-phase test.
 				std::vector<Contact> contacts = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
-        
+
 				if(contacts.size() > 0)
 				{
 					std::cout << "real collision detected between #" << i << " and #" << j << std::endl;
-
+        
 					for(int k = 0; k < contacts.size(); ++k)
 					{
 						Vector3* impulses = this->computeImpulse(contacts[k]);
@@ -91,13 +91,12 @@ void Engine::applyConstraints(double dt)
 		this->constraints_p[i]->apply(1);
 }
 
-void Engine::emergencyPush(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p)
+void Engine::emergencyPush(RigidBody* rb1_p, RigidBody* rb2_p, Vector3 distance)
 {
-	Vector3 push = Geometry::gjkDistanceBetweenPolyhedra(rb1_p, rb2_p);
 	double totalInverseMass = rb1_p->getInverseMass() + rb2_p->getInverseMass();
 
-	rb1_p->move(push * rb1_p->getInverseMass() / totalInverseMass);
-	rb2_p->move(push * rb2_p->getInverseMass() / totalInverseMass * -1);
+	rb1_p->move(-1 * distance * rb1_p->getInverseMass() / totalInverseMass);
+	rb2_p->move(distance * rb2_p->getInverseMass() / totalInverseMass);
 }
 
 Vector3* Engine::computeImpulse(Contact contact)

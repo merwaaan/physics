@@ -143,7 +143,7 @@ namespace Geometry
   Vector3 closestPointOfTetrahedron(Vector3 point, Tetrahedron tetrahedron, double* distance = NULL);
   Vector3 closestPointOfSphere(Vector3 p, Sphere sphere, double* distance_p = NULL);
 
-  Vector3 gjkDistanceBetweenPolyhedra(RigidBody* rb1_p, RigidBody* rb2_p, bool* interPenetration_p = NULL);
+  Vector3 gjkDistance(RigidBody* rb1_p, RigidBody* rb2_p, bool* interPenetration_p = NULL);
 
   std::vector<Contact> vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool second = false);
   std::vector<Contact> edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);

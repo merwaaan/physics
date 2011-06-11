@@ -16,8 +16,14 @@ struct BoundingBox
   Vector3 b;
 };
 
+enum Type{SPHERE, CUSTOM};
+
 class RigidBody
 {
+  public:
+
+	Type type;
+
   protected:
 
     double inverseMass;
@@ -69,7 +75,7 @@ class RigidBody
     BoundingBox getBoundingBox();
     
     std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt);
-		std::vector<Contact> resolveInterPenetration(RigidBody* rb_p, double dt);
+		std::vector<Contact> resolveInterPenetration(RigidBody* rb_p, double dt, int state);
 		virtual std::vector<Contact> getContacts(RigidBody* rb_p) = 0;
 		virtual Vector3 getSupportPoint(Vector3 direction) = 0;
 

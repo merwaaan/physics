@@ -1,6 +1,6 @@
 #include "Box.h"
 
-Box::Box(double width, double height, double depth) :
+Box::Box(double width, double height, double depth, double mass) :
   width(width),
   height(height),
   depth(depth)
@@ -9,14 +9,16 @@ Box::Box(double width, double height, double depth) :
 	double hh = height / 2;
 	double hd = depth / 2;
 
-  this->addVertex(0, -hw, hh, hd, 1);
-  this->addVertex(1, -hw, -hh, hd, 1);
-  this->addVertex(2, hw, -hh, hd, 1);
-  this->addVertex(3, hw, hh, hd, 1);
-  this->addVertex(4, -hw, hh, -hd, 1);
-  this->addVertex(5, -hw, -hh, -hd, 1);
-  this->addVertex(6, hw, -hh, -hd, 1);
-  this->addVertex(7, hw, hh, -hd, 1);
+	double m = mass/8;
+
+  this->addVertex(0, -hw, hh, hd, m);
+  this->addVertex(1, -hw, -hh, hd, m);
+  this->addVertex(2, hw, -hh, hd, m);
+  this->addVertex(3, hw, hh, hd, m);
+  this->addVertex(4, -hw, hh, -hd, m);
+  this->addVertex(5, -hw, -hh, -hd, m);
+  this->addVertex(6, hw, -hh, -hd, m);
+  this->addVertex(7, hw, hh, -hd, m);
   
   this->addPolygon(4, (int[]){0, 1, 2, 3}); // front
   this->addPolygon(4, (int[]){7, 6, 5, 4}); // back
@@ -45,8 +47,8 @@ void Box::computeInverseInertiaTensor()
   this->inverseInertiaTensor = inertiaTensor.inverse();
 }
 
-Cube::Cube(double side) :
-  Box(side, side, side)
+Cube::Cube(double side, double mass) :
+  Box(side, side, side, mass)
 {
 }
 

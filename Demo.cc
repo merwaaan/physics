@@ -12,8 +12,8 @@ void input(unsigned char k, int x, int y)
 {
   if(k == 97)
   {
-	  Cube* c = new Cube(2);
-	  c->setPosition((float)rand() / RAND_MAX * 8 - 4, 5, (float)rand() / RAND_MAX * 8 - 4);
+	  Cube* c = new Cube(2, 100);
+	  c->setPosition((float)rand() / RAND_MAX * 8 - 4, 7, (float)rand() / RAND_MAX * 8 - 4);
 	  c->prepare();
 	  e->addRigidBody_p(c);
   }
@@ -74,20 +74,20 @@ void testGeometry()
 
 void testGJK()
 {
-  Cube* c1 = new Cube(2);
+  Cube* c1 = new Cube(2,1);
   c1->setPosition(0, 0, 0);
   c1->prepare();
 
-  Cube* c2 = new Cube(2);
+  Cube* c2 = new Cube(2,1);
   c2->setPosition(5, 0, 0);
   c2->prepare();
   
-  std::cout << "DISTANCE" << Geometry::gjkDistanceBetweenPolyhedra(c1, c2) << std::endl;
+  std::cout << "DISTANCE" << Geometry::gjkDistance(c1, c2) << std::endl;
 }
 
 void testGS()
 {
-  Cube* c1 = new Cube(2);
+  Cube* c1 = new Cube(2,1);
   c1->setPosition(0, 0, 0);
 	c1->setAngularMomentum(20, 2, 5);
 
@@ -215,7 +215,7 @@ void demoBalls()
 
 void demoMixed()
 {
-	Cube* c = new Cube(2);
+	Cube* c = new Cube(2,1);
 	c->setPosition(0, 5, 0);
   e->addRigidBody_p(c);
 
@@ -223,7 +223,7 @@ void demoMixed()
 	s->setPosition(0, 4, 4);
   e->addRigidBody_p(s);
 
-	Box* sol = new Box(30, 0.5, 30);
+	Box* sol = new Box(30, 0.5, 30, 1);
 	sol->setPosition(0, -2.5, 0);
   sol->setFixed(true);
   e->addRigidBody_p(sol);
@@ -236,11 +236,11 @@ void demoMixed()
 
 void demoBoxes()
 {
-	Cube* c = new Cube(4);
+	Cube* c = new Cube(4,1);
   c->setFixed(true);
   e->addRigidBody_p(c);
 
-	Box* sol = new Box(30, 0.5, 30);
+	Box* sol = new Box(50, 0.5, 50, 1);
 	sol->setPosition(0, -2.5, 0);
   sol->setFixed(true);
   e->addRigidBody_p(sol);
@@ -253,7 +253,7 @@ void demoBoxes()
 
 int main(int argc, char** argv)
 {
-	srand(1);//123);
+	srand(123);//123
 
   e = new Engine(&argc, argv, 0.01);
   
@@ -261,14 +261,14 @@ int main(int argc, char** argv)
   
   //testGeometry();
   //testGJK();
-	testGS();
+	//testGS();
   //testTimeReversing();
 	
   //demoRope();
 	//demoBalls();
   //demoPendulum();
 	//demoMixed();
-  //demoBoxes();
+  demoBoxes();
   
   delete e;
 

@@ -11,7 +11,7 @@ class Box : public CustomRigidBody
     double depth;
 
   public:
-    Box(double width, double height, double depth);
+    Box(double width, double height, double depth, double mass);
     ~Box();
 
     void computeInverseInertiaTensor();
@@ -20,7 +20,7 @@ class Box : public CustomRigidBody
 class Cube : public Box
 {
   public:
-    Cube(double side);
+	Cube(double side, double mass);
     ~Cube();
 };
 

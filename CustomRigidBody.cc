@@ -11,6 +11,7 @@ extern Engine* E;
 
 CustomRigidBody::CustomRigidBody()
 {
+	this->type = CUSTOM;
 }
 
 CustomRigidBody::~CustomRigidBody()
@@ -220,12 +221,10 @@ void CustomRigidBody::computeVerticesAbsolutePositions()
 
 std::vector<Contact> CustomRigidBody::getContacts(RigidBody* rb_p)
 {
-	return this->getContacts(rb_p);
-}
+	if(rb_p->type == CUSTOM)
+		return this->getContacts((CustomRigidBody*)rb_p);
 
-std::vector<Contact> CustomRigidBody::getContacts(Sphere* s_p)
-{
-	return std::vector<Contact>();
+	return this->getContacts((Sphere*)rb_p);
 }
 
 std::vector<Contact> CustomRigidBody::getContacts(CustomRigidBody* rb_p)
@@ -239,6 +238,11 @@ std::vector<Contact> CustomRigidBody::getContacts(CustomRigidBody* rb_p)
 		vfContacts.push_back(eeContacts[i]);
 
 	return vfContacts;
+}
+
+std::vector<Contact> CustomRigidBody::getContacts(Sphere* s_p)
+{
+	return std::vector<Contact>();
 }
 
 Vector3 CustomRigidBody::getSupportPoint(Vector3 direction)

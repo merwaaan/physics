@@ -482,7 +482,7 @@ Vector3 Geometry::closestPointOfSphere(Vector3 point, Sphere sphere, double* dis
   return closest;
 }
 
-Vector3 Geometry::gjkDistanceBetweenPolyhedra(RigidBody* rb1_p, RigidBody* rb2_p, bool* interPenetration_p)
+Vector3 Geometry::gjkDistance(RigidBody* rb1_p, RigidBody* rb2_p, bool* interPenetration_p)
 {
 	Vector3 origin(0, 0, 0);
 
@@ -545,7 +545,7 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
       double distance;
       Vector3 point = Geometry::closestPointOfPolygon(vertex, face, &distance);
 
-      if(distance < E->getTolerance())
+      if(distance < 0.1)
       {
         Contact contact;
 
@@ -587,13 +587,11 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
   std::vector<Edge> edges1 = rb1_p->getEdges();
   std::vector<Edge> edges2 = rb2_p->getEdges();
 
-	std::cout << "edges " << edges1.size() << " " << edges2.size() <<  std::endl;
   for(int i = 0; i < edges1.size(); ++i)
 	  for(int j = 0; j < edges2.size(); ++j)
     {
 	    Vector3 closest1, closest2;
 	    double distance = Geometry::edgeEdgeDistance(edges1[i], edges2[j], &closest1, &closest2);
-			std::cout << distance << std::endl;
 
 			if(
 				edges1[i].a == closest1 ||
@@ -602,7 +600,7 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 				edges2[j].b == closest2)
 				continue;
 
-			if(distance < E->getTolerance())
+			if(distance < 0.1)
 			{
 		    Contact contact;
 

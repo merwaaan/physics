@@ -11,6 +11,7 @@ extern Engine* E;
 Sphere::Sphere(double radius) :
   radius(radius)
 {
+	this->type = SPHERE;
 }
 
 Sphere::~Sphere()
@@ -80,7 +81,10 @@ void Sphere::draw()
 
 std::vector<Contact> Sphere::getContacts(RigidBody* rb_p)
 {
-	return this->getContacts(rb_p);
+	if(rb_p->type == SPHERE)
+		return this->getContacts((Sphere*)rb_p);
+
+	return this->getContacts((CustomRigidBody*)rb_p);
 }
 
 std::vector<Contact> Sphere::getContacts(Sphere* s_p)
@@ -91,7 +95,8 @@ std::vector<Contact> Sphere::getContacts(Sphere* s_p)
 	Vector3 closest1 = this->position + from1to2.normalize() * this->radius;
 	Vector3 closest2 = s_p->getPosition() + (-1 * from1to2).normalize() * s_p->getRadius();
 
-	if((closest1 - closest2).length() < E->getTolerance())
+	//if((closest1 - closest2).length() < E->getTolerance())
+	if(closest1 == closest2)
 	{
 		Contact c;
 		c.a = this;

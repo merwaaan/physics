@@ -35,7 +35,7 @@ class Engine
 		void cleanUp();
 
 		Vector3* computeImpulse(Contact contact);
-		void emergencyPush(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p);
+		void emergencyPush(RigidBody* rb1_p, RigidBody* rb2_p, Vector3 distance);
 
     double getAbsoluteTime();
     double getLocalTime();

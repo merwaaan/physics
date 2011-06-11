@@ -11,7 +11,7 @@ l'environnement. Finalement, une force de séparation doit être
 calculée et appliquée aux deux objets afin de simuler le rebond ou le
 repos.
 
-\subsection{Détection d'une collision}
+\subsection{Détection}
 
 Une collision fait entrer en jeu deux corps rigides dont l'intégrité
 physique a été corrompue, autrement dit : les corps rentrent l'un dans
@@ -223,7 +223,7 @@ détermination du point le plus proche de l'origine $O$
   la figure le plus proche de l'origine.
 \end{itemize}
 
-\subsection{Correction du contact}
+\subsection{Correction}
 
 \`A chaque mise à jour de la simulation, des corps sont susceptibles
 de se déplacer et donc d'entrer en contact les uns avec les autres. Le
@@ -321,7 +321,7 @@ pas la seule valeur à avoir été recalée : orientation, élans angulaire
 et linéaires sont eux aussi revenus aux valeurs qu'ils auraient dû
 atteindre à l'instant du contact.
 
-\subsection{Réponse à une collision}
+\subsection{Réponse}
 
 Un coefficient de restitution $0 \leq \varepsilon \leq 1$ détermine le
 taux de rebond d'un corps. Si $\varepsilon = 1$, la balle rebondira

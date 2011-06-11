@@ -165,7 +165,7 @@ Matrix3 Matrix3::normalize() const
 }
 
 /**
- * Iteratively orthonalize a matrix using the Gram-Schmidt algorithm
+ * Iteratively orthonalize a matrix using the Gram-Schmidt process.
  */
 Matrix3 Matrix3::orthogonalize() const
 {

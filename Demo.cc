@@ -85,6 +85,16 @@ void testGJK()
   std::cout << "DISTANCE" << Geometry::gjkDistanceBetweenPolyhedra(c1, c2) << std::endl;
 }
 
+void testGS()
+{
+  Cube* c1 = new Cube(2);
+  c1->setPosition(0, 0, 0);
+	c1->setAngularMomentum(20, 2, 5);
+
+	e->addRigidBody_p(c1);
+	e->run();
+}
+
 void testTimeReversing()
 {
   double dt = 1;
@@ -251,13 +261,14 @@ int main(int argc, char** argv)
   
   //testGeometry();
   //testGJK();
+	testGS();
   //testTimeReversing();
 	
   //demoRope();
 	//demoBalls();
   //demoPendulum();
-	demoMixed();
-  demoBoxes();
+	//demoMixed();
+  //demoBoxes();
   
   delete e;
 

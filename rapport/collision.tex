@@ -5,11 +5,10 @@ les corps de la simulation évoluent indépendament les uns des autres,
 il est temps de les faire interagir entre eux. Cette phase se divise
 en trois étapes. Premièrement, le moteur physique doit être capable de
 déterminer si une collision a lieu entre deux corps. Ensuite, il doit
-pouvoir corriger leur état afin de contre-balancer les décalages dûs
-aux erreurs numériques et à l'intégration discrète de
-l'environnement. Finalement, une force de séparation doit être
-calculée et appliquée aux deux objets afin de simuler le rebond ou le
-repos.
+pouvoir corriger leur état afin de contre-balancer les décalages dûs à
+l'intégration discrète de l'environnement. Finalement, une force de
+séparation doit être calculée et appliquée aux deux objets afin de
+simuler le rebond ou le repos.
 
 \subsection{Détection}
 
@@ -17,18 +16,18 @@ Une collision fait entrer en jeu deux corps rigides dont l'intégrité
 physique a été corrompue, autrement dit : les corps rentrent l'un dans
 l'autre. Nous allons définir un traitement à appliquer à deux objets
 pour savoir si tel est le cas et de façon certaine. Néanmoins, bien
-que l'algorithme que nous allons présenter ait fait ses preuves
-dans le domaine des simulations physiques, il faut garder à l'esprit
-que ce test sera éxécuté à chaque intégration de la simulation et ce,
-pour chaque paire de corps. Dans de telles circonstances, l'usage d'un
-algorithme a priori rapide peut se révéler désastreux au niveau des
-performances.
+que l'algorithme que nous allons présenter ait fait ses preuves dans
+le domaine des simulations physiques, il faut garder à l'esprit que ce
+test sera éxécuté à chaque intégration de la simulation et ce, pour
+chaque paire de solides. Dans de telles circonstances, l'usage d'un
+algorithme a priori rapide peut se révéler désastreux au niveau pour
+les performances du moteur.
 
 Nous faisons donc le choix de séparer la détection de collision en
 deux étapes : une détection grossière et une détection fine. La
-détection grossière fera usage d'un algorithme approximatif qui
-informe de la possibilité d'une collision, si le résultat est positif
-alors on exécute la détection fine (mais plus coûteuse) pour confirmer
+détection grossière fera usage d'un algorithme approximatif mais
+économique qui informe de la possibilité d'une collision, si le
+résultat est positif alors on exécute la détection fine pour confirmer
 ou infirmer le contact de façon certaine.
 
 \subsubsection{Détection grossière}
@@ -41,31 +40,30 @@ soit positif sans qu'aucune collision ne prenne vraiment place. Dans
 ce dernier cas, la détection fine invalidera la collision.
 
 On se base sur l'utilisation de boîtes englobantes, ou \textit{AABB}
-(\textit{axis-aligned bounding-boxes}), pour détecter l'éventualité
+(\textit{axis-aligned bounding boxes}), pour détecter l'éventualité
 d'un contact. Les boîtes englobantes sont des volumes alignés avec les
-axes du repère global qui contiennent tous les points d'un corps. Pour
+axes du repère global qui contiennent tous les sommets d'un
+corps. Puisque tous les sommets de l'objet sont contenus dans l'AABB,
+il est évident que tous les points du corps le seront aussi. Pour
 savoir si deux corps rentrent possiblement en collision, on vérifie si
 leur boîte englobante entrent en collision.
 
 Le processus de construction d'une boîte englobante est simple : on
-enregistre pour chaque axe les deux points du corps qui sont les plus
-éloignés dans les sens positifs et négatifs.
+enregistre pour chaque axe le sommet du corps le plus éloigné dans la
+direction négative (\texttt{min} dans l'algorithme) et le sommet le
+plus éloigné dans la direction positive (\texttt{max}).
 
 \begin{verbatim}
 entrée : le corps C
-sortie : une boîte englobant C
+sortie : une boîte englobante B
 
-boite_englobante :
-  boite.min = [INF, INF, INF]
-  boite.max = [INF, INF, INF]
-
-  Pour tous les axes
-    Pour tous les points P de C
-      Si P[axe] < boite.min[axe]
-        boite.min[axe] = P[axe]
-      Si P[axe] > boite.max[axe]
-        boite.max[axe] = P[axe]
-
+boite_englobante(C) :
+  Pour tous les axes A
+    Pour tous les sommets S de C
+      Si S.A < B.A.min
+        B.A.min = S.A
+      Si S.A > B.A.max
+        B.A.max = S.A
   retourner boite
 \end{verbatim}
 
@@ -73,38 +71,37 @@ Le test vérifiant la collision entre deux boîtes englobantes est très
 rapide puisque qu'il tire parti du fait que les boîtes sont alignées
 avec le repère absolu. Pour vérifier que deux AABB sont en état
 d'interpénétration, on utilise le théorème des axes de séparation
-selon lequel deux boîtes sont séparées si leur projection sur au moins
-un axe du repère absolu ne se superposent pas \cite{ericson05}. En
-deux dimension, on peut résumer ce théorème par le fait que si une
-ligne parallèle à un des axes du repère global sépare deux corps,
+selon lequel deux boîtes alignées sur les axes du repère absolu sont
+séparées si leur projection sur au moins un axe ne se superposent
+pas. En deux dimension, on peut résumer ce théorème par le fait que si
+une ligne parallèle à un des axes du repère global sépare deux corps,
 alors ils ne peuvent pas être en état de collision. En trois dimension
 le principe est le même, à la différence que l'on parle de plan de
 séparation.
 
 \begin{verbatim}
-entrée : deux boîtes englobantes b1 et b2
+entrée : deux boîtes englobantes B1 et B2
 sortie : booléen
 
 detection_collision_grossiere :
-  Si b1.min[x] > b2.max[x] ou
-     b1.max[x] < b2.min[x] ou
-     b1.min[y] > b2.max[x] ou
-     b1.max[y] < b2.min[x] ou
-     b1.min[z] > b2.max[z] ou
-     b1.max[z] < b2.min[z]
+  Si B1.x.min > B2.x.max ou
+     B1.x.max < B2.x.min ou
+     B1.y.min > B2.y.max ou
+     B1.y.max < B2.y.min ou
+     B1.z.min > B2.z.max ou
+     B1.z.max < B2.z.min
        retourner faux
 
   retourner vrai
 \end{verbatim}
 
-La figure \ref{aabb} illustre les trois situation possibles impliquant
-deux corps.
-
-Sur la sous-figure $a$, les boîtes englobantes ne rentrent pas en
-collision car leur projection sur l'axe des abscisses ne se
-superposent pas. Il est donc impossible que les corps qu'elles
-contiennent soient eux-mêmes en état de collision, il est inutile
-d'aller plus loin et de lancer la détection fine.
+La figure \ref{aabb} illustre les trois situations possibles
+impliquant deux corps; un cercle et un rectangle. Sur la sous-figure
+$a$, les boîtes englobantes ne rentrent pas en collision car leur
+projection sur l'axe des abscisses ne se superposent pas. Il est donc
+impossible que les corps qu'elles contiennent soient eux-mêmes en état
+de collision, il est inutile d'aller plus loin et de lancer la
+détection fine.
 
 La sous-figure $b$ montre qu'il est possible dans certaines
 configurations que les boîtes englobantes entrent en collision sans
@@ -112,10 +109,11 @@ que ce soit nécessairement le cas pour les corps qu'elles
 contiennent. Les boîtes sont en état d'interpénetration puisque leurs
 projections ne se séparent sur aucun axe. Ici, la détection grossière
 renvoit un résultat positif et c'est l'algorithme de détection fine
-qui réfutera la collision.
+qui réfutera la collision entre les deux solides.
 
 La sous-figure $c$ illustre quant à elle un troisième cas de figure
-dans lequel les boîtes entrent en collision et les corps aussi.
+dans lequel les boîtes entrent en collision et les corps aussi. La
+détection fine sera appellée et confirmera la collision.
 
 \begin{figure}
   \centering
@@ -137,7 +135,18 @@ collision.
 Introduisons en premier lieu la somme de Minkowski, une opération
 mathématique notée $A \oplus B = \{a + b \mid a \in A, b \in B\}$ avec
 $A$ et $B$ deux corps. On peut résumer la somme de Minkowski en un
-balayage de chaque corps par l'autre.
+balayage de chaque corps par l'autre. Nous utiliserons une variante de
+cette opération : la différence de Minkowski, notée $A \ominus B = A
+\oplus (-B)$. La propriété de cette opération qui nous intéresse le
+plus est le fait que la plus petite distance entre les points qui la
+forment et l'origine du repère absolu est égale à la plus petite
+distance entre les corps $A$ et $B$. La figure \ref{minkowski}
+illustre cette caractéristique. Nous pouvons exploiter cette
+singularité pour déterminer si deux corps entrent en collision. En
+effet, si la distance minimum entre les deux corps est supérieure à
+zéro, alors aucune collision ne peut possiblement exister. Si au
+contraire, la distance minimum est nulle, alors les deux objets sont
+en état d'interpénétration.
 
 \begin{figure}
   \centering
@@ -147,42 +156,45 @@ balayage de chaque corps par l'autre.
   \label{minkowski}
 \end{figure}
 
-Nous utilisons une variante de cette opération : la différence de
-Minkowski, notée $A \ominus B = A \oplus (-B)$. La propriété de cette
-opération qui nous intéresse le plus est le fait que la plus petite
-distance entre les points qui la forment et l'origine du repère absolu
-est égale à la plus petite distance entre les corps $A$ et $B$ (figure
-\ref{minkowski}). Nous pouvons exploiter cette caractéristique pour
-déterminer si deux corps entrent en collision. En effet, si la
-distance minimum entre les deux corps est supérieure à zéro, alors
-aucune collision ne peut possiblement exister. Si au contraire, la
-distance minimum est inférieure à zéro, alors les deux objets sont
-état d'interpénétration.
-
-Le processus de détection fine passera donc par le calcul de la
-différence de Minkowski $M$ entre deux corps. Une fois $M$ calculée,
-il reste encore à calculer la distance séparant $M$ et l'origine du
-repère absolu. Dans cette optique, on utilise l'algorithme GJK, ou
+L'algorithme de détection fine consistera donc à se baser sur la
+différence de Minkowski $M$ entre deux corps pour en calculer la plus
+petite distance la séparant de l'origine du repère absolu. Dans cette
+optique, on utilise l'algorithme GJK, pour
 \textit{Gilbert-Johnson-Keerthi algorithm}. De façon générale, cet
 algorithme est capable de calculer efficacement la plus petite
-distance entre la coque formée par un nuage de points et un point
-précis de l'espace. Dans le cadre de notre problématique, le nuage de
-points correspond aux vertex de $M$ et le point cible correspond à
-l'origine du repère absolu.
+distance entre la coque formée par un nuage de points et un autre
+point quelconque de l'espace. Dans le cadre de notre problématique, le
+nuage de points correspond aux sommets de $M$ et le point cible
+correspond à l'origine du repère absolu.
 
-GJK se base sur l'utilisation de simplex. Un simplex d'un corps est
-une structure géométrique entièrement contenue dans ce dernier et
-étant caractérisée par une dimension. Un simplex de dimension 0 est un
-point, un simplex de dimension 1 est une ligne, une simplex de
-dimension 2 est un triangle et un simplex de dimension 3 est un
-tétrahèdre. Un corps de dimension $d$ peut contenir un simplex de
-dimension $d$ au maximum. Le principe de GJK est de partir d'un
-simplex de base choisi alétoirement (souvent un point, donc un simplex
-de dimension 0) et d'augmenter sa dimension pour se rapprocher
-progressivement du point de la figure le plus proche du point
-cible. \`A la fin de cette procédure, on a determiné, le point de $M$
-le plus proche de l'origine, et une simple soustraction vectorielle
-permet de calculer leur distance.
+GJK se base sur l'utilisation de deux éléments : le simplex et le
+point de support. Un simplex d'un corps est une structure géométrique
+entièrement contenue dans ce dernier et étant caractérisée par une
+dimension. Un simplex de dimension 0 est un sommet, un simplex de
+dimension 1 est une arête, un simplex de dimension 2 est un triangle
+et un simplex de dimension 3 est un tétrahèdre. Un corps de dimension
+$d$ peut contenir un simplex de dimension $d$ au maximum. Au départ de
+l'algorithme on part d'un simplex de base choisi alétoirement (souvent
+un sommet, donc un simplex de dimension 0). Ensuite, et à chaque
+étape, on augmente sa dimension pour l'agrandir jusqu'à ce que le
+point de $M$ le plus proche de l'origine en fasse partie. \`A la fin
+de chaque étape, on détermine le point du simplex actuellement le plus
+proche de l'origine. Afin d'alléger la charge de calcul, il est aussi
+nécessaire de réduire la dimension du simplex dés que des sommets ne
+sont plus nécessaires à la définition du point actuellement le plus
+proche. En effet plus la dimension du simplex est faible et plus les
+calculs géométriques associés à la détermination du point du simplex
+actuellement le plus proche sont rapides.
+
+Un point de support est un sommet de $M$ fourni par une fonction de
+support $S(\vec{d})$, avec $\vec{d}$ la direction du point du simplex
+actuellement le plus proche de l'origine à l'origine. La fonction de
+support est employée dans l'algorithme principal de GJK pour
+obtenir le sommet de $M$ le plus extrême dans la direction
+$\vec{d}$. Il est à noter que grâce à la fonction de support il n'est
+pas nécessaire de calculer explicitement la différence de Minkowski
+dans son intégralité \cite{ericson}, car $S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) -
+S_B(-\vec{d})$.
 
 \begin{figure}
   \centering
@@ -206,21 +218,21 @@ détermination du point le plus proche de l'origine $O$
 \begin{itemize}
 \item Le vertex $A$ est choisi aléatoirement pour faire office de
   simplex de base. Le point du simplex actuellement le plus proche de
-  l'origine ne peu que être $A$. On cherche le vertex de la figure le
-  plus extrême dans la direction du point le plus proche ($A$) à
+  l'origine ne peut que être $A$ / $S_0$. On cherche un point de support dans
+  la direction $\vec{S_0O}$.
+\item Le sommet le plus extrême dans la direction $\vec{AO}$ est $C$,
+  on l'ajoute au simplex. Le point du simplex actuellement le plus
+  proche de l'origine est $S_1$.
+\item On cherche le vertex le plus extrême dans la direction
+  $\vec{S_1O}$.
+\item Le point de support retourné est $B$, on l'ajoute au simplex. Le
+  point du simplex le plus proche de l'origine est $\vec{S_2}$.
+\item Le vertex $A$ n'est plus utile à la définition de $\vec{S_2}$,
+  on le retire du simplex. On cherche le vertex le plus extrême dans
+  la direction $\vec{S_2O}$.
+\item Aucun vertex n'est plus extrême que $\vec{S_2}$ dans la
+  direction $\vec{S_2O}$, c'est donc le point de $M$ le plus proche de
   l'origine.
-\item Le vertex le plus extrême est $C$, on l'ajoute au simplex. Le
-  point du simplex le plus proche de l'origine est ???.
-\item On cherche le vertex le plus extrême dans la direction de ??? à
-  l'origine.
-\item Le vertex le plus extrême est $B$, on l'ajoute au simplex. Le
-  point du simplex le plus proche de l'origine est ???2.
-\item Le vertex $A$ n'est plus utile à la définition du simplex
-  contenant le point le point le plus proche de l'origine. On le
-  retire du simplex. On cherche le vertex le plus extrême dans la
-  direction de ???2 à l'origine.
-\item Aucun vertex n'est plus extrême que ???2, on a donc le point de
-  la figure le plus proche de l'origine.
 \end{itemize}
 
 \subsection{Correction}
@@ -299,13 +311,15 @@ sur la figure \ref{dichotomie}.
 \end{figure}
 
 \begin{verbatim}
-entrée: deux corps A et B, le pas de temps
-sortie: deux corps en collision exacte
+entrée: deux corps A et B, le pas de temps dt
+sortie: deux corps A et B
 
 correction:
-  si collision_exacte(A,B)
+  d = distance_GJK(A,B)
+
+  si 0 <= d <= seuil
     retourner A et B
-  sinon si collision(A,B) alors
+  sinon d = 0
     A.integrer(-dt/2)
     B.integrer(-dt/2)
   sinon
@@ -323,25 +337,19 @@ atteindre à l'instant du contact.
 
 \subsection{Réponse}
 
-Un coefficient de restitution $0 \leq \varepsilon \leq 1$ détermine le
-taux de rebond d'un corps. Si $\varepsilon = 1$, la balle rebondira
-avec autant d'énergie qu'elle est arrivée (une situation concrètement
-impossible à retrouver dans le monde réel). Si $\varepsilon = 0$, la
-balle repartira avec une énergie nulle; autrement dit, elle restera
-collée au plan. Le coefficient de restitution dépend habituellement de
-la matière que l'on cherche à simuler : une balle en cahoutchouc aura
-un $\varepsilon$ elevé tandis qu'un bloc d'argile aura un
-$\varepsilon$ proche de zéro.
+[Points de contacts]
 
-Le coefficient de friction influe sur la réponse rotationnelle qu'une
-collision est susceptible de provoquer. Si la balle avait été laché, à
-partir d'une vitesse nulle, sur un plan droit, le rebond aura été
-purement linéaire. Dans le cas d'un plan incliné, un frottement non
-perpendiculaire a lieu et la balle va entrer en rotation. Plus le
-coefficient de friction est élevé et plus cet effet est puissant. On
-peut simplifier cette notion en disant que le coefficient de friction
-détermine si un corps est recouvert d'une matière qui accroche ou au
-contraire qui glisse.
+Un coefficient de restitution $\varepsilon$, avec $0 \leq \varepsilon
+\leq 1$, détermine le taux de rebond d'un corps. Si $\varepsilon = 1$,
+la balle rebondira avec autant d'énergie qu'elle est arrivée (une
+situation concrètement impossible à retrouver dans le monde réel). Si
+$\varepsilon = 0$, la balle repartira avec une énergie nulle; elle
+restera collée au plan. Le coefficient de restitution dépend
+habituellement de la matière que l'on cherche à simuler : une balle en
+caoutchouc aura un $\varepsilon$ elevé tandis qu'un bloc d'argile aura
+un $\varepsilon$ proche de zéro.
 
-\cite{newton87}
+[Friction]
+
+\cite{newton}
 

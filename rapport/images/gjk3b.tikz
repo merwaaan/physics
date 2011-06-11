@@ -1,5 +1,7 @@
 \begin{tikzpicture}[scale=0.4,transform shape]
 	\input{images/gjk_base.tikz}
 
-  \node[gjkclosest] (closest) at ($(C)!(O)!(B)$) {};  
+  \node[gjkclosest] (closest) at ($(C)!(O)!(B)$) {};
+
+  \node at ($(closest)+(0.4,0)$) (lclosest) {$S_2$};
 \end{tikzpicture}

@@ -8,4 +8,6 @@
 
   \draw[gjkdir] ($(C)!(O)!(B)$) -- (O);
   \node[gjkclosest] (closest) at ($(C)!(O)!(B)$) {};
+
+  \node at ($(closest)+(0.4,0)$) (lclosest) {$S_2$};
 \end{tikzpicture}

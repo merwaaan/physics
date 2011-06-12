@@ -32,7 +32,7 @@ rapport à une unité de temps.
   \vec{a} = \frac{\deriv \vec{v}}{\deriv t} \\
 \end{align*}
 
-Par transitivité, on confirme que la position est den relation directe
+Par transitivité, on confirme que la position est en relation directe
 avec l'accélération.
 
 \begin{align*}
@@ -133,9 +133,9 @@ corps à :
 
 L'élan linéaire remplace l'accélération dans la définition d'un corps
 et permet de calculer sa vitesse si besoin en est. Cette organisation
-permet à première vue une intégration plus courte et une occupation
-moindre de la mémoire mais les avantages majeurs de ce choix prendront
-tous leurs sens lorsque le mouvement angulaire sera introduit.
+permet une intégration plus courte et une occupation moindre de la
+mémoire mais l'avantage principal reste la simplification de la
+structure générale d'un corps rigide.
 
 \subsubsection{Modélisation d'un corps}
 
@@ -154,18 +154,20 @@ déformation du corps. Cette méthode est envisageable mais elle
 présente plusieurs désavantages. Premièrement, les règles de cohésion
 à mettre en place nécessiteraient des traitements supplémentaires, et
 donc un temps de calcul plus élevé. Deuxièment, un corps devrait
-passer par autant d'intégrations qu'il a de points à chaque mise à
+passer par autant d'intégrations qu'il a de particules à chaque mise à
 jour. Il existe une solution plus simple et plus élégante qui permet
-de réduire les mouvements linéaires d'un corps rigide à ceux d'une
-unique particule judicieusement placée.
+de réduire les mouvements linéaires d'un corps doté d'un volume
+convexe à ceux d'une unique particule judicieusement placée.
 
 Introduisons en premier lieu la notion de repères absolu et local. Le
 repère absolu est le référentiel orthogonal dont l'origine sert de
 centre à l'environnement de la simulation. Un repère local est un
 référentiel qui est unique à chaque corps et dont le l'origine se
 situe à l'intérieur même de cet objet. La figure \ref{reperelocal}
-nous montre la position q'un pointt $x$ peut prendre par rapport aux
-deux repères.
+nous montre la position qu'un point $x$ d'un corps peut prendre par
+rapport à chaque repère : $\vec{p}_l$ correspond à sa position
+dans son repère local tandis que $\vec{p}_a$ est celle dans le
+repère absolu.
 
 \begin{figure}
   \centering
@@ -187,14 +189,16 @@ $\vec{C}$ la position du centre de masse dans le repère absolu.
   \vec{C} = \frac{1}{M} \sum m_i \vec{p}_i \\
 \end{align*}
 
-Une fois le centre de masse défini, la position locale
-$\vec{r}_i$ d'une particule $i$ peut être calculée en fonction de sa
+Une fois le centre de masse déterminé, la position locale $\vec{r}_i$
+d'un point quelconque $i$ peut être calculée en fonction de sa
 position absolue $\vec{p}_i$ par :
 
-\[\vec{r}_i = \vec{p}_i - \vec{C}\]
+\[\vec{r}_i = \vec{p}_i - \vec{C}\] \\
 
-Grâce au centre de masse, on a une seule position à faire évoluer,
-quelle que soit la complexité de la structure du corps concerné.
+Le centre de masse est l'unique position que nous devons faire évoluer
+par intégration, quelle que soit la complexité de la structure d'un
+corps. Il reste encore néanmoins à considérer le pendant angulaire de
+l'aspect dynamique d'un objet.
 
 \subsection{La composante angulaire}
 
@@ -206,7 +210,7 @@ l'on peut être témoin dans un environnement réel. Les particules étant
 de simples points flottants dans l'espace, cela ne posait pas de
 problème précédemment mais le moteur physique que l'on conçoit doit
 gérer des volumes plus complexes. Imaginons une boîte cubique que l'on
-lancerait en l'air, si aucune rotation n'apparaît (si la base de la
+lancerait devant soi, si aucune rotation n'apparaît (si la base de la
 boîte reste parallèle au sol), l'imitation du réel que l'on souhaite
 reproduire perd toute crédibilité.
 
@@ -217,21 +221,20 @@ linéaire correspondent l'orientation et l'élan angulaire.
 
 De la même façon que la position représentait visuellement l'état d'un
 corps au sein de la composante linéaire, un corps doit posséder une
-orientation. En deux dimensions, un nombre flottant représentant
-l'angle du corps par rapport à un axe fixe suffirait à décrire
-l'orientation d'un objet mais pas dans notre environnement en trois
-dimensions. Le repère local d'un corps a été introduit dans la partie
-précédente et se résumait à un centre de masse faisant office
-d'origine, mais un repère possède aussi des axes et ceux du repère
-local ne sont pas nécessairement alignés avec ceux du repère
-absolu. Pour représenter la direction des axes du repère local, et
-donc l'orientation du corps à qui il appartient, on utilise une
-matrice de dimension 3 dans laquelle chaque vecteur colonne
-correspondra à un des axes du repère local \cite{witkit}. Pour
-illustrer ces propos, analysons la matrice identité d'ordre 3, qui
-correspond à la matrice d'orientation d'un corps parfaitement aligné
-avec les axes du repère absolu et n'ayant encore subit aucune
-rotation.
+orientation. En deux dimensions, une valeur représentant l'angle du
+corps par rapport à un axe fixe suffirait à décrire l'orientation d'un
+objet mais pas dans notre environnement en trois dimensions. Le repère
+local d'un corps a été introduit dans la partie précédente et se
+résumait à un centre de masse faisant office d'origine, mais un repère
+possède aussi des axes et ceux du repère local ne sont pas
+nécessairement alignés avec ceux du repère absolu. Pour représenter la
+direction des axes du repère local, et donc l'orientation du corps à
+qui il appartient, on utilise une matrice de dimension 3 dans laquelle
+chaque vecteur colonne correspondra à un des axes du repère local
+\cite{witkit}. Pour illustrer ces propos, analysons la matrice
+identité d'ordre 3, qui correspond à la matrice d'orientation d'un
+corps parfaitement aligné avec les axes du repère absolu et n'ayant
+encore subit aucune rotation.
 
 \[
 \begin{pmatrix}
@@ -281,18 +284,18 @@ IMAGE 2
 \end{figure}
 
 Afin de contrer cet effet indésirable, on ajoutera deux étapes de
-corrections à la fin de chaque intégration. Premièrement, il nous faut
-normaliser les axes du repère local. Chaque axe correspondand à un
-vecteur colonne de la matrice d'orientation, il faut donc les extraire
-un par un et recalculer leur magnitude pour s'assurer de leur
+correction à la fin de chaque intégration. Premièrement, il nous faut
+normaliser les axes du repère local. Chaque axe correspondant à un
+vecteur colonne de la matrice d'orientation, il suffit de les extraire
+un par un et de recalculer leur magnitude pour s'assurer de leur
 normalité.
 
 En second lieu, il sera nécessaire de réorthogonaliser le repère
 local, autrement dit s'assurer que ses axes restent orthognaux entre
-eux. Pour cela, on orthogonalisera la matrice de rotation par
-le processus de Gram-Schmidt \cite{weber}, une méthode
+eux. Pour cela, on orthogonalisera la matrice de rotation par le
+processus de Gram-Schmidt \cite{weber}, une méthode
 d'orthogonalisation fonctionnant par projection itérative des axes les
-uns sur les autres. 
+uns sur les autres.
 
 Maintenant que l'orientation d'un corps a été définie, penchons nous
 sur l'élan angulaire. On pourrait utiliser vitesse et accélération
@@ -308,15 +311,17 @@ le point d'un objet sur lequel une force est exercée, la quantité
 d'élan linéaire ajoutée est la même. Par contre, la quantité d'élan
 angulaire transmis par une force dépend de son point d'application;
 plus précisément de son excentricité par rapport au centre de
-masse. Imaginons une boîte cubique flottant en état d'apesanteur. Si
-l'on exerce une légère poussée sur le milieu d'une de ses faces alors
-la boîte subira une translation. Si l'on applique maintenant une
-pression toujours dans la même direction mais cette fois sur l'un des
-coins de la boîte, la même translation sera accompagnée d'une rotation
-autour du centre de masse. On formule la composante angulaire d'une
-force par le couple $\vec{\tau}$, qui dépend de la position $\vec C$
-du centre de masse et de la position $\vec x$ (dans le repère absolu)
-du point d'application de la force $\vec{F}$.
+masse. Imaginons une boîte cubique flottant en état d'apesanteur et
+dont la masse est également répartie sur tous les sommets (le centre
+de masse se situera donc en son centre géométrique). Si l'on exerce
+une légère poussée sur le milieu d'une de ses faces alors la boîte
+subira une translation. Si l'on applique maintenant une pression
+toujours dans la même direction mais cette fois sur l'un des coins de
+la boîte, la même translation sera accompagnée d'une rotation autour
+du centre de masse. On formule la composante angulaire d'une force par
+le couple $\vec{\tau}$, qui dépend de la position $\vec C$ du centre
+de masse et de la position $\vec x$ du point d'application de la force
+$\vec{F}$ dans le repère absolu.
 
 \begin{align*}
   \vec{\tau} = (\vec{x} - \vec{C}) \times \vec{F} \\
@@ -326,9 +331,10 @@ Lorsqu'une force est appliquée à un objet, elle est décomposée en sa
 composante linéaire et en sa composante angulaire. Ses deux quantités
 sont ensuite stockées dans des accumulateurs de force et de couple,
 qui seront remis à zéro après chaque intégration. Ici, $\sum
-\vec{\tau}_i$ correspond aux forces accumulées pendant une
-itération. Il est de même pour le $\sum \vec{F}_i$ de l'intégration de
-la composante linéaire.
+\vec{\tau}_i$ correspond à la somme des composantes angulaires des
+différentes forces $\vec{F}_i$ subies pendant une itération. Il est de
+même pour le $\sum \vec{F}_i$ de l'intégration de la composante
+linéaire.
 
 \begin{align*}
   \vec{A}_{n+1} &= \vec{A}_n + {\sum \vec{\tau}_i} \\ \\
@@ -337,24 +343,27 @@ la composante linéaire.
 \subsubsection{Quantités auxiliaires}
 
 On sait désormais qu'un corps possède une orientation et un élan
-angulaire, on sait aussi comment passer de l'application d'une force à
-une variation d'élan angulaire. Néanmoins, l'intégration de la
-composante rotative d'un mouvement n'est pas aussi directe que pour sa
-version linéaire. Nous avons encore besoin de faire appel à plusieurs
-quantités auxiliaires, telles que le tenseur d'inertie et le tenseur
-d'inertie instantanée, avant de mesurer l'étendue de la variation
-d'orientation induite par l'application de forces.
+angulaire, on sait aussi comment passer de l'application de forces à
+une variation d'élan angulaire. Néanmoins, la partie rotationnelle de
+l'intégration d'un objet n'est pas aussi directe que sa version
+linéaire. Nous avons encore besoin de faire appel à plusieurs
+quantités auxiliaires, telles que le tenseur d'inertie local, le
+tenseur d'inertie absolu et vitesse angulaire, avant de mesurer
+l'étendue de la variation d'orientation induite par des influences
+extérieures.
 
 Concrètement, un tenseur d'inertie est une matrice de dimension 3 dont
 les coefficients servent de facteurs lors du calcul de la variation
-d'orientation d'un corps à partir de son élan angulaire et
-représentent la répartition de la densité d'un corps. Il dépend
-directement de la forme du corps considéré et affecte les axes de
-rotation principaux de ce dernier. Pour le calculer précisément, on
-doit effectuer des intégrations par rapport au volume du solides
+d'orientation d'un corps à partir de son élan angulaire et représente
+la répartition de la densité d'un corps. Il dépend directement de la
+forme du corps considéré et affecte ses axes de rotation
+principaux. Pour calculer un tenseur d'inertie local, on doit
+effectuer des intégrations par rapport au volume du solide
 considéré. Ces opérations sont un travail complexe en elles-mêmes mais
 pour notre plus grande satisfaction, la plupart des manuels de
-mécanique listent en annexe les tenseurs d'inertie usuel. 
+mécanique listent en annexe les tenseurs d'inertie usuels. Ci-suit, en
+exemple, le tenseur d'inertie local d'une boîte, avec $d_i$ son
+étendue le long de l'axe $i$ et $m$ sa masse.
 
 \[
 \begin{pmatrix}
@@ -362,26 +371,33 @@ mécanique listent en annexe les tenseurs d'inertie usuel.
   0 & \frac{m}{12}(d_x^2 + d_z^2) & 0 \\
   0 & 0 & \frac{m}{12}(d_x^2 + d_y^2) \\
 \end{pmatrix}
-\]
+\] \\
 
-Le tenseur d'inertie d'un corps sera attribué lors de la phase de
-préparation des solides et ne changera pas pendant la simulation. Le
-tenseur d'inertie instantanée est une autre quantité auxiliaure qui
-est le pendant absolu du tenseur d'inertie présenté précedemment, qui
-était lui plus local. Il doit être recalculé avant chaque intégration
-si le corps considéré à changé d'orientation depuis la dernière mise à
-jour.
+Le tenseur d'inertie local d'un corps sera attribué lors de la phase
+de préparation des solides et ne changera pas au long de la
+simulation, quelle que soit l'état du corps.
+
+Le tenseur d'inertie absolu est une autre quantité auxiliaire, il doit
+être recalculé à chaque mise à jour puisqu'il dépend du tenseur
+d'inertie local et de l'orientation actuelle du corps. La formule
+suivante, avec $I_l$ le tenseur d'inertie local et $R$ la matrice
+d'orientation, nous fournit le tenseur d'inertie absolu $I_{a}$.
 
 \begin{align*}
-  I_{abs} = R I R^T \\
+  I_a = R I_l R^T \\
 \end{align*}
+
+[vitesse angulaire]
 
 \subsubsection{Intégration}
 
-[ajouter détails]
+[fonction de 'skew']
+
+[détails]
 
 \begin{align*}
-  \vec{A}_{n+1} &= \vec{A}_n + \sum \vec{\tau} \\ \\
-  I_{abs} &= R I R^T \\ \\
-  R_{n+1} &= \frac{\vec{A}_{n+1}}{I_{abs}} R_n \deriv t \\
+  \vec{A}_{n+1} &= \vec{A}_n + \sum \vec{\tau}_i \\ \\
+  I_a &= R_n I_l R_n^T \\ \\
+  \vec{\omega} &= I_a \vec{A}_{n+1} \\ \\
+  R_{n+1} &= \vec{\omega} R_n \deriv t \\
 \end{align*}

@@ -15,13 +15,13 @@ simuler le rebond ou le repos.
 Une collision fait entrer en jeu deux corps rigides dont l'intégrité
 physique a été corrompue, autrement dit : les corps rentrent l'un dans
 l'autre. Nous allons définir un traitement à appliquer à deux objets
-pour savoir si tel est le cas et de façon certaine. Néanmoins, bien
-que l'algorithme que nous allons présenter ait fait ses preuves dans
-le domaine des simulations physiques, il faut garder à l'esprit que ce
-test sera éxécuté à chaque intégration de la simulation et ce, pour
-chaque paire de solides. Dans de telles circonstances, l'usage d'un
-algorithme a priori rapide peut se révéler désastreux au niveau pour
-les performances du moteur.
+pour savoir si tel est le cas et ce, de façon certaine. Néanmoins,
+bien que l'algorithme que nous allons présenter ait fait ses preuves
+dans le domaine des simulations physiques, il faut garder à l'esprit
+que ce test sera éxécuté à chaque intégration de la simulation et ce,
+pour chaque paire de solides. Dans de telles circonstances, l'usage
+d'un algorithme a priori rapide peut se révéler désastreux pour les
+performances du moteur.
 
 Nous faisons donc le choix de séparer la détection de collision en
 deux étapes : une détection grossière et une détection fine. La
@@ -53,19 +53,25 @@ enregistre pour chaque axe le sommet du corps le plus éloigné dans la
 direction négative (\texttt{min} dans l'algorithme) et le sommet le
 plus éloigné dans la direction positive (\texttt{max}).
 
-\begin{verbatim}
-entrée : le corps C
-sortie : une boîte englobante B
-
-boite_englobante(C) :
-  Pour tous les axes A
-    Pour tous les sommets S de C
-      Si S.A < B.A.min
-        B.A.min = S.A
-      Si S.A > B.A.max
-        B.A.max = S.A
-  retourner boite
-\end{verbatim}
+\begin{algorithm}
+  \caption{Construction d'une AABB}
+  \dontprintsemicolon
+  \Entree{Un corps C}
+  \Sortie{Une boîte englobante B}
+  \BlankLine
+  \PourCh{axe A}{
+    \PourCh{sommet S de C}{
+      \Si{S.A $<$ B.A.min}{
+        B.A.min $\leftarrow$ S.A
+      }
+      \Si{Si S.A $>$ B.A.max}{
+        B.A.max $\leftarrow$ S.A
+      }
+    }
+  }
+  \BlankLine
+  \Retour{B}
+\end{algorithm}
 
 Le test vérifiant la collision entre deux boîtes englobantes est très
 rapide puisque qu'il tire parti du fait que les boîtes sont alignées
@@ -79,21 +85,23 @@ alors ils ne peuvent pas être en état de collision. En trois dimension
 le principe est le même, à la différence que l'on parle de plan de
 séparation.
 
-\begin{verbatim}
-entrée : deux boîtes englobantes B1 et B2
-sortie : booléen
 
-detection_collision_grossiere :
-  Si B1.x.min > B2.x.max ou
-     B1.x.max < B2.x.min ou
-     B1.y.min > B2.y.max ou
-     B1.y.max < B2.y.min ou
-     B1.z.min > B2.z.max ou
-     B1.z.max < B2.z.min
-       retourner faux
-
-  retourner vrai
-\end{verbatim}
+\begin{algorithm}
+  \caption{Détection grossière}
+  \dontprintsemicolon
+  \Entree{Deux boîtes englobantes B1 et B2}
+  \Sortie{Un booléen}
+  \BlankLine
+  \Si{B1.x.min $>$ B2.x.max ou \\
+    $\;\;\;\;$ B1.x.max $<$ B2.x.min ou \\
+    $\;\;\;\;$ B1.y.min $>$ B2.y.max ou \\
+    $\;\;\;\;$ B1.y.max $<$ B2.y.min ou \\
+    $\;\;\;\;$ B1.z.min $>$ B2.z.max ou \\
+    $\;\;\;\;$ B1.z.max $<$ B2.z.min}{
+    \Retour{faux}
+  }
+  \Retour{vrai}
+\end{algorithm}
 
 La figure \ref{aabb} illustre les trois situations possibles
 impliquant deux corps; un cercle et un rectangle. Sur la sous-figure
@@ -182,19 +190,18 @@ de chaque étape, on détermine le point du simplex actuellement le plus
 proche de l'origine. Afin d'alléger la charge de calcul, il est aussi
 nécessaire de réduire la dimension du simplex dés que des sommets ne
 sont plus nécessaires à la définition du point actuellement le plus
-proche. En effet plus la dimension du simplex est faible et plus les
+proche. En effet, plus la dimension du simplex est faible et plus les
 calculs géométriques associés à la détermination du point du simplex
 actuellement le plus proche sont rapides.
 
 Un point de support est un sommet de $M$ fourni par une fonction de
 support $S(\vec{d})$, avec $\vec{d}$ la direction du point du simplex
 actuellement le plus proche de l'origine à l'origine. La fonction de
-support est employée dans l'algorithme principal de GJK pour
-obtenir le sommet de $M$ le plus extrême dans la direction
-$\vec{d}$. Il est à noter que grâce à la fonction de support il n'est
-pas nécessaire de calculer explicitement la différence de Minkowski
-dans son intégralité \cite{ericson}, car $S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) -
-S_B(-\vec{d})$.
+support est employée dans l'algorithme principal de GJK pour obtenir
+le sommet de $M$ le plus extrême dans la direction $\vec{d}$. Il est à
+noter que grâce à la fonction de support il n'est pas nécessaire de
+calculer explicitement la différence de Minkowski \cite{ericson}, car
+$S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) - S_B(-\vec{d})$.
 
 \begin{figure}
   \centering
@@ -218,8 +225,8 @@ détermination du point le plus proche de l'origine $O$
 \begin{itemize}
 \item Le vertex $A$ est choisi aléatoirement pour faire office de
   simplex de base. Le point du simplex actuellement le plus proche de
-  l'origine ne peut que être $A$ / $S_0$. On cherche un point de support dans
-  la direction $\vec{S_0O}$.
+  l'origine ne peut que être $A$. On cherche un point de support dans
+  la direction $\vec{AO}$.
 \item Le sommet le plus extrême dans la direction $\vec{AO}$ est $C$,
   on l'ajoute au simplex. Le point du simplex actuellement le plus
   proche de l'origine est $S_1$.
@@ -277,8 +284,8 @@ cette fonction et qu'elle peut prendre en argument un pas de temps
 négatif et simuler l'évolution d'un système en sens inverse. Cette
 possibilité nous permet notamment de revenir en arrière dans la
 simulation dés qu'une interpénétration est détectée et ce jusqu'à
-retrouver le point de contact exact. Le terme "exact" est à prendre
-avec des pincettes puisque le moteur physique est limitée par
+retrouver le point de contact exact. Le terme \og exact \fg{} est à
+prendre avec des pincettes puisque le moteur physique est limité par
 l'arithmétique des nombres à virgules flottantes et que l'on doit se
 contenter d'un résultat validé par un seuil de tolérance adapté. Le
 pas de temps choisi devra correspondre à une fraction du pas de temps
@@ -288,20 +295,20 @@ moment du pas de temps les corps sont réellement entrés en contact.
 Usuellement, ce retour en arrière s'effectue en intégrant plusieurs
 fois la simulation pas un pas de temps négatif et fixe, par exemple
 $-\frac{\deriv t}{10}$. Néanmoins cette méthode s'adapte mal aux
-simulations contenant des objets évoluant à hautes vitesses puisqu'en
+simulations contenant des objets évoluant à haute vitesse puisqu'en
 utilisant cette même fraction du pas de temps, un corps s'étant
 déplacé de dix mètres pendant l'intégration sera au moins recalé un
 mètre avant tout contact réel, même si la profondeur de pénétration
 n'était que de quelques centimètres.
 
-Afin d'accélérer la phase de recherche on fait le choix de procéder
-par dichotomie. \`A chaque étape $i$ de cette recherche, on recule de
-$\frac{\deriv t}{2i}$ unité de temps si les corps s'interpénétrent,
-sinon on avance de cette même durée. On considère qu'une position de
-contact valide a été déterminée lorsqu'il n'y a plus
-d'interpénétration et que la distance entre les objets est inférieure
-à un seuil de tolérance choisi au préalable. Le processus est visible
-sur la figure \ref{dichotomie}.
+Afin d'accélérer la phase de recherche et d'obtenir des résultats
+précis, on fait le choix de procéder par dichotomie. \`A chaque étape
+$i$ de cette recherche, on recule de $\frac{\deriv t}{2i}$ unité de
+temps si les corps s'interpénétrent, sinon on avance de cette même
+durée. On considère qu'une position de contact valide a été déterminée
+lorsqu'il n'y a plus d'interpénétration et que la distance entre les
+objets est inférieure à un seuil de tolérance choisi au préalable. Le
+processus est visible sur la figure \ref{dichotomie}.
 
 \begin{figure}
   \centering
@@ -310,23 +317,28 @@ sur la figure \ref{dichotomie}.
   \label{dichotomie}
 \end{figure}
 
-\begin{verbatim}
-entrée: deux corps A et B, le pas de temps dt
-sortie: deux corps A et B
-
-correction:
-  d = distance_GJK(A,B)
-
-  si 0 <= d <= seuil
-    retourner A et B
-  sinon d = 0
-    A.integrer(-dt/2)
+\begin{algorithm}
+  \caption{Correction d'une collision}
+  \dontprintsemicolon
+  \Entree{
+    Deux corps A et B,\\
+    $\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;$ un pas de temps $\deriv t$,\\
+    $\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;$ un seuil de tolérance $\theta$}
+  \Sortie{Deux corps A et B corrigés}
+  \BlankLine
+  $d =$ distance\_GJK(A,B)\;
+  \Si{$0 < d \leq \theta$}{
+    \Retour{A et B}
+  }
+  \SinonSi{$d = 0$}{
+    A.integrer(-dt/2)\;
     B.integrer(-dt/2)
-  sinon
-    A.integrer(dt/2)
+  }
+  \Sinon{
+    A.integrer(dt/2)\;
     B.integrer(dt/2)
-
-\end{verbatim}
+  }
+\end{algorithm}
 
 Une fois ce processus achevé, la configuration de contact est
 retrouvée et les deux corps ne sont plus en situation de pénétration
@@ -334,6 +346,8 @@ mutuelle. On remarque que grâce à cette technique, la position n'est
 pas la seule valeur à avoir été recalée : orientation, élans angulaire
 et linéaires sont eux aussi revenus aux valeurs qu'ils auraient dû
 atteindre à l'instant du contact.
+
+[nouvelle version ?]
 
 \subsection{Réponse}
 

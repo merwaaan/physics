@@ -5,6 +5,4 @@
 
   \draw[gjkdir] (a) -- (O);
   \node[gjkclosest,draw=bleu,fill=none,thick] (closest) at (A) {};
-
-  \node at ($(closest)+(0.4,-0.4)$) (lclosest) {$S_0$};
 \end{tikzpicture}

@@ -1,11 +1,12 @@
 \documentclass[twocolumn]{article}
 
-%\usepackage[francais]{babel}
+\usepackage[francais]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{color}
 \usepackage{tikz}
 \usepackage{subfig}
+\usepackage[french,ruled,noend]{algorithm2e}
 \usepackage[adobe-utopia]{mathdesign}
 
 % Colors from famfamfam.com
@@ -53,7 +54,7 @@
 
 \newcommand{\deriv}{\partial \!}
 
-\title{Dynamique des Corps Rigides et Interaction}
+\title{Simulation physique de corps rigides avec interaction}
 \author{Merwan Achibet}
 \date{}
 
@@ -61,6 +62,8 @@
 
 \maketitle
 \tableofcontents
+
+\shorthandoff{!} % Pour éviter bug de Tikz + Babel french
 
 \input{intro}
 \input{dynamique}

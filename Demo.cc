@@ -12,7 +12,7 @@ void input(unsigned char k, int x, int y)
 {
   if(k == 97)
   {
-	  Cube* c = new Cube(2, 100);
+	  Cube* c = new Cube(2, 20);
 	  c->setPosition((float)rand() / RAND_MAX * 8 - 4, 7, (float)rand() / RAND_MAX * 8 - 4);
 	  c->prepare();
 	  e->addRigidBody_p(c);

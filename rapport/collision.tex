@@ -48,13 +48,15 @@ il est évident que tous les points du corps le seront aussi. Pour
 savoir si deux corps rentrent possiblement en collision, on vérifie si
 leur boîte englobante entrent en collision.
 
-Le processus de construction d'une boîte englobante est simple : on
-enregistre pour chaque axe le sommet du corps le plus éloigné dans la
-direction négative (\texttt{min} dans l'algorithme) et le sommet le
-plus éloigné dans la direction positive (\texttt{max}).
+L'algorithme \ref{constructionAABB} construit la boîte englobante d'un
+corps. Le principe est simple : on enregistre pour chaque axe le la
+position du sommet du corps le plus éloigné dans la direction négative
+(\textit{min}) et la position de celui qui est le plus éloigné dans la
+direction positive (\textit{max}).
 
-\begin{algorithm}
+\begin{algorithm}[h]
   \caption{Construction d'une AABB}
+  \label{constructionAABB}
   \dontprintsemicolon
   \Entree{Un corps C}
   \Sortie{Une boîte englobante B}
@@ -76,18 +78,19 @@ plus éloigné dans la direction positive (\texttt{max}).
 Le test vérifiant la collision entre deux boîtes englobantes est très
 rapide puisque qu'il tire parti du fait que les boîtes sont alignées
 avec le repère absolu. Pour vérifier que deux AABB sont en état
-d'interpénétration, on utilise le théorème des axes de séparation
-selon lequel deux boîtes alignées sur les axes du repère absolu sont
-séparées si leur projection sur au moins un axe ne se superposent
-pas. En deux dimension, on peut résumer ce théorème par le fait que si
-une ligne parallèle à un des axes du repère global sépare deux corps,
-alors ils ne peuvent pas être en état de collision. En trois dimension
-le principe est le même, à la différence que l'on parle de plan de
-séparation.
+d'interpénétration, on utilise le théorème des axes de séparation.
+selon ce dernier, deux boîtes alignées sur les axes du repère absolu
+n'entrent pas en contact si leur projection sur au moins un axe ne se
+superposent pas. En deux dimension, on peut visualiser ce théorème par
+le fait que si une ligne parallèle à un des axes du repère global
+sépare deux corps, alors ils ne peuvent pas être en état de
+collision. En trois dimension le principe est le même, à la différence
+que l'on parle de plan de séparation. L'algorithme
+\ref{detectionGrossiere} utilise ce principe.
 
-
-\begin{algorithm}
+\begin{algorithm}[h]
   \caption{Détection grossière}
+  \label{detectionGrossiere}
   \dontprintsemicolon
   \Entree{Deux boîtes englobantes B1 et B2}
   \Sortie{Un booléen}

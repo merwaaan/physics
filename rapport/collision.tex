@@ -48,7 +48,7 @@ il est évident que tous les points du corps le seront aussi. Pour
 savoir si deux corps rentrent possiblement en collision, on vérifie si
 leur boîte englobante entrent en collision.
 
-L'algorithme \ref{constructionAABB} construit la boîte englobante d'un
+L'algorithme \ref{algoConstructionAABB} construit la boîte englobante d'un
 corps. Le principe est simple : on enregistre pour chaque axe le la
 position du sommet du corps le plus éloigné dans la direction négative
 (\textit{min}) et la position de celui qui est le plus éloigné dans la
@@ -56,7 +56,7 @@ direction positive (\textit{max}).
 
 \begin{algorithm}[h]
   \caption{Construction d'une AABB}
-  \label{constructionAABB}
+  \label{algoConstructionAABB}
   \dontprintsemicolon
   \Entree{Un corps C}
   \Sortie{Une boîte englobante B}
@@ -86,11 +86,11 @@ le fait que si une ligne parallèle à un des axes du repère global
 sépare deux corps, alors ils ne peuvent pas être en état de
 collision. En trois dimension le principe est le même, à la différence
 que l'on parle de plan de séparation. L'algorithme
-\ref{detectionGrossiere} utilise ce principe.
+\ref{algoDetectionGrossiere} utilise ce principe.
 
 \begin{algorithm}[h]
   \caption{Détection grossière}
-  \label{detectionGrossiere}
+  \label{algoDetectionGrossiere}
   \dontprintsemicolon
   \Entree{Deux boîtes englobantes B1 et B2}
   \Sortie{Un booléen}
@@ -311,7 +311,8 @@ temps si les corps s'interpénétrent, sinon on avance de cette même
 durée. On considère qu'une position de contact valide a été déterminée
 lorsqu'il n'y a plus d'interpénétration et que la distance entre les
 objets est inférieure à un seuil de tolérance choisi au préalable. Le
-processus est visible sur la figure \ref{dichotomie}.
+processus est visible sur la figure \ref{dichotomie} et est détaillé
+dans l'algorithme \ref{algoDichotomie}.
 
 \begin{figure}
   \centering
@@ -322,6 +323,7 @@ processus est visible sur la figure \ref{dichotomie}.
 
 \begin{algorithm}
   \caption{Correction d'une collision}
+  \label{algoDichotomie}
   \dontprintsemicolon
   \Entree{
     Deux corps A et B,\\
@@ -366,6 +368,15 @@ habituellement de la matière que l'on cherche à simuler : une balle en
 caoutchouc aura un $\varepsilon$ elevé tandis qu'un bloc d'argile aura
 un $\varepsilon$ proche de zéro.
 
+\[
+j = \frac{-(1 + \varepsilon) \vec{v}_{rel}^-}{
+  \frac{1}{m_a} +
+  \frac{1}{m_b} +
+  n
+  (I_a^{-1} (r_a \times n)) \times r_a +
+  (I_b^{-1} (r_b \times n)) \times r_b
+}
+\]
 [Friction]
 
 \cite{newton}

@@ -11,6 +11,7 @@ class Sphere : public RigidBody
   public:
     Sphere(double radius);
     ~Sphere();
+		Sphere* copy();
 
     void prepare();
     void computeInverseInertiaTensor();

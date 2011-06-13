@@ -2,6 +2,7 @@
 #define ENGINE_H
 
 #include <vector>
+#include <algorithm>
 
 #include "Constraint.h"
 #include "CustomRigidBody.h"
@@ -30,12 +31,13 @@ class Engine
 
     void run();
     void update();
+		std::vector<RigidBody*> copyBodies();
+		std::vector<Contact> predictContacts();
     void applyEnvironmentalForces(RigidBody* rb_p, double dt);
 		void applyConstraints(double dt);
 		void cleanUp();
 
 		Vector3* computeImpulse(Contact contact);
-		void emergencyPush(RigidBody* rb1_p, RigidBody* rb2_p, Vector3 distance);
 
     double getAbsoluteTime();
     double getLocalTime();

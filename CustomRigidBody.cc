@@ -234,8 +234,10 @@ std::vector<Contact> CustomRigidBody::getContacts(CustomRigidBody* rb_p)
 
 	std::cout << vfContacts.size() << " v/f and " << eeContacts.size() << " e/e" << std::endl;
 
-	for(int i = 0; i < eeContacts.size(); ++i)
+	vfContacts.insert(vfContacts.end(), eeContacts.begin(), eeContacts.end());
+/*	for(int i = 0; i < eeContacts.size(); ++i)
 		vfContacts.push_back(eeContacts[i]);
+*/
 
 	return vfContacts;
 }

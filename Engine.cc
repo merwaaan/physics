@@ -4,6 +4,8 @@
 #include <sys/time.h>
 
 #include "Geometry.h"
+#include "Sphere.h"
+#include "Box.h"
 
 Engine* E = NULL;
 
@@ -31,7 +33,8 @@ Engine::~Engine()
 
 void Engine::run()
 {
-  // compute all centers of mass and inertia tensors before we begin the simulation
+  // Compute all centers of mass and inertia tensors before we begin
+  // the simulation.
   for(int i = 0; i < this->bodies_p.size(); ++i)
     this->bodies_p[i]->prepare();
 
@@ -40,13 +43,39 @@ void Engine::run()
 
 void Engine::update()
 {
+	if(bodies_p.size() > 11) std::cout << "--------------------------" << std::endl << *bodies_p[11] << std::endl;
+
+	// Predict contacts to come.
+	std::vector<Contact> futureContacts = this->predictContacts();
+	double timeStepToFirstContact = futureContacts.size() > 0 ? futureContacts[0].TOI+0.0001 : this->timeStep;
+	
+	if(bodies_p.size() > 11) std::cout << timeStep << " " << timeStepToFirstContact << " UUU " << (futureContacts.size() > 0 ? "CONTACT" : "") << std::endl;
+
+	// Apply constraints.
+	// this->applyConstraints(timeStepToFirstContact);
+
+	// Integrate forward in time to the first contact.
+	for(int i = 0; i < this->bodies_p.size(); ++i)
+	{      
+		// Apply external forces.
+		for(int j = 0; j < this->environmentalForces_p.size(); ++j)
+			this->environmentalForces_p[j]->apply(this->bodies_p[i], timeStepToFirstContact);
+
+		// Integrate each body.
+		this->bodies_p[i]->integrate(timeStepToFirstContact);
+	}
+
+	if(bodies_p.size() > 11) std::cout << "REAL INTEGRATION " << std::endl << *bodies_p[11] << std::endl;
+
 	// Check for collisions.
 	for(int i = 1; i < this->bodies_p.size(); ++i)
 		for(int j = 0; j < i; ++j)
 		{
-			//
+			// No need to check collision if the two bodies are fixed.
 			if(this->bodies_p[i]->isFixed() && this->bodies_p[j]->isFixed())
 				continue;
+
+			std::cout << "xyz" << std::endl;
 
 			// Broad-phase test.
 			if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
@@ -71,36 +100,68 @@ void Engine::update()
 			}
 		}
 
-	// Apply constraints.
-	this->applyConstraints(this->timeStep);
-
-	for(int i = 0; i < this->bodies_p.size(); ++i)
-	{      
-		// Apply external forces.
-		for(int j = 0; j < this->environmentalForces_p.size(); ++j)
-			this->environmentalForces_p[j]->apply(this->bodies_p[i], this->timeStep);
-
-		// Integrate each body.
-		this->bodies_p[i]->integrate(this->timeStep);
-	}
-
-	this->lastUpdateTime += this->timeStep;
+	this->lastUpdateTime += timeStepToFirstContact;
 
 	this->cleanUp();
+}
+
+bool sortContacts(Contact a, Contact b)
+{
+	return a.TOI < b.TOI;
+}
+
+std::vector<Contact> Engine::predictContacts()
+{
+	std::vector<Contact> futureContacts;
+
+	for(int i = 1; i < this->bodies_p.size(); ++i)
+		for(int j = 0; j < i; ++j)
+		{
+			if(i == 11) std::cout << *this->bodies_p[i] << std::endl;
+		  RigidBody* a = this->bodies_p[i];
+			RigidBody* b = this->bodies_p[j];
+
+			if(a->type == SPHERE)
+				a = ((Sphere*)a)->copy();
+			else
+				a = ((Box*)a)->copy();
+
+			if(b->type == SPHERE)
+				b = ((Sphere*)b)->copy();
+			else
+				b = ((Box*)b)->copy();
+
+			// Integrate forward in time.
+			for(int k = 0; k < this->environmentalForces_p.size(); ++k)
+			{
+				this->environmentalForces_p[k]->apply(a, this->timeStep);
+				this->environmentalForces_p[k]->apply(b, this->timeStep);
+			}
+			a->integrate(this->timeStep);
+			b->integrate(this->timeStep);
+
+			if(i == 11) std::cout << *a << std::endl;
+
+			// Check for a collision.
+			if(a->isFixed() && b->isFixed())
+				continue;
+			if(a->isBoundingBoxCollidingWith(b))
+			{
+				std::vector<Contact> c = a->isCollidingWith(b, this->timeStep);
+				futureContacts.insert(futureContacts.end(), c.begin(), c.end());
+			}
+		}
+
+	// Sort future contacts with respect to their time.
+	sort(futureContacts.begin(), futureContacts.end(), sortContacts);
+
+	return futureContacts;
 }
 
 void Engine::applyConstraints(double dt)
 {
 	for(int i = 0; i < this->constraints_p.size(); ++i)
 		this->constraints_p[i]->apply(1);
-}
-
-void Engine::emergencyPush(RigidBody* rb1_p, RigidBody* rb2_p, Vector3 distance)
-{
-	double totalInverseMass = rb1_p->getInverseMass() + rb2_p->getInverseMass();
-
-	rb1_p->move(-1 * distance * rb1_p->getInverseMass() / totalInverseMass);
-	rb2_p->move(distance * rb2_p->getInverseMass() / totalInverseMass);
 }
 
 Vector3* Engine::computeImpulse(Contact contact)

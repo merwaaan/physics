@@ -32,6 +32,34 @@ Box::~Box()
 {
 }
 
+Box* Box::copy()
+{
+	Box* copy_p = new Box(this->width, this->height, this->depth, 1/this->inverseMass);
+
+	copy_p->inverseMass = this->inverseMass;
+	copy_p->inverseInertiaTensor = this->inverseInertiaTensor;
+
+	copy_p->position = this->position;
+	copy_p->linearMomentum = this->linearMomentum;
+	copy_p->accumulatedForces = this->accumulatedForces;
+
+	copy_p->orientation = this->orientation;
+	copy_p->angularMomentum = this->angularMomentum;
+	copy_p->accumulatedTorques = this->accumulatedTorques;
+
+	copy_p->boundingBox = this->boundingBox;
+
+	copy_p->linearVelocity = this->linearVelocity;
+	copy_p->angularVelocity = this->angularVelocity;
+
+	copy_p->restitution = this->restitution;
+	copy_p->friction = this->friction;
+
+	copy_p->fixed = this->fixed;
+
+	return copy_p;
+}
+
 void Box::computeInverseInertiaTensor()
 {
   Matrix3 inertiaTensor;

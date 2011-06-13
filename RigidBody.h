@@ -18,11 +18,13 @@ struct BoundingBox
 
 enum Type{SPHERE, CUSTOM};
 
+enum Dir{FORWARD, BACKWARD};
+
 class RigidBody
 {
   public:
 
-	Type type;
+	  Type type;
 
   protected:
 
@@ -75,7 +77,7 @@ class RigidBody
     BoundingBox getBoundingBox();
     
     std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt);
-		std::vector<Contact> resolveInterPenetration(RigidBody* rb_p, double dt, int state);
+		std::vector<Contact> resolveInterPenetration(RigidBody* rb_p, double dt, Dir direction, double TOI);
 		virtual std::vector<Contact> getContacts(RigidBody* rb_p) = 0;
 		virtual Vector3 getSupportPoint(Vector3 direction) = 0;
 

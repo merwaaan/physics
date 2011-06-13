@@ -130,8 +130,6 @@ bool RigidBody::isBoundingBoxCollidingWith(RigidBody* rb_p)
   return true;
 }
 
-enum Dir{FORWARD, BACKWARD};
-
 /**
  * Check for a collision with another rigid body.
  */
@@ -151,14 +149,15 @@ std::vector<Contact> RigidBody::isCollidingWith(RigidBody* rb_p, double dt)
  
 	std::cout << "Real collision" << std::endl;
 
-  return this->resolveInterPenetration(rb_p, dt, FORWARD);
+  return this->resolveInterPenetration(rb_p, dt, FORWARD, dt);
 }
 
 /**
  * Determine the exact contact point by integrating backward in time.
  */
-std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double dt, int state)
+std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double dt, Dir direction, double TOI)
 {
+	std::cout << "TOI " << TOI << std::endl;
   // Compute the distance between the two bodies.
 	bool interPenetration;
   Vector3 distance = Geometry::gjkDistance(this, rb_p, &interPenetration);
@@ -168,8 +167,8 @@ std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double 
   // If the bodies are too far apart, integrate forward in time.
   if(!interPenetration && distance.length() > E->getTolerance())
   {
-		double sdt = state != FORWARD ? dt/2 : dt;
-		state = FORWARD;
+		double sdt = direction != FORWARD ? dt/2 : dt;
+		direction = FORWARD;
 
 	  std::cout << "going forward " << sdt << "ms" << std::endl;
 
@@ -181,13 +180,13 @@ std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double 
 
     std::cout << *rb_p << std::endl;
 
-    return this->resolveInterPenetration(rb_p, sdt, state);
+    return this->resolveInterPenetration(rb_p, sdt, direction, TOI+sdt);
   }
   // Else if the bodies are inter-penetrating, integrate backward in time.
   else if(interPenetration)
   {
-		double sdt = state != BACKWARD ? dt/2 : dt;
-		state = BACKWARD;
+		double sdt = direction != BACKWARD ? dt/2 : dt;
+		direction = BACKWARD;
 
 	  std::cout << "going backward " << sdt << "ms" << std::endl;
 
@@ -199,18 +198,22 @@ std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double 
 
 		std::cout << *rb_p << std::endl;
 
-    return this->resolveInterPenetration(rb_p, sdt, state);
+    return this->resolveInterPenetration(rb_p, sdt, direction, TOI-sdt);
   }
 
   // If bodies are within the tolerance area, compute the real contact points.
 	std::vector<Contact> contacts = this->getContacts(rb_p);
 
-	// Recompute auxiliary quantities as they could have been
-	// corrupted during the binary search.
 	if(contacts.size() > 0)
 	{
+		// Recompute auxiliary quantities as they could have been
+		// corrupted during the binary search.
 		contacts[0].a->computeAuxiliaryQuantities();
 		contacts[0].b->computeAuxiliaryQuantities();
+
+		// Append the time of impact to the contacts.
+		for(int i = 0; i < contacts.size(); ++i)
+			contacts[i].TOI = TOI;
 	}
 
 	return contacts;

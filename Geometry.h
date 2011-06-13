@@ -121,6 +121,7 @@ struct Contact
 
   Vector3 position;
   Vector3 normal;
+	double TOI;
 };
 
 namespace Geometry

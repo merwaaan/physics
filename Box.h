@@ -5,7 +5,7 @@
 
 class Box : public CustomRigidBody
 {
-  public:
+  protected:
 	  double width;
     double height;
     double depth;
@@ -15,6 +15,10 @@ class Box : public CustomRigidBody
     ~Box();
 
     void computeInverseInertiaTensor();
+
+		double getWidth() { return this->width; }
+		double getHeight() { return this->height; }
+		double getDepth() { return this->depth; }
 };
 
 class Cube : public Box

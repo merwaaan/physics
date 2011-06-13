@@ -29,7 +29,7 @@ Display::Display(int* argc, char** argv, int w, int h) :
   GLfloat lightSpecular[] = {0.1, 0.1, 0.1, 1.0};
   glLightfv(GL_LIGHT0, GL_SPECULAR, lightSpecular);
   
-  GLfloat lightAmbient[] = {200.0/255, 200.0/255, 200.0/255, 1.0};
+  GLfloat lightAmbient[] = {100.0/255, 100.0/255, 100.0/255, 1.0};
   glLightfv(GL_LIGHT0, GL_AMBIENT, lightAmbient);
  
   GLfloat lightPosition[] = {5, 10, 0.0, 1.0};
@@ -39,7 +39,7 @@ Display::Display(int* argc, char** argv, int w, int h) :
   glutMouseFunc(&mousePressed);
   glutPassiveMotionFunc(&mouseMoved);
 
-  this->camera.radius = 40;
+  this->camera.radius = 20;
   this->camera.angle = 90;
   this->camera.lastX = -1;
 }
@@ -92,7 +92,7 @@ void update()
     Camera* cam_p = E->getDisplay_p()->getCamera_p();
     gluLookAt(
       cam_p->radius * sin(cam_p->angle),
-      7,
+      10,
       cam_p->radius * cos(cam_p->angle),
       0, 0, 0,
       0, 1, 0);

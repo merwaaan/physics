@@ -5,7 +5,7 @@
 extern Engine* E;
 
 RigidBody::RigidBody() :
-	restitution(0.8),
+	restitution(0.7),
 	friction(0.9),
   fixed(false)
 {
@@ -71,7 +71,7 @@ void RigidBody::integrate(double dt)
 	if(dt > 0)
 		this->linearMomentum += this->accumulatedForces;
 
-  Vector3 velocity = this->linearMomentum * this->inverseMass;
+  Vector3 velocity = this->linearMomentum / this->inverseMass;
   this->position += velocity * dt * (dt < 0 ? -1 : 1);
 
 	if(dt < 0)

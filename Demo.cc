@@ -8,15 +8,9 @@
 
 Engine* e;
 
-void input(unsigned char k, int x, int y)
+float randomf()
 {
-  if(k == 97)
-  {
-	  Cube* c = new Cube(2, 20);
-	  c->setPosition((float)rand() / RAND_MAX * 8 - 4, 7, (float)rand() / RAND_MAX * 8 - 4);
-	  c->prepare();
-	  e->addRigidBody_p(c);
-  }
+	return (float)rand() / RAND_MAX;
 }
 
 void testGeometry()
@@ -83,16 +77,6 @@ void testGJK()
   c2->prepare();
   
   std::cout << "DISTANCE" << Geometry::gjkDistance(c1, c2) << std::endl;
-}
-
-void testGS()
-{
-  Cube* c1 = new Cube(2,1);
-  c1->setPosition(0, 0, 0);
-	c1->setAngularMomentum(20, 2, 5);
-
-	e->addRigidBody_p(c1);
-	e->run();
 }
 
 void testTimeReversing()
@@ -234,8 +218,25 @@ void demoMixed()
   e->run();
 }
 
-void demoBoxes()
+void inputDemoBoxes(unsigned char k, int x, int y)
 {
+  if(k == 97)
+  {
+	  Cube* c = new Cube(4, 2);
+	  c->setPosition(randomf()*20-10, 10, 5 + randomf()*5);
+		c->prepare();
+	  e->addRigidBody_p(c);
+  }
+	else if(k == 115) // S
+		e->getDisplay_p()->getCamera_p()->radius += 1;
+	else if(k == 122) // Z
+		e->getDisplay_p()->getCamera_p()->radius -= 1;
+}
+
+void demoBoxes()
+{  
+  glutKeyboardFunc(&inputDemoBoxes);
+
 	Cube* c = new Cube(4,1);
   c->setFixed(true);
   e->addRigidBody_p(c);
@@ -251,24 +252,113 @@ void demoBoxes()
   e->run();
 }
 
+void inputDemoStairs(unsigned char k, int x, int y)
+{
+  if(k == 97)
+  {
+	  Cube* c = new Cube(3, 3);
+	  c->setPosition(randomf()*20-10, 10, 5 + randomf()*5);
+		c->prepare();
+	  e->addRigidBody_p(c);
+  }
+	else if(k == 115) // S
+		e->getDisplay_p()->getCamera_p()->radius += 1;
+	else if(k == 122) // Z
+		e->getDisplay_p()->getCamera_p()->radius -= 1;
+}
+
+void demoStairs()
+{
+	srand(100);
+  glutKeyboardFunc(&inputDemoStairs);
+
+	Box* c = NULL;
+	int height = 7;
+	int steps = 10;
+	int stepSize = 1;
+
+	for(int i = 0; i < steps; ++i)
+	{
+		c = new Box(20, (steps-i) * (double)height/steps, stepSize, 1);
+		c->setPosition(0, c->getHeight()/2, 10-i*stepSize);
+		c->setFixed(true);
+		e->addRigidBody_p(c);
+	}
+			
+	Box* floor = new Box(20, 0.5, 50, 1);
+	floor->setPosition(0, 0, 0);
+  floor->setFixed(true);
+  e->addRigidBody_p(floor);
+
+  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  e->addEnvironmentalForce_p(g);
+
+  e->run();
+}
+
+void inputDemoPool(unsigned char k, int x, int y)
+{
+  if(k == 97)
+  {
+	  Cube* c = new Cube(4, 2);
+	  c->setPosition(randomf()*20-10, 10, 5 + randomf()*5);
+		c->prepare();
+	  e->addRigidBody_p(c);
+  }
+	else if(k == 115) // S
+		e->getDisplay_p()->getCamera_p()->radius += 1;
+	else if(k == 122) // Z
+		e->getDisplay_p()->getCamera_p()->radius -= 1;
+}
+
+void demoPool()
+{  
+  glutKeyboardFunc(&inputDemoPool);
+
+	Box* floor = new Box(40, 0.5, 40, 1);
+	floor->setPosition(0, 0, 0);
+  floor->setFixed(true);
+  e->addRigidBody_p(floor);
+
+	Box* wall = NULL;
+	wall = new Box(40, 5, 1, 1);
+	wall->setPosition(0, 2.5, 20);
+	wall->setFixed(true);
+	e->addRigidBody_p(wall);
+
+	wall = new Box(40, 5, 1, 1);
+	wall->setPosition(0, 2.5, -20);
+	wall->setFixed(true);
+	e->addRigidBody_p(wall);
+
+	wall = new Box(1, 5, 40, 1);
+	wall->setPosition(-20, 2.5, 0);
+	wall->setFixed(true);
+	e->addRigidBody_p(wall);
+
+
+  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  e->addEnvironmentalForce_p(g);
+
+  e->run();
+}
+
 int main(int argc, char** argv)
 {
 	srand(123);//123
 
   e = new Engine(&argc, argv, 0.01);
   
-  glutKeyboardFunc(&input);
-  
   //testGeometry();
   //testGJK();
-	//testGS();
   //testTimeReversing();
 	
   //demoRope();
-	//demoBalls();
   //demoPendulum();
 	//demoMixed();
-  demoBoxes();
+  //demoBoxes();
+	demoStairs();
+	//demoPool();
   
   delete e;
 

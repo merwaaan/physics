@@ -44,6 +44,10 @@ void Engine::update()
 	for(int i = 1; i < this->bodies_p.size(); ++i)
 		for(int j = 0; j < i; ++j)
 		{
+			//
+			if(this->bodies_p[i]->isFixed() && this->bodies_p[j]->isFixed())
+				continue;
+
 			// Broad-phase test.
 			if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
 			{
@@ -113,7 +117,7 @@ Vector3* Engine::computeImpulse(Contact contact)
 		impulse = relativeVelocity * n;
 	else
 	{		
-		// displacements of the contact point with respect to the center of mass of each body
+		// displacements of the contact points with respect to the center of mass of each body
 		Vector3 da = p - a->getPosition();
 		Vector3 db = p - b->getPosition();
 
@@ -124,7 +128,7 @@ Vector3* Engine::computeImpulse(Contact contact)
 		double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
 		double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
 	
-		double restitution = this->timeStep > 0 ? 0.2 : 1.25;
+		double restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
 		impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
 	}
 
@@ -173,7 +177,7 @@ void Engine::cleanUp()
 	Vector3 origin(0, 0, 0);
 
 	for(int i = 0; i < this->bodies_p.size(); ++i)
-		if((this->bodies_p[i]->getPosition() - origin).length() > 100)
+		if((this->bodies_p[i]->getPosition() - origin).length() > 200)
 		{
 			this->bodies_p.erase(this->bodies_p.begin() + i);
 			--i;

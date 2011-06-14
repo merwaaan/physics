@@ -51,6 +51,7 @@ class RigidBody
 		double friction;
 
     bool fixed;
+		bool sleeping;
 
   public:
     RigidBody();

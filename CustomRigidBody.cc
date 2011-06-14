@@ -243,7 +243,32 @@ std::vector<Contact> CustomRigidBody::getContacts(CustomRigidBody* rb_p)
 
 std::vector<Contact> CustomRigidBody::getContacts(Sphere* s_p)
 {
-	return std::vector<Contact>();
+	std::vector<Contact> contacts;
+
+	Vector3 dirSphereToCustom = this->position - s_p->position;
+	Vector3 closest = s_p->position + s_p->getRadius() * dirSphereToCustom.normalize();
+
+  for(int i = 0; i < this->structure.polygons.size(); ++i)
+	{
+		Polygon face = this->structure.polygons[i].getPolygon();
+
+		double distance;
+		Vector3 point = Geometry::closestPointOfPolygon(closest, face, &distance);
+
+		if(distance < 0.1)
+		{
+			Contact contact;
+			
+			contact.a = this;
+			contact.b = s_p;
+			contact.position = point;
+			contact.normal = (closest - point).normalize();
+			
+			contacts.push_back(contact);  
+		}
+	}
+
+  return contacts;
 }
 
 Vector3 CustomRigidBody::getSupportPoint(Vector3 direction)

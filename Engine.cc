@@ -45,12 +45,11 @@ void Engine::update()
 	// Predict contacts to come.
 	std::cout << "CONTACT PREDICTION" << std::endl;
 	std::vector<Contact> futureContacts = this->predictContacts();
-	for(int i = 0; i < futureContacts.size(); ++i)
-				std::cout << "fc " << futureContacts[i].TOI << std::endl;
+	//for(int i = 0; i < futureContacts.size(); ++i)
+	//std::cout << "fc " << futureContacts[i].TOI << std::endl;
 
   double timeStepToFirstContact = futureContacts.size() > 0 ? futureContacts[0].TOI : this->timeStep;
-	
-	if(bodies_p.size() > 11) std::cout << timeStep << " " << timeStepToFirstContact << " UUU " << (futureContacts.size() > 0 ? "CONTACT" : "") << std::endl;
+//timeStepToFirstContact = timeStepToFirstContact < this->timeStep/4 ? this->timeStep/4 : timeStepToFirstContact;
 
 	// Apply constraints.
 	// this->applyConstraints(timeStepToFirstContact);
@@ -165,10 +164,6 @@ Vector3* Engine::computeImpulse(Contact contact)
 	
 	double restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
 	impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
-
-	std::cout << a->inverseMass << " "<< b->inverseMass<<std::endl;
-	std::cout << inverseInertiaA << std::endl;
-	std::cout << t1 << " " << t2 << " " << t3 << " " << restitution << std::endl;
 
 	Vector3 impulseA = impulse;
 	Vector3 impulseB = -1 * impulse;

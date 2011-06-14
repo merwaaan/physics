@@ -7,7 +7,8 @@ extern Engine* E;
 RigidBody::RigidBody() :
 	restitution(0.7),
 	friction(0.9),
-  fixed(false)
+  fixed(false),
+	sleeping(false)
 {
   // The initial orientation is aligned with the axis.
   this->orientation.set(0, 0, 1);

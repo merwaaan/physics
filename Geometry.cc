@@ -495,35 +495,29 @@ Vector3 Geometry::gjkDistance(RigidBody* rb1_p, RigidBody* rb2_p, bool* interPen
 	while(true)
 	{
 		// Compute the closest point.
-		//std::cout << "dim " << simplex.points.size() << std::endl;
 		Vector3 closest = simplex.getClosestPoint();
-		//std::cout << "closest " << closest << std::endl;
 
 		// Return an intersection if the closest point is the origin.
 		if(closest == origin)
 		{
 			if(interPenetration_p != NULL)
 				*interPenetration_p = true;
-			//std::cout << "interpenetration" << std::endl;
+
 			return origin;
 		}
 
 		// Reduce the simplex to its minimum form.
-		//std::cout << "before " << simplex.points.size() << std::endl;
 		simplex.reduce(closest);
-		//std::cout << "after " << simplex.points.size() << std::endl;
 
 		// Compute a support point along the direction from the closest point to the origin.
 		Vector3 support = rb1_p->getSupportPoint(-1 * closest) - rb2_p->getSupportPoint(closest);
-		//std::cout << "support " << support << std::endl;
 
 		// Return a non-intersection if
-		//std::cout << ((-1 * closest) * closest) << " VS " << ((-1 * closest) * support) << std::endl;
 		if((-1 * closest) * closest + 0.01 >= (-1 * closest) * support)
 		{
 			if(interPenetration_p != NULL)
 				*interPenetration_p = false;
-			//std::cout << "no interpenetration" << std::endl;
+b
 			return closest;
 		}
 
@@ -535,8 +529,6 @@ Vector3 Geometry::gjkDistance(RigidBody* rb1_p, RigidBody* rb2_p, bool* interPen
 std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool second)
 {
   std::vector<Contact> contacts;
-	std::cout << *rb1_p << std::endl;
-	std::cout << *rb2_p << std::endl;
   for(int i = 0; i < rb2_p->structure.polygons.size(); ++i)
     for(int j = 0; j < rb1_p->structure.vertices.size(); ++j)
     {

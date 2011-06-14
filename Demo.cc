@@ -300,10 +300,10 @@ void inputDemoPool(unsigned char k, int x, int y)
 {
   if(k == 97)
   {
-	  Cube* c = new Cube(4, 2);
-	  c->setPosition(randomf()*20-10, 10, 5 + randomf()*5);
-		c->prepare();
-	  e->addRigidBody_p(c);
+	  Sphere* s = new Sphere(1);
+	  s->setPosition(0, 6, 0);
+		s->prepare();
+	  e->addRigidBody_p(s);
   }
 	else if(k == 115) // S
 		e->getDisplay_p()->getCamera_p()->radius += 1;
@@ -357,8 +357,8 @@ int main(int argc, char** argv)
   //demoPendulum();
 	//demoMixed();
   //demoBoxes();
-	demoStairs();
-	//demoPool();
+	//demoStairs();
+	demoPool();
   
   delete e;
 

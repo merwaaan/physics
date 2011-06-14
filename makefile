@@ -16,7 +16,7 @@ OBJ= \
 	Vector3.o
 
 $(EXEC): $(OBJ)
-	$(COMP) -g -Wall $^ -lglut -lGLU -ggdb -o $(EXEC)
+	$(COMP) -g -Wall $^ -lm -lglut -lGLU -ggdb -o $(EXEC)
 
 %.o: %.cc
 	$(COMP) -o $@ -c $^

@@ -535,7 +535,8 @@ Vector3 Geometry::gjkDistance(RigidBody* rb1_p, RigidBody* rb2_p, bool* interPen
 std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, CustomRigidBody* rb2_p, bool second)
 {
   std::vector<Contact> contacts;
-
+	std::cout << *rb1_p << std::endl;
+	std::cout << *rb2_p << std::endl;
   for(int i = 0; i < rb2_p->structure.polygons.size(); ++i)
     for(int j = 0; j < rb1_p->structure.vertices.size(); ++j)
     {

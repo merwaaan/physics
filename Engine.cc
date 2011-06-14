@@ -10,7 +10,7 @@
 Engine* E = NULL;
 
 Engine::Engine(int* argc, char** argv, double timeStep) :
-	tolerance(0.09),
+	tolerance(0.01),
   timeStep(timeStep),
 	startingTime(getAbsoluteTime()),
 	lastUpdateTime(0),
@@ -33,8 +33,7 @@ Engine::~Engine()
 
 void Engine::run()
 {
-  // Compute all centers of mass and inertia tensors before we begin
-  // the simulation.
+	// Prepare bodies.
   for(int i = 0; i < this->bodies_p.size(); ++i)
     this->bodies_p[i]->prepare();
 
@@ -43,11 +42,13 @@ void Engine::run()
 
 void Engine::update()
 {
-	if(bodies_p.size() > 11) std::cout << "--------------------------" << std::endl << *bodies_p[11] << std::endl;
-
 	// Predict contacts to come.
+	std::cout << "CONTACT PREDICTION" << std::endl;
 	std::vector<Contact> futureContacts = this->predictContacts();
-	double timeStepToFirstContact = futureContacts.size() > 0 ? futureContacts[0].TOI+0.0001 : this->timeStep;
+	for(int i = 0; i < futureContacts.size(); ++i)
+				std::cout << "fc " << futureContacts[i].TOI << std::endl;
+
+  double timeStepToFirstContact = futureContacts.size() > 0 ? futureContacts[0].TOI : this->timeStep;
 	
 	if(bodies_p.size() > 11) std::cout << timeStep << " " << timeStepToFirstContact << " UUU " << (futureContacts.size() > 0 ? "CONTACT" : "") << std::endl;
 
@@ -55,6 +56,7 @@ void Engine::update()
 	// this->applyConstraints(timeStepToFirstContact);
 
 	// Integrate forward in time to the first contact.
+	std::cout << "REAL INTEGRATION" << std::endl;
 	for(int i = 0; i < this->bodies_p.size(); ++i)
 	{      
 		// Apply external forces.
@@ -65,40 +67,18 @@ void Engine::update()
 		this->bodies_p[i]->integrate(timeStepToFirstContact);
 	}
 
-	if(bodies_p.size() > 11) std::cout << "REAL INTEGRATION " << std::endl << *bodies_p[11] << std::endl;
+	std::cout << "PREDICTED CONTACT HANDLING" << std::endl;
+	// Handle predicted contacts.
+	for(int i = 0; i < futureContacts.size(); ++i)
+	{
+		if(futureContacts[i].TOI > timeStepToFirstContact)
+			break;
 
-	// Check for collisions.
-	for(int i = 1; i < this->bodies_p.size(); ++i)
-		for(int j = 0; j < i; ++j)
-		{
-			// No need to check collision if the two bodies are fixed.
-			if(this->bodies_p[i]->isFixed() && this->bodies_p[j]->isFixed())
-				continue;
+		Vector3* impulses = this->computeImpulse(futureContacts[i]);
 
-			std::cout << "xyz" << std::endl;
-
-			// Broad-phase test.
-			if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
-			{
-				std::cout << "bounding box collision detected between #" << i << " and #" << j << std::endl;
-
-				// Narrow-phase test.
-				std::vector<Contact> contacts = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
-
-				if(contacts.size() > 0)
-				{
-					std::cout << "real collision detected between #" << i << " and #" << j << std::endl;
-        
-					for(int k = 0; k < contacts.size(); ++k)
-					{
-						Vector3* impulses = this->computeImpulse(contacts[k]);
-
-						contacts[k].a->applyOffCenterForce(impulses[0], contacts[k].position, 1);
-						contacts[k].b->applyOffCenterForce(impulses[1], contacts[k].position, 1);
-					}
-				}
-			}
-		}
+		futureContacts[i].a->applyOffCenterForce(impulses[0], futureContacts[i].position, 1);
+		futureContacts[i].b->applyOffCenterForce(impulses[1], futureContacts[i].position, 1);
+	}
 
 	this->lastUpdateTime += timeStepToFirstContact;
 
@@ -117,19 +97,8 @@ std::vector<Contact> Engine::predictContacts()
 	for(int i = 1; i < this->bodies_p.size(); ++i)
 		for(int j = 0; j < i; ++j)
 		{
-			if(i == 11) std::cout << *this->bodies_p[i] << std::endl;
-		  RigidBody* a = this->bodies_p[i];
-			RigidBody* b = this->bodies_p[j];
-
-			if(a->type == SPHERE)
-				a = ((Sphere*)a)->copy();
-			else
-				a = ((Box*)a)->copy();
-
-			if(b->type == SPHERE)
-				b = ((Sphere*)b)->copy();
-			else
-				b = ((Box*)b)->copy();
+		  RigidBody* a = a->type == SPHERE ? a = new Sphere((Sphere&)*(this->bodies_p[i])) : a = new Box((Box&)*(this->bodies_p[i]));
+			RigidBody* b = b->type == SPHERE ? b = new Sphere((Sphere&)*(this->bodies_p[j])) : b = new Box((Box&)*(this->bodies_p[j]));
 
 			// Integrate forward in time.
 			for(int k = 0; k < this->environmentalForces_p.size(); ++k)
@@ -140,16 +109,25 @@ std::vector<Contact> Engine::predictContacts()
 			a->integrate(this->timeStep);
 			b->integrate(this->timeStep);
 
-			if(i == 11) std::cout << *a << std::endl;
-
 			// Check for a collision.
 			if(a->isFixed() && b->isFixed())
 				continue;
 			if(a->isBoundingBoxCollidingWith(b))
 			{
 				std::vector<Contact> c = a->isCollidingWith(b, this->timeStep);
+				if(c.size() > 0) std::cout << "FTOI " << c[0].TOI << std::endl;
+
+				// Set pointers to the original bodies, not their copies.
+				for(int k = 0; k < c.size(); ++k)
+				{
+					c[k].a = this->bodies_p[i];
+					c[k].b = this->bodies_p[j];
+				}
 				futureContacts.insert(futureContacts.end(), c.begin(), c.end());
 			}
+
+			delete a;
+			delete b;
 		}
 
 	// Sort future contacts with respect to their time.
@@ -174,24 +152,23 @@ Vector3* Engine::computeImpulse(Contact contact)
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
 	Vector3 impulse;
 
-	if(abs(relativeVelocity) < 0.5)
-		impulse = relativeVelocity * n;
-	else
-	{		
-		// displacements of the contact points with respect to the center of mass of each body
-		Vector3 da = p - a->getPosition();
-		Vector3 db = p - b->getPosition();
-
-		Matrix3 inverseInertiaA = a->getOrientation() * a->getInverseInertiaTensor() * a->getOrientation().transpose();
-		Matrix3 inverseInertiaB = b->getOrientation() * b->getInverseInertiaTensor() * b->getOrientation().transpose();
-
-		double t1 = a->getInverseMass() + b->getInverseMass();
-		double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
-		double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
+	// displacements of the contact points with respect to the center of mass of each body
+	Vector3 da = p - a->getPosition();
+	Vector3 db = p - b->getPosition();
 	
-		double restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
-		impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
-	}
+	Matrix3 inverseInertiaA = a->getOrientation() * a->getInverseInertiaTensor() * a->getOrientation().transpose();
+	Matrix3 inverseInertiaB = b->getOrientation() * b->getInverseInertiaTensor() * b->getOrientation().transpose();
+	
+	double t1 = a->getInverseMass() + b->getInverseMass();
+	double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
+	double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
+	
+	double restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
+	impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
+
+	std::cout << a->inverseMass << " "<< b->inverseMass<<std::endl;
+	std::cout << inverseInertiaA << std::endl;
+	std::cout << t1 << " " << t2 << " " << t3 << " " << restitution << std::endl;
 
 	Vector3 impulseA = impulse;
 	Vector3 impulseB = -1 * impulse;

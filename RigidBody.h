@@ -16,7 +16,7 @@ struct BoundingBox
   Vector3 b;
 };
 
-enum Type{SPHERE, CUSTOM};
+enum Type{SPHERE, BOX};
 
 enum Dir{FORWARD, BACKWARD};
 
@@ -26,7 +26,7 @@ class RigidBody
 
 	  Type type;
 
-  protected:
+//  protected:
 
     double inverseMass;
     Matrix3 inverseInertiaTensor;

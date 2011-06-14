@@ -13,7 +13,6 @@ class Box : public CustomRigidBody
   public:
     Box(double width, double height, double depth, double mass);
     ~Box();
-		virtual Box* copy();
 
     void computeInverseInertiaTensor();
 

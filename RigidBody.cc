@@ -143,11 +143,11 @@ std::vector<Contact> RigidBody::isCollidingWith(RigidBody* rb_p, double dt)
   // Check for a true collision.
 	if(!interPenetration)
   {
-	  std::cout << "No real collision" << std::endl;
+	  std::cout << "No collision" << std::endl;
     return std::vector<Contact>();
   }
  
-	std::cout << "Real collision" << std::endl;
+	std::cout << "Collision" << std::endl;
 
   return this->resolveInterPenetration(rb_p, dt, FORWARD, dt);
 }
@@ -178,7 +178,7 @@ std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double 
     this->integrate(sdt);
     rb_p->integrate(sdt);
 
-    std::cout << *rb_p << std::endl;
+    std::cout << *this << std::endl;
 
     return this->resolveInterPenetration(rb_p, sdt, direction, TOI+sdt);
   }
@@ -196,7 +196,7 @@ std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double 
     this->integrateBackward(sdt);
     rb_p->integrateBackward(sdt);
 
-		std::cout << *rb_p << std::endl;
+		std::cout << *this << std::endl;
 
     return this->resolveInterPenetration(rb_p, sdt, direction, TOI-sdt);
   }

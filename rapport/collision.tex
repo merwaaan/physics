@@ -356,23 +356,24 @@ atteindre à l'instant du contact.
 
 \subsection{Réponse}
 
-Une fois que la collision entre deux solides est confirmée est que
+Une fois que la collision entre deux solides est confirmée et que
 leurs états sont corrigés, il reste à déterminer quels points des
-corps entre en collision. Parfois, un seul point de contact peut
+corps entrent en collision. Parfois, un seul point de contact peut
 exister, comme lors d'une collision entre deux sphères. Plus souvent,
 il en existera plusieurs. Un corps rigide est structuré par trois
 types d'élément : les sommets, les arêtes et les faces et il est
 usuellement admis que seuls les contacts sommet-face et arête-arête
 sont nécessaires à nos besoins. Les autres associations d'éléments
-peuvent être ramenés à des cas dégénérés. Par exemple, un contact
-entre une arête et une face peut être assimilée à deux contacts
-sommet-face, chaque sommet étant une extrémité de l'arête. La figure
-\ref{contacts} illustre une configuration comprenant quatre contacts :
-deux contacts sommet/face et deux contacts arête/arête.
+peuvent être ramenés à des configurations dégénérés de ces deux
+cas. Par exemple, un contact entre une arête et une face peut être
+assimilée à deux contacts sommet-face, chaque sommet étant une
+extrémité de l'arête. La figure \ref{contacts} illustre une
+configuration comprenant quatre points de contact : deux sommet-face
+et deux arête-arête.
 
 \begin{figure}
   \centering
-  %\input{images/contacts.tikz}
+  \input{images/contacts.tikz}
   \caption{Quatre points de contacts entre deux cubes}
   \label{contacts}
 \end{figure}
@@ -380,52 +381,60 @@ deux contacts sommet/face et deux contacts arête/arête.
 Pour énumérer les points de contact entre deux corps, on effectue des
 tests de proximité entre chaque paire sommet-face et
 arête-arête. Cette phase repose sur plusieurs procédures géométriques
-utilitaires de projection qui déterminent la distance minimum entre
-deux éléments. Ici aussi, l'utilisation d'un seuil de tolérance adapté
-et en accord avec celui utilisé lors de la correction de l'état
-collisionnel est inévitable.
+utilitaires, qui déterminent la plus faible distance entre deux
+éléments par projection. Ici aussi, on utilise un seuil de tolérance
+adapté et en accord avec celui utilisé lors de la correction de l'état
+collisionnel.
 
 Nous référerons désormais aux informations concernant un point de
-contact entre deux corps en tant que contact. Un contact ne s'agit pas
-uniquement d'une unique position à laquelle deux corps se touchent, il
-doit aussi renseigner sur la direction de la collision, et contiendra
-donc une normale. Pour des raisons pratiques, on y adjoindra aussi une
-référence à chacun des corps entrant en jeu dans la collision. Il
-reste une information supplémentaire à enregistrer : le temps de
-contact. Par temps de contact, on ne pense pas à la durée d'un
-contact, puisqu'ils sont instantanés dans cette simulation, mais au
-moment précis auquel le contact est apparu. On pourrait penser que,
-comme le pas de temps de la simulation est fixe, tous les contacts
-inexistants au temps $t$ et apparus au temps $t + \deriv t$ auront
-tous blablabla
+contact entre deux corps en tant que \textit{contact}. Un contact ne
+s'agit pas uniquement d'une unique position à laquelle deux corps se
+touchent, il doit aussi renseigner sur la direction de la collision,
+et contiendra donc un vecteur normal au choc. Pour des raisons
+pratiques, on y adjoindra aussi une référence vers chacun des corps
+entrant en jeu dans la collision. Il reste une information
+supplémentaire à enregistrer : le temps de contact. Par temps de
+contact, on ne pense pas à la durée d'un contact, puisqu'ils sont
+instantanés dans cette simulation, mais au moment précis du pas de
+temps auquel le contact est apparu. On pourrait penser que, comme le
+pas de temps de la simulation est fixe, tous les contacts inexistants
+au temps $t$ et apparus au temps $t + \deriv t$ auront un temps
+d'impact $\deriv t$ mais la routine de correction de l'état
+collisionnel se charge de cibler précisément le moment du
+contact. Cette information se révélera utile dans la dernière partie
+de ce rapport, lorsque l'on souhaitera s'assurer du bon ordre des
+collisions.
 
-Les contacts sont indispensables au calcul d'une réponse physique
-appropriée pour simuler un choc entre deux objets. Après chaque
-intégration et si deux corps entrent en collision, une force de
-séparation devra être générée pour annuler cette collision, on parle
-d'impulsion. Il ne s'agit pas d'une unique force appliquée au centre de
-masse de chaque corps, chaque contact engendrera une impulsion. Dans
-le cas d'une boîte cubique tombant à plat sur le sol, quatre points de
-contact seront détectées : les quatres sommets de la face basse du
-cube. \`A chacune de ces positions, une impulsion identique sera
-appliquée, et la boîte s'élévera comme si blabla.
+Après chaque intégration et si deux corps entrent en collision, des
+forces de séparation devront être générées pour annuler cette
+collision, on parle d'\textit{impulsion} \cite{mirtich}. Une collision
+devra subir autant d'impulsions qu'il existe de contacts entre les
+deux corps considérés. Dans le cas d'une boîte cubique tombant à plat
+sur le sol, quatre points de contact seront détectées : les quatres
+sommets de la face basse du cube. \`A chacune de ces positions, une
+impulsion identique sera appliquée. Dans ce cas précis, on imagine que
+la masse de la boîte est également répartie et les quatre impulsions
+devront donc être égales afin de ne pas déséquilibrer l'objet et de
+produire un rebond droit.
 
-La vitesse relative entre deux corps correspond à la composante
-blablabla 
+[normale du contact]
 
-Le 
+[vitesse relative]
 
 Un coefficient de restitution $\varepsilon$, avec $0 \leq \varepsilon
-\leq 1$, détermine le taux de rebond d'un corps. Si $\varepsilon = 1$,
-la balle rebondira avec autant d'énergie qu'elle est arrivée (une
-situation concrètement impossible à retrouver dans le monde réel). Si
-$\varepsilon = 0$, la balle repartira avec une énergie nulle; elle
-restera collée au plan. Le coefficient de restitution dépend
-habituellement de la matière que l'on cherche à simuler : une balle en
-caoutchouc aura un $\varepsilon$ elevé tandis qu'un bloc d'argile aura
-un $\varepsilon$ proche de zéro.
+\leq 1$, détermine le taux de rebond d'un corps. Reprenons l'exemple
+de la balle de caoutchouc utilisé en guise d'étude de cas. Si
+$\varepsilon = 1$, la balle rebondira avec autant d'énergie qu'elle
+est arrivée; une situation concrètement impossible à retrouver dans le
+monde réel. Si $\varepsilon = 0$, la balle repartira avec une énergie
+nulle; autrement dit, elle restera collée au plan. Le coefficient de
+restitution dépend habituellement de la matière que l'on cherche à
+simuler : une balle en cahoutchoux aura un $\varepsilon$ elevé tandis
+qu'un bloc d'argile aura un $\varepsilon$ proche de zéro.
 
-\[
+[détails]
+
+\begin{align*}
 j = \frac{-(1 + \varepsilon) \vec{v}_{r}}{
   \frac{1}{m_a} +
   \frac{1}{m_b} +
@@ -433,5 +442,9 @@ j = \frac{-(1 + \varepsilon) \vec{v}_{r}}{
   (I_a^{-1} (r_a \times n)) \times r_a +
   (I_b^{-1} (r_b \times n)) \times r_b
 }
-\]
-[Friction]
+\end{align*}
+
+[friction]
+
+[cas des contact de repos]
+

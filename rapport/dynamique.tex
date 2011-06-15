@@ -19,38 +19,34 @@ notre affichage final, c'est cette valeur à tout instant $t$ de la
 simulation que l'on veut déterminer. Un corps possède aussi une
 vitesse $\vec v$, qui correspond à la variation de sa position pour
 une unité de temps. On note cette relation sous la forme dérivée :
-
 \begin{align*}
-  \vec{v} = \frac{\deriv \vec{p}}{\deriv t} \\
+  \vec{v} = \frac{\deriv \vec{p}}{\deriv t}
 \end{align*}
 
 Pareillement, l'accéleration $\vec a$, qui apparaissaît plus tôt dans
 la seconde loi de Newton, correspond à la variation de la vitesse par
 rapport à une unité de temps.
-
 \begin{align*}
-  \vec{a} = \frac{\deriv \vec{v}}{\deriv t} \\
+  \vec{a} = \frac{\deriv \vec{v}}{\deriv t}
 \end{align*}
 
 Par transitivité, on confirme que la position est en relation directe
 avec l'accélération.
-
 \begin{align*}
-  \vec{a} = \frac{\deriv \vec{v}}{\deriv t} = \frac{\deriv^2 \vec{p}}{\deriv t} \\
+  \vec{a} = \frac{\deriv \vec{v}}{\deriv t} = \frac{\deriv^2 \vec{p}}{\deriv t}
 \end{align*}
 
-Le travail de la partie dynamique du moteur physique revient à
-déterminer la nouvelle position d'un objet à partir de la connaissance
-de ses autres variables d'état. Grâce à l'équation précédente, on peut
+Le travail de la partie dynamique du moteur physique est de déterminer
+la nouvelle position d'un objet à partir de la connaissance de ses
+autres variables d'état. Grâce à l'équation précédente, on peut
 calculer l'accélération d'un objet à partir de sa variation de
 position. Dans le moteur physique, ce sera en fait l'opération inverse
 qui devra être effectuée : on connaîtra les forces appliquées, on en
 déduira par la seconde loi de Newton l'accélération induite puis on
 calculera le changement de position. Il faut donc exploiter le fait
 que ces trois quantités partagent aussi des relations de primitive.
-
 \begin{align*}
-  \vec{p} = \int \vec{v}\; \deriv t = \int \vec{a}\; \deriv t^2 \\
+  \vec{p} = \int \vec{v}\; \deriv t = \int \vec{a}\; \deriv t^2
 \end{align*}
 
 Récapitulons. Chacun des corps rigides dont l'on veut simuler
@@ -81,93 +77,117 @@ phase de la mise à jour et nous devons trouver un moyen d'approximer
 ces intégrales.
 
 Parmi les techniques classiques d'intégration approximative, on trouve
-l'intégration d'Euler. Cette méthode part du principe que l'on dispose
-de la valeur initiale $x_0$ de la quantité que l'on souhaite faire
-évoluer ainsi que de son taux de changement $x'$ et de la variation de
-temps $\deriv t$ par rapport à l'état précédent.
-
+l'intégration d'Euler \cite{hecker}. Cette méthode part du principe
+que l'on dispose de la valeur initiale $x_0$ de la quantité que l'on
+souhaite faire évoluer ainsi que de son taux de changement $x'$ pour
+une unité de temps et de la variation de temps $\deriv t$ par rapport
+à l'état précédent.
 \begin{align*}
-  x_{n+1} = x_{n} + x' \deriv t \\
+  x_{n+1} = x_{n} + x' \deriv t
 \end{align*}
 
 Si l'on adapte cette méthode à notre problème, on obtient la
 succession de calculs suivante :
-
 \begin{align*}
   \vec{a}_{n+1} &= \frac{1}{m} \sum \vec{F}_i \\ \\
   \vec{v}_{n+1} &= \vec{v}_n + \vec{a}_{n+1} \deriv t \\ \\
-  \vec{p}_{n+1} &= \vec{p}_n + \vec{v}_{n+1} \deriv t \\
+  \vec{p}_{n+1} &= \vec{p}_n + \vec{v}_{n+1} \deriv t
 \end{align*}
 
 On calcule l'accélération à un instant $t$ puis on intègre en fonction
 du temps jusqu'à obtenir la nouvelle position du corps. Ce processus
 doit être repété à chaque mise à jour du système et ce, pour chaque
-corps.
+particule. Il est important de noter que plus $\deriv t$ sera faible
+et plus les résultats seront précis. Néanmoins, le choix d'un $\deriv
+t$ trop petit est susceptible de faire perdre au moteur physique son
+statut d'application temps réel, puisque le programme doit être
+capable de calculer $\frac{1}{\deriv t}$ itérations de la simulation
+par seconde.
 
 On aurait pu choisir une autre méthode d'intégration, telle que
 l'intégration Runge-Kutta d'ordre 4 qui calcule les pentes des
-sous-segments d'un pas de temps pour obtenir des résultats plus précis
+subdivisions d'un pas de temps pour obtenir des résultats plus précis
 \cite{fiedler}, ou bien telle que l'intégration de Verlet qui dispose
 d'une meilleure stabilité \cite{bitterli}, mais Euler reste le choix
 le plus économique et fournit des résultats relativement
 satisfaisants.
 
 Afin de réduire la complexité de la structure informatique qui
-représentera un corps rigide, nous allons introduire la notion d'élan
-linéaire. Pour un corps rigide, l'élan linéaire $\vec{L}$ est le
-produit de la masse et de la vitesse. Cette nouvelle quantité a pour
-avantage majeur de posséder comme primitive la variation de force
-exercée sur le corps.
-
+représentera un corps rigide et de raccourcir les calculs, nous allons
+introduire la notion d'élan linéaire. Pour un corps rigide, l'élan
+linéaire $\vec{L}$ est le produit de sa masse et de sa vitesse. Cette
+nouvelle quantité a pour avantage majeur de posséder comme primitive
+la variation de force exercée sur le corps à un instant.
 \begin{align*}
-  {\sum \vec{F}_i} = \frac{\deriv \vec{L}}{\deriv t} = \frac{\deriv (m\vec{v})}{\deriv t} \\
+  {\sum \vec{F}_i} = \frac{\deriv \vec{L}}{\deriv t} = \frac{\deriv (m\vec{v})}{\deriv t}
 \end{align*}
 
 Ce qui signifie que l'on peut réduire l'intégration de l'état d'un
 corps à :
-
 \begin{align*}
   \vec{L}_{n+1} &= \vec{L}_n + {\sum \vec{F}_i} \\ \\
-  \vec{p}_{n+1} &= \vec{p}_n + \frac{\vec{L}_{n+1}}{m} \deriv t \\
+  \vec{p}_{n+1} &= \vec{p}_n + \frac{1}{m}\vec{L}_{n+1} \deriv t
 \end{align*}
 
-L'élan linéaire remplace l'accélération dans la définition d'un corps
-et permet de calculer sa vitesse si besoin en est. Cette organisation
-permet une intégration plus courte et une occupation moindre de la
-mémoire mais l'avantage principal reste la simplification de la
-structure générale d'un corps rigide.
+L'élan linéaire nous débarasse de l'accélération dans la définition
+d'un corps et permet de calculer sa vitesse si besoin en est.
+
+Pour des raisons pratiques, on enregistrera dans chaque corps non pas
+sa masse, mais l'inverse de celle-ci. L'avantage principal de ce choix
+est de pouvoir aisément fixer des objets. Si l'on veut qu'un élément
+de la simulation reste immobile, un mur fixe par exemple, on peut lui
+attribuer une masse inverse nulle. De cette façon, à chaque
+intégration il accumulera de l'élan mais sa position restera la même.
 
 \subsubsection{Modélisation d'un corps}
 
 Nous avons décrit dans la partie précédente les quantités régissant le
 mouvement linéaire d'une particule ainsi que la façon dont elles
 évoluent mais le moteur physique que l'on conçoit a pour visée de
-simuler les interactions entre des corps rigides à volume
-convexe. Comment peut-on étendre les principes énoncés pour des
-particules à ce modèle plus complexe ?
+simuler les comportements de corps rigides à volume convexe. Comment
+peut-on étendre les principes énoncés pour des particules à ce modèle
+plus complexe ?
 
 On pourrait en premier lieu penser à représenter un tel corps par une
 liste de particules, chacune placée à un sommet de l'objet. Chaque
 particule évoluerait indépendement et des contraintes de cohésion
 entre particules voisines seraient appliquées pour empêcher toute
-déformation du corps. Cette méthode est envisageable mais elle
-présente plusieurs désavantages. Premièrement, les règles de cohésion
-à mettre en place nécessiteraient des traitements supplémentaires, et
-donc un temps de calcul plus élevé. Deuxièment, un corps devrait
-passer par autant d'intégrations qu'il a de particules à chaque mise à
-jour. Il existe une solution plus simple et plus élégante qui permet
-de réduire les mouvements linéaires d'un corps doté d'un volume
-convexe à ceux d'une unique particule judicieusement placée.
+déformation du corps. Cette méthode est envisageable et existe, mais
+elle présente plusieurs désavantages. Premièrement, les règles de
+cohésion à mettre en place nécessiteraient des traitements
+supplémentaires, et donc un temps de calcul plus long. Deuxièment, un
+corps devrait passer par autant d'intégrations qu'il a de particules à
+chaque mise à jour. Il existe une solution plus simple et plus
+élégante qui permet de réduire les mouvements d'un corps rigide à ceux
+d'une unique particule judicieusement placée.
 
 Introduisons en premier lieu la notion de repères absolu et local. Le
-repère absolu est le référentiel orthogonal dont l'origine sert de
+repère absolu est le référentiel orthonormé dont l'origine sert de
 centre à l'environnement de la simulation. Un repère local est un
 référentiel qui est unique à chaque corps et dont le l'origine se
-situe à l'intérieur même de cet objet. La figure \ref{reperelocal}
-nous montre la position qu'un point $x$ d'un corps peut prendre par
-rapport à chaque repère : $\vec{p}_l$ correspond à sa position
-dans son repère local tandis que $\vec{p}_a$ est celle dans le
-repère absolu.
+situe à l'intérieur même de cet objet. La position exacte de l'origine
+du repère local dépend de la position des sommets qui forment l'objet
+mais il ne s'agit pas d'un simple centre géométrique puisque la masse
+de chaque sommet entre aussi en jeu. Cette position se nomme le centre
+de masse, ou barycentre, et sera calculée dans le repère absolu par la
+formule suivante, avec $M$ la masse totale des sommets du corps, $m_i$
+et $\vec{p}_i$ respectivement la masse et la position du sommet $i$
+dans le repère absolu :
+\begin{align*}
+  \vec{C} = \frac{1}{M} \sum m_i \vec{p}_i
+\end{align*}
+
+Une fois le centre de masse déterminé, la position locale $\vec{r}_i$
+d'un point quelconque $i$ peut être calculée en fonction de sa
+position absolue $\vec{p}_i$ par :
+\begin{align*}
+  \vec{r}_i = \vec{p}_i - \vec{C}
+\end{align*}
+
+La figure \ref{reperelocal} nous montre la position qu'un point $x$
+d'un corps peut prendre par rapport à chaque repère : $\vec{p}_l$
+correspond à sa position dans son repère local tandis que $\vec{p}_a$
+est celle dans le repère absolu.
 
 \begin{figure}
   \centering
@@ -175,25 +195,6 @@ repère absolu.
   \caption{Les repères absolu et local d'un rectangle}
   \label{reperelocal}
 \end{figure}
-
-La position exacte de l'origine du repère local dépend de la position
-des sommets qui forment l'objet mais il ne s'agit pas d'un simple
-centre géométrique puisque la masse de chaque sommet est aussi un
-facteur déterminant. Cette position se nomme le centre de masse, ou
-barycentre, et sera calculée par la formule suivante, avec $M$ la
-masse totale des points du corps, $m_i$ et $\vec{p}_i$ respectivement
-la masse et la position du sommet $i$ dans le repère absolu et
-$\vec{C}$ la position du centre de masse dans le repère absolu.
-
-\begin{align*}
-  \vec{C} = \frac{1}{M} \sum m_i \vec{p}_i \\
-\end{align*}
-
-Une fois le centre de masse déterminé, la position locale $\vec{r}_i$
-d'un point quelconque $i$ peut être calculée en fonction de sa
-position absolue $\vec{p}_i$ par :
-
-\[\vec{r}_i = \vec{p}_i - \vec{C}\] \\
 
 Le centre de masse est l'unique position que nous devons faire évoluer
 par intégration, quelle que soit la complexité de la structure d'un
@@ -230,27 +231,26 @@ possède aussi des axes et ceux du repère local ne sont pas
 nécessairement alignés avec ceux du repère absolu. Pour représenter la
 direction des axes du repère local, et donc l'orientation du corps à
 qui il appartient, on utilise une matrice de dimension 3 dans laquelle
-chaque vecteur colonne correspondra à un des axes du repère local
-\cite{witkit}. Pour illustrer ces propos, analysons la matrice
-identité d'ordre 3, qui correspond à la matrice d'orientation d'un
-corps parfaitement aligné avec les axes du repère absolu et n'ayant
-encore subit aucune rotation.
-
-\[
-\begin{pmatrix}
-  1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1
-\end{pmatrix}
-\rightarrow
-\begin{pmatrix}
-  1 \\ 0 \\ 0
-\end{pmatrix}
-\begin{pmatrix}
-  0 \\ 1 \\ 0
-\end{pmatrix}
-\begin{pmatrix}
-  0 \\ 0 \\ 1
-\end{pmatrix}
-\]
+chaque vecteur colonne correspondra à un des axes du repère
+local. Pour illustrer ces propos, analysons la matrice identité
+d'ordre 3, qui correspond à la matrice d'orientation d'un corps
+parfaitement aligné avec les axes du repère absolu et n'ayant encore
+subit aucune rotation.
+\begin{align*}
+  \begin{pmatrix}
+    1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1
+  \end{pmatrix}
+  \rightarrow
+  \begin{pmatrix}
+    1 \\ 0 \\ 0
+  \end{pmatrix}
+  \begin{pmatrix}
+    0 \\ 1 \\ 0
+  \end{pmatrix}
+  \begin{pmatrix}
+    0 \\ 0 \\ 1
+  \end{pmatrix}
+\end{align*}
 
 Si l'on isole les vecteurs colonnes de cette matrice identité, on
 remarque que chacun correspond à un des axes du repère absolu. Le
@@ -262,38 +262,28 @@ La matrice d'orientation contient les directions des axes du repère
 local, or on calcule la position des sommets d'un corps grâce à la
 position de son centre de masse et à son orientation. Il est donc
 primordial d'attacher un soin particulier à la validité de cette
-matrice si l'on veut éviter toute déformation du
-solide. L'arithmétique des nombres à virgule flottante impose ici son
-premier effet négatif. En effet, à chaque intégration de l'état d'un
-corps, de légères erreurs de calcul apparaissent, principalement sur
-la matrice d'orientation. L'effet est infime mais ces erreurs
-s'accumulent à chaque itération, jusqu'à devenir visuellement
-perceptibles. Le problème vient du fait qu'avec chaque mise à jour de
-la simulation, les axes du repère local (donc les vecteurs colonne de
-la matrice) perdent progressivement de leur normalité et de leur
-orthogonalité. En conséquence, l'orientation n'est pas aussi réaliste
-qu'on le souhaiterait, pire, l'objet est gravement déformé. Cette
-situation est visible sur la figure \ref{grahm}.
-
-IMAGE 2
-\begin{figure}
-  \centering
-  %\includegraphics[]{images/GS.png}
-  \caption{}
-  \label{grahm}
-\end{figure}
+matrice si l'on veut éviter toute déformation du solide ou tout
+résultat incorrect. L'arithmétique des nombres à virgule flottante
+impose ici son premier effet négatif. En effet, à chaque intégration
+de l'état d'un corps, de légères erreurs de calcul apparaissent,
+principalement sur la matrice d'orientation. L'effet est infime mais
+ces erreurs s'accumulent à chaque itération, jusqu'à devenir
+visuellement perceptibles. Le problème vient du fait qu'avec chaque
+mise à jour de la simulation, les axes du repère local (donc les
+vecteurs colonne de la matrice) perdent progressivement de leur
+normalité et de leur orthogonalité. En conséquence, l'orientation
+n'est pas aussi réaliste qu'on le souhaiterait, pire, l'objet est
+gravement déformé lorsqu'on le dessine.
 
 Afin de contrer cet effet indésirable, on ajoutera deux étapes de
 correction à la fin de chaque intégration. Premièrement, il nous faut
 normaliser les axes du repère local. Chaque axe correspondant à un
 vecteur colonne de la matrice d'orientation, il suffit de les extraire
 un par un et de recalculer leur magnitude pour s'assurer de leur
-normalité.
-
-En second lieu, il sera nécessaire de réorthogonaliser le repère
-local, autrement dit s'assurer que ses axes restent orthognaux entre
-eux. Pour cela, on orthogonalisera la matrice de rotation par le
-processus de Gram-Schmidt \cite{weber}, une méthode
+normalité. En second lieu, il sera nécessaire de réorthogonaliser le
+repère local, autrement dit s'assurer que ses axes restent orthognaux
+entre eux. Pour cela, on orthogonalisera la matrice d'orientation par
+le processus de Gram-Schmidt \cite{weber}, une méthode
 d'orthogonalisation fonctionnant par projection itérative des axes les
 uns sur les autres.
 
@@ -322,9 +312,8 @@ du centre de masse. On formule la composante angulaire d'une force par
 le couple $\vec{\tau}$, qui dépend de la position $\vec C$ du centre
 de masse et de la position $\vec x$ du point d'application de la force
 $\vec{F}$ dans le repère absolu.
-
 \begin{align*}
-  \vec{\tau} = (\vec{x} - \vec{C}) \times \vec{F} \\
+  \vec{\tau} = (\vec{x} - \vec{C}) \times \vec{F}
 \end{align*}
 
 Lorsqu'une force est appliquée à un objet, elle est décomposée en sa
@@ -332,23 +321,23 @@ composante linéaire et en sa composante angulaire. Ses deux quantités
 sont ensuite stockées dans des accumulateurs de force et de couple,
 qui seront remis à zéro après chaque intégration. Ici, $\sum
 \vec{\tau}_i$ correspond à la somme des composantes angulaires des
-différentes forces $\vec{F}_i$ subies pendant une itération. Il est de
-même pour le $\sum \vec{F}_i$ de l'intégration de la composante
-linéaire.
-
+différentes forces $\vec{F}_i$ subies pendant une itération. Le $\sum
+\vec{F}_i$ de l'intégration de la composante linéaire vue plus tôt
+correspond quant à lui à la somme des composantes linéaires.
 \begin{align*}
   \vec{A}_{n+1} &= \vec{A}_n + {\sum \vec{\tau}_i} \\ \\
+  \vec{L}_{n+1} &= \vec{L}_n + {\sum \vec{F}_i}
 \end{align*}
 
 \subsubsection{Quantités auxiliaires}
 
 On sait désormais qu'un corps possède une orientation et un élan
 angulaire, on sait aussi comment passer de l'application de forces à
-une variation d'élan angulaire. Néanmoins, la partie rotationnelle de
-l'intégration d'un objet n'est pas aussi directe que sa version
+une variation d'élan angulaire. Néanmoins, l'intégration des quantités
+angulaires d'un objet n'est pas aussi directe que sa version
 linéaire. Nous avons encore besoin de faire appel à plusieurs
 quantités auxiliaires, telles que le tenseur d'inertie local, le
-tenseur d'inertie absolu et vitesse angulaire, avant de mesurer
+tenseur d'inertie absolu et la vitesse angulaire, avant de mesurer
 l'étendue de la variation d'orientation induite par des influences
 extérieures.
 
@@ -364,40 +353,88 @@ pour notre plus grande satisfaction, la plupart des manuels de
 mécanique listent en annexe les tenseurs d'inertie usuels. Ci-suit, en
 exemple, le tenseur d'inertie local d'une boîte, avec $d_i$ son
 étendue le long de l'axe $i$ et $m$ sa masse.
-
-\[
-\begin{pmatrix}
-  \frac{m}{12}(d_y^2 + d_z^2) & 0 & 0 \\
-  0 & \frac{m}{12}(d_x^2 + d_z^2) & 0 \\
-  0 & 0 & \frac{m}{12}(d_x^2 + d_y^2) \\
-\end{pmatrix}
-\] \\
+\begin{align*}
+  \begin{pmatrix}
+    \frac{m}{12}(d_y^2 + d_z^2) & 0 & 0 \\
+    0 & \frac{m}{12}(d_x^2 + d_z^2) & 0 \\
+    0 & 0 & \frac{m}{12}(d_x^2 + d_y^2) \\
+  \end{pmatrix}
+\end{align*}
 
 Le tenseur d'inertie local d'un corps sera attribué lors de la phase
 de préparation des solides et ne changera pas au long de la
-simulation, quelle que soit l'état du corps.
+simulation, quel que soit l'état du corps.
 
 Le tenseur d'inertie absolu est une autre quantité auxiliaire, il doit
 être recalculé à chaque mise à jour puisqu'il dépend du tenseur
 d'inertie local et de l'orientation actuelle du corps. La formule
 suivante, avec $I_l$ le tenseur d'inertie local et $R$ la matrice
 d'orientation, nous fournit le tenseur d'inertie absolu $I_{a}$.
-
 \begin{align*}
-  I_a = R I_l R^T \\
+  I_a = R I_l {}^t\!\!R
 \end{align*}
 
-[vitesse angulaire]
+On peut exprimer la vitesse angulaire $\vec{\omega}$ comme le produit
+de l'inverse du tenseur d'inertie absolu et de l'élan angulaire. Cette
+quantité peut être visualisée comme un vecteur dont la direction
+correspond à un axe et dont la magnitude traduit le nombre de
+rotations par unité de temps autour de cet axe. Il reste à lier
+vitesse angulaire et matrice d'orientation. Commençons par introduire
+l'opérateur $^*$ \cite{witkit}, qui transforme un vecteur en matrice,
+tel que :
+\begin{align*}
+  \begin{pmatrix}
+    x \\ y \\ z
+  \end{pmatrix}
+  ^*
+  =
+  \begin{pmatrix}
+    0 & -z & y \\ z & 0 & -x \\ -y & x & 0
+  \end{pmatrix}
+\end{align*}
+
+Puisque $\vec{\omega}$ correspond à une variation d'orientation le
+long d'un axe, on peut écrire la variation complète d'orientation
+comme :
+\begin{align*}
+  \frac{\deriv R}{\deriv t} =
+  \begin{pmatrix}
+    \vec{\omega}^* \begin{pmatrix} R_{xx} \\ R_{xy} \\ R_{xz} \end{pmatrix} & 
+    \vec{\omega}^* \begin{pmatrix} R_{yx} \\ R_{yy} \\ R_{yz} \end{pmatrix} & 
+    \vec{\omega}^* \begin{pmatrix} R_{zx} \\ R_{zy} \\ R_{zz} \end{pmatrix} \\
+  \end{pmatrix}
+\end{align*}
+
+On peut extraire la vitesse angulaire et simplifier cette formulation
+en :
+\begin{align*}
+  \frac{\deriv R}{\deriv t} = \vec{\omega}^*R
+\end{align*}
 
 \subsubsection{Intégration}
 
-[fonction de 'skew']
-
-[détails]
-
+Toutes les quantités nécessaires à l'intégration de la composante
+angulaire d'un corps sont désormais réunies.
 \begin{align*}
   \vec{A}_{n+1} &= \vec{A}_n + \sum \vec{\tau}_i \\ \\
-  I_a &= R_n I_l R_n^T \\ \\
-  \vec{\omega} &= I_a \vec{A}_{n+1} \\ \\
-  R_{n+1} &= \vec{\omega} R_n \deriv t \\
+  I_a &= R_n I_l {}^t\!\!R_n \\ \\
+  \vec{\omega} &= I^{-1}_a \vec{A}_{n+1} \\ \\
+  R_{n+1} &= R_n + \vec{\omega}^* R_n \deriv t
+\end{align*}
+
+On part de la somme des composantes angulaires de chaque force subie
+par le corps pendant une itération et on obtient le nouvel élan
+angulaire. Ce dernier, utilisé conjointement avec l'inverse du torseur
+d'inertie absolu, fournit la vitesse angulaire du corps. Il reste
+alors à mettre à jour la matrice d'orientation en lui ajoutant le
+produit de $\vec{\omega}^*$ et de l'ancienne orientation, le tout
+multiplié par le pas de temps.
+
+Le second calcul de cette intégration nous fournit le tenseur
+d'inertie absolu, mais il est encore nécessaire de l'inverser pour
+calculer la vitesse angulaire. Afin de nous débarasser de cette
+opération supplémentaire, un corps contiendra non pas un tenseur
+d'inertie local, mais son inverse. On remplace donc ce calcul par :
+\begin{align*}
+  I^{-1}_a = (R_n I_l {}^t\!\!R_n)^{-1} = R_n I^{-1}_l {}^t\!\!R_n
 \end{align*}

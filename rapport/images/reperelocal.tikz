@@ -16,12 +16,10 @@
   \node at ($(x)+(0.4,0)$) (xlabel) {$x$};
 
   \draw[->,bleu,thick] (0,0) -- node[auto,color=black]{$\vec{p}_a$} (x);
-  \draw[bleu,thick] (2,0) arc (0:22:2);
 
   \draw[->,rose,thick] (R) -- node[auto,color=black]{$\vec{p}_l$} (x);
-  \begin{scope}[rotate around={-30:(R)}]
-    \draw[rose,thick] ($(R)+(0.5,0)$) arc (0:300:0.5);
-  \end{scope}
+
+  \draw[->,vert,thick] (0,0) -- node[auto,color=black]{$\vec{C}$} (R);
 
   \input{images/repere.tikz}
 \end{tikzpicture}

@@ -107,10 +107,9 @@ par seconde.
 On aurait pu choisir une autre méthode d'intégration, telle que
 l'intégration Runge-Kutta d'ordre 4 qui calcule les pentes des
 subdivisions d'un pas de temps pour obtenir des résultats plus précis
-\cite{fiedler}, ou bien telle que l'intégration de Verlet qui dispose
-d'une meilleure stabilité \cite{bitterli}, mais Euler reste le choix
-le plus économique et fournit des résultats relativement
-satisfaisants.
+\cite{fiedler}, ou bien l'intégration de Verlet qui dispose d'une
+meilleure stabilité \cite{bitterli}, mais Euler reste le choix le plus
+économique et fournit des résultats relativement satisfaisants.
 
 Afin de réduire la complexité de la structure informatique qui
 représentera un corps rigide et de raccourcir les calculs, nous allons
@@ -164,9 +163,9 @@ d'une unique particule judicieusement placée.
 Introduisons en premier lieu la notion de repères absolu et local. Le
 repère absolu est le référentiel orthonormé dont l'origine sert de
 centre à l'environnement de la simulation. Un repère local est un
-référentiel qui est unique à chaque corps et dont le l'origine se
-situe à l'intérieur même de cet objet. La position exacte de l'origine
-du repère local dépend de la position des sommets qui forment l'objet
+référentiel qui est unique à chaque corps et dont l'origine se situe à
+l'intérieur même de cet objet. La position exacte de l'origine du
+repère local dépend de la position des sommets qui forment l'objet
 mais il ne s'agit pas d'un simple centre géométrique puisque la masse
 de chaque sommet entre aussi en jeu. Cette position se nomme le centre
 de masse, ou barycentre, et sera calculée dans le repère absolu par la
@@ -281,7 +280,7 @@ normaliser les axes du repère local. Chaque axe correspondant à un
 vecteur colonne de la matrice d'orientation, il suffit de les extraire
 un par un et de recalculer leur magnitude pour s'assurer de leur
 normalité. En second lieu, il sera nécessaire de réorthogonaliser le
-repère local, autrement dit s'assurer que ses axes restent orthognaux
+repère local, autrement dit s'assurer que ses axes restent orthogonaux
 entre eux. Pour cela, on orthogonalisera la matrice d'orientation par
 le processus de Gram-Schmidt \cite{weber}, une méthode
 d'orthogonalisation fonctionnant par projection itérative des axes les
@@ -317,7 +316,7 @@ $\vec{F}$ dans le repère absolu.
 \end{align*}
 
 Lorsqu'une force est appliquée à un objet, elle est décomposée en sa
-composante linéaire et en sa composante angulaire. Ses deux quantités
+composante linéaire et en sa composante angulaire. Ces deux quantités
 sont ensuite stockées dans des accumulateurs de force et de couple,
 qui seront remis à zéro après chaque intégration. Ici, $\sum
 \vec{\tau}_i$ correspond à la somme des composantes angulaires des

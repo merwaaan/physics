@@ -45,11 +45,11 @@ d'un contact. Les boîtes englobantes sont des volumes alignés avec les
 axes du repère global qui contiennent tous les sommets d'un
 corps. Puisque tous les sommets de l'objet sont contenus dans l'AABB,
 il est évident que tous les points du corps le seront aussi. Pour
-savoir si deux corps rentrent possiblement en collision, on vérifie si
-leur boîte englobante entrent en collision.
+savoir si deux corps rentrent possiblement en collision, on effectue
+un test de collision entre leur boîte englobante.
 
-L'algorithme \ref{algoConstructionAABB} construit la boîte englobante d'un
-corps. Le principe est simple : on enregistre pour chaque axe le la
+L'algorithme \ref{algoConstructionAABB} construit la boîte englobante
+d'un corps. Le principe est simple : on enregistre pour chaque axe la
 position du sommet du corps le plus éloigné dans la direction négative
 (\textit{min}) et la position de celui qui est le plus éloigné dans la
 direction positive (\textit{max}).
@@ -79,13 +79,13 @@ Le test vérifiant la collision entre deux boîtes englobantes est très
 rapide puisque qu'il tire parti du fait que les boîtes sont alignées
 avec le repère absolu. Pour vérifier que deux AABB sont en état
 d'interpénétration, on utilise le théorème des axes de séparation.
-selon ce dernier, deux boîtes alignées sur les axes du repère absolu
+Selon ce dernier, deux boîtes alignées sur les axes du repère absolu
 n'entrent pas en contact si leur projection sur au moins un axe ne se
-superposent pas. En deux dimension, on peut visualiser ce théorème par
-le fait que si une ligne parallèle à un des axes du repère global
+superposent pas. En deux dimensions, on peut visualiser ce théorème
+par le fait que si une ligne parallèle à un des axes du repère global
 sépare deux corps, alors ils ne peuvent pas être en état de
-collision. En trois dimension le principe est le même, à la différence
-que l'on parle de plan de séparation. L'algorithme
+collision. En trois dimensions le principe est le même, à la
+différence que l'on parle de plan de séparation. L'algorithme
 \ref{algoDetectionGrossiere} utilise ce principe.
 
 \begin{algorithm}[h]
@@ -119,12 +119,12 @@ configurations que les boîtes englobantes entrent en collision sans
 que ce soit nécessairement le cas pour les corps qu'elles
 contiennent. Les boîtes sont en état d'interpénetration puisque leurs
 projections ne se séparent sur aucun axe. Ici, la détection grossière
-renvoit un résultat positif et c'est l'algorithme de détection fine
+renvoie un résultat positif et c'est l'algorithme de détection fine
 qui réfutera la collision entre les deux solides.
 
 La sous-figure $c$ illustre quant à elle un troisième cas de figure
 dans lequel les boîtes entrent en collision et les corps aussi. La
-détection fine sera appellée et confirmera la collision.
+détection fine sera appelée et confirmera la collision.
 
 \begin{figure}
   \centering
@@ -183,7 +183,7 @@ point de support. Un simplex d'un corps est une structure géométrique
 entièrement contenue dans ce dernier et étant caractérisée par une
 dimension. Un simplex de dimension 0 est un sommet, un simplex de
 dimension 1 est une arête, un simplex de dimension 2 est un triangle
-et un simplex de dimension 3 est un tétrahèdre. Un corps de dimension
+et un simplex de dimension 3 est un tétraèdre. Un corps de dimension
 $d$ peut contenir un simplex de dimension $d$ au maximum. Au départ de
 l'algorithme on part d'un simplex de base choisi alétoirement (souvent
 un sommet, donc un simplex de dimension 0). Ensuite, et à chaque
@@ -191,7 +191,7 @@ un sommet, donc un simplex de dimension 0). Ensuite, et à chaque
 point de $M$ le plus proche de l'origine en fasse partie. \`A la fin
 de chaque étape, on détermine le point du simplex actuellement le plus
 proche de l'origine. Afin d'alléger la charge de calcul, il est aussi
-nécessaire de réduire la dimension du simplex dés que des sommets ne
+nécessaire de réduire la dimension du simplex dès que des sommets ne
 sont plus nécessaires à la définition du point actuellement le plus
 proche. En effet, plus la dimension du simplex est faible et plus les
 calculs géométriques associés à la détermination du point du simplex
@@ -222,7 +222,7 @@ $S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) - S_B(-\vec{d})$.
   \label{gjk}
 \end{figure}
 
-La figure \ref{gjk} illustre la succession d'étapes qui amène à la
+La figure \ref{gjk} illustre la succession d'étapes qui amènent à la
 détermination du point le plus proche de l'origine $O$
 
 \begin{itemize}

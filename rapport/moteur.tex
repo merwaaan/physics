@@ -160,14 +160,14 @@ s'offrent à nous pour pallier ce problème.
   \label{tunneling1}
 \end{figure}
 
-On pourrait envisager diminuer la durée du pas de temps d'intégration
-afin de diminuer le risque de tunneling, mais même si un pas de temps
-faible améliore la qualité des résultats, il ne pourra pas être
-indéfiniment réduit. Il est principalement limité par le temps de
-calcul d'une mise à jour du système, puisqu'à partir du moment o\`u
-$\deriv t$ est inférieur au temps moyen nécessaire à une machine pour
-calculer une itération de la simulation, le programme perdra son
-statut d'application temps réel.
+On pourrait envisager de diminuer la durée du pas de temps
+d'intégration afin de diminuer le risque de tunneling, mais même si un
+pas de temps faible améliore la qualité des résultats, il ne pourra
+pas être indéfiniment réduit. Il est principalement limité par le
+temps de calcul d'une mise à jour du système, puisqu'à partir du
+moment o\`u $\deriv t$ est inférieur au temps moyen nécessaire à une
+machine pour calculer une itération de la simulation, le programme
+perdra son statut d'application temps réel.
 
 Une technique usuellement admise est le lancer de rayons
 (\textit{raycasting}) entre les points de la position de départ du
@@ -219,7 +219,7 @@ Comme mis en avant tout au long de ce rapport, on cherche à concevoir
 un moteur physique dont la rapidité d'éxécution est un facteur
 déterminant. Dans cette optique, il est primordial d'optimiser les
 routines géométriques entrant en jeu mais aussi d'éviter leur
-éxécution inutile dés que possible. La détection des collisions entre
+exécution inutile dès que possible. La détection des collisions entre
 les corps qui peuplent notre système se déroule en deux étapes : une
 détection grossière visant à vérifier de façon économique si deux
 objets se touchent et une détection fine servant à confirmer ou à
@@ -254,8 +254,6 @@ pourront pas rentrer dans leur intégralité à l'intérieur d'une unique
 case. Une solution à ce problème est de ranger un même objet dans
 plusieurs cases différentes de la grille, mais une fois encore, si des
 corps sont démultipliés de la sorte, le temps de maintenance d'une
-telle structure sera augmentée.
+telle structure sera augmenté.
 
 [Quatree, octree]
-
-[Conclusion]

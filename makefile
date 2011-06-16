@@ -23,4 +23,3 @@ $(EXEC): $(OBJ)
 
 clean:
 	rm *.o
-	rm *~

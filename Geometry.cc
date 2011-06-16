@@ -517,7 +517,7 @@ Vector3 Geometry::gjkDistance(RigidBody* rb1_p, RigidBody* rb2_p, bool* interPen
 		{
 			if(interPenetration_p != NULL)
 				*interPenetration_p = false;
-b
+
 			return closest;
 		}
 

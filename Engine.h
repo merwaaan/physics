@@ -10,6 +10,8 @@
 #include "Force.h"
 #include "RigidBody.h"
 
+enum UpdateType {FIXED, CONTINUOUS};
+
 class Engine
 {
   private:
@@ -18,6 +20,8 @@ class Engine
 		std::vector<Constraint*> constraints_p;
 
 		double tolerance;
+
+		UpdateType updateType;
 
     double timeStep;
 		double startingTime;
@@ -31,6 +35,8 @@ class Engine
 
     void run();
     void update();
+    void updateFixed();
+    void updateContinuous();
 		std::vector<RigidBody*> copyBodies();
 		std::vector<Contact> predictContacts();
     void applyEnvironmentalForces(RigidBody* rb_p, double dt);

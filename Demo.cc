@@ -254,12 +254,19 @@ void demoBoxes()
 
 void inputDemoStairs(unsigned char k, int x, int y)
 {
-  if(k == 97)
+  if(k == 97) // A
   {
 	  Cube* c = new Cube(3, 3);
 	  c->setPosition(randomf()*20-10, 10, 5 + randomf()*5);
 		c->prepare();
 	  e->addRigidBody_p(c);
+  }
+	if(k == 113) // Q
+  {
+	  Sphere* s = new Sphere(1);
+	  s->setPosition(randomf()*20-10, 10, 5 + randomf()*5);
+		s->prepare();
+	  e->addRigidBody_p(s);
   }
 	else if(k == 115) // S
 		e->getDisplay_p()->getCamera_p()->radius += 1;
@@ -357,7 +364,7 @@ int main(int argc, char** argv)
   //demoPendulum();
 	//demoMixed();
   //demoBoxes();
-	//demoStairs();
+	demoStairs();
 	demoPool();
   
   delete e;

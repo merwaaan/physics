@@ -39,7 +39,7 @@ Display::Display(int* argc, char** argv, int w, int h) :
   glutMouseFunc(&mousePressed);
   glutPassiveMotionFunc(&mouseMoved);
 
-  this->camera.radius = 20;
+  this->camera.radius = 30;
   this->camera.angle = 90;
   this->camera.lastX = -1;
 }

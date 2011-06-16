@@ -12,6 +12,7 @@ Engine* E = NULL;
 Engine::Engine(int* argc, char** argv, double timeStep) :
 	tolerance(0.01),
   timeStep(timeStep),
+	updateType(FIXED),
 	startingTime(getAbsoluteTime()),
 	lastUpdateTime(0),
   display(argc, argv, 600, 600)
@@ -41,6 +42,65 @@ void Engine::run()
 }
 
 void Engine::update()
+{
+	if(this->updateType == FIXED)
+		this->updateFixed();
+	else if(this->updateType == CONTINUOUS)
+		this->updateContinuous();
+}
+
+void Engine::updateFixed()
+{
+	// Check for collisions.
+	for(int i = 1; i < this->bodies_p.size(); ++i)
+		for(int j = 0; j < i; ++j)
+		{
+			// No need to go further is the two bodies are fixed.
+			if(this->bodies_p[i]->isFixed() && this->bodies_p[j]->isFixed())
+				continue;
+			
+			// Broad-phase test.
+			if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
+			{
+				std::cout << "bounding box collision detected between #" << i << " and #" << j << std::endl;
+				
+				// Narrow-phase test.
+				std::vector<Contact> contacts = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
+				
+				if(contacts.size() > 0)
+				{
+					std::cout << "real collision detected between #" << i << " and #" << j << std::endl;
+					
+					for(int k = 0; k < contacts.size(); ++k)
+					{
+						Vector3* impulses = this->computeImpulse(contacts[k]);
+						
+						contacts[k].a->applyOffCenterForce(impulses[0], contacts[k].position, 1);
+						contacts[k].b->applyOffCenterForce(impulses[1], contacts[k].position, 1);
+					}
+				}
+			}
+		}
+
+	// Apply constraints.
+	this->applyConstraints(this->timeStep);
+	
+	for(int i = 0; i < this->bodies_p.size(); ++i)
+	{      
+		// Apply external forces.
+		for(int j = 0; j < this->environmentalForces_p.size(); ++j)
+			this->environmentalForces_p[j]->apply(this->bodies_p[i], this->timeStep);
+		
+		// Integrate each body.
+		this->bodies_p[i]->integrate(this->timeStep);
+	}
+	
+	this->lastUpdateTime += this->timeStep;
+	
+	this->cleanUp();
+}
+
+void Engine::updateContinuous()
 {
 	// Predict contacts to come.
 	std::cout << "CONTACT PREDICTION" << std::endl;

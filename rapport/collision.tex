@@ -385,19 +385,20 @@ atteindre à l'instant du contact.
 \subsection{Réponse}
 
 Une fois que la collision entre deux solides est confirmée et que
-leurs états sont corrigés, il reste à déterminer quels points des
-corps entrent en collision. Parfois, un seul point de contact peut
-exister, comme lors d'une collision entre deux sphères. Plus souvent,
-il en existera plusieurs. Un corps rigide est structuré par trois
-types d'élément : les sommets, les arêtes et les faces et il est
-usuellement admis que seuls les contacts sommet-face et arête-arête
-sont nécessaires à nos besoins. Les autres associations d'éléments
-peuvent être ramenés à des configurations dégénérés de ces deux
-cas. Par exemple, un contact entre une arête et une face peut être
-assimilée à deux contacts sommet-face, chaque sommet étant une
-extrémité de l'arête. La figure \ref{contacts} illustre une
-configuration comprenant quatre points de contact : deux sommet-face
-et deux arête-arête.
+leurs états sont corrigés, il reste à rassembler toutes les
+informations nécessaires au calcul d'une réponse. Pour cela, on aura
+besoin de déterminer quels points précis des corps entrent en contact.
+Parfois, un seul point de contact peut exister, comme lors d'une
+collision entre deux sphères. Souvent, il en existera plusieurs. Un
+corps rigide est structuré par trois types d'élément : les sommets,
+les arêtes et les faces et il est usuellement admis que seuls les
+contacts sommet-face et arête-arête sont nécessaires à nos
+besoins. Les autres associations d'éléments peuvent être ramenées à
+des configurations dégénérés de ces deux cas. Par exemple, un contact
+entre une arête et une face peut être assimilée à deux contacts
+sommet-face, chaque sommet étant une extrémité de l'arête. La figure
+\ref{contacts} illustre une configuration comprenant quatre points de
+contact : deux sommet-face et deux arête-arête.
 
 \begin{figure}
   \centering
@@ -412,13 +413,19 @@ arête-arête. Cette phase repose sur plusieurs procédures géométriques
 utilitaires, qui déterminent la plus faible distance entre deux
 éléments par projection. Ici aussi, on utilise un seuil de tolérance
 adapté et en accord avec celui utilisé lors de la correction de l'état
-collisionnel.
+collisionnel afin de juger si deux éléments sont en contact.
 
 Nous référerons désormais aux informations concernant un point de
 contact entre deux corps en tant que \textit{contact}. Un contact ne
 s'agit pas uniquement d'une unique position à laquelle deux corps se
 touchent, il doit aussi renseigner sur la direction de la collision,
-et contiendra donc un vecteur normal au choc. Pour des raisons
+et contiendra donc un vecteur normal $\vec{n}$ qui variera selon le
+type de contact. Pour un contact sommet-face, il s'agira d'un vecteur
+normal à la face et dirigée vers le sommet. Pour un contact
+arête-arête, il s'agira d'un vecteur unité orthogonal aux deux arêtes,
+et donc de direction $\vec{a}_1 \times \vec{a}_2$, avec $\vec{a}_1$
+(respectivement $\vec{a}_2$) le vecteur reliant les deux extrémités de
+la première (respectivement seconde) arête. Pour des raisons
 pratiques, on y adjoindra aussi une référence vers chacun des corps
 entrant en jeu dans la collision. Il reste une information
 supplémentaire à enregistrer : le temps de contact. Par temps de
@@ -428,28 +435,68 @@ temps auquel le contact est apparu. On pourrait penser que, comme le
 pas de temps de la simulation est fixe, tous les contacts inexistants
 au temps $t$ et apparus au temps $t + \deriv t$ auront un temps
 d'impact $\deriv t$ mais la routine de correction de l'état
-collisionnel se charge de cibler précisément le moment du
+collisionnel doit être capable de cibler précisément le moment du
 contact. Cette information se révélera utile dans la dernière partie
-de ce rapport, lorsque l'on souhaitera s'assurer du bon ordre des
-collisions.
+de ce rapport, lorsque l'on souhaitera s'assurer du bon ordonnancement
+des collisions.
 
 Après chaque intégration et si deux corps entrent en collision, des
 forces de séparation devront être générées pour annuler cette
 collision, on parle d'\textit{impulsion} \cite{mirtich}. Une collision
-devra subir autant d'impulsions qu'il existe de contacts entre les
-deux corps considérés. Dans le cas d'une boîte cubique tombant à plat
-sur le sol, quatre points de contact seront détectées : les quatres
+provoquera autant d'impulsions qu'il existe de contacts entre les
+deux objets considérés. Dans le cas d'une boîte cubique tombant à plat
+sur le sol, quatre points de contact seront détectés : les quatres
 sommets de la face basse du cube. \`A chacune de ces positions, une
 impulsion identique sera appliquée. Dans ce cas précis, on imagine que
 la masse de la boîte est également répartie et les quatre impulsions
-devront donc être égales afin de ne pas déséquilibrer l'objet et de
-produire un rebond droit.
+devront donc être égales et dirigées vers le haut afin de ne pas
+déséquilibrer l'objet et de produire un rebond droit.
 
-[normale du contact]
+Pour calculer une impulsion $J$ séparant deux corps $A$ et $B$, on
+utilise cette intimidante formule d'Isaac Newton, tirée de sa loi de
+la restitution des collisions instantanées sans friction :
+\begin{align*}
+J = \vec{n} 
+  \frac{-(1 + \varepsilon) v_r}{
+  \frac{1}{m_A} +
+  \frac{1}{m_B} +
+  \vec{n}
+  (I_A^{-1} (\vec{r}_A \times \vec{n})) \times \vec{r}_A +
+  (I_B^{-1} (\vec{r}_b \times \vec{n})) \times \vec{r}_B
+}
+\end{align*}
 
-[vitesse relative]
+On y voit apparaître plusieurs quantités présentées plus tôt,
+notamment les tenseurs d'inertie absolus de chaque corps impliqué dans
+la collision ainsi que leur masse. On observe que le vecteur normal
+$\vec{n}$ enregistré lors de la recherche des points de contact y joue
+un rôle important puisqu'au final, l'impulsion correspondra à un
+produit entre $\vec{n}$ et un scalaire. Plusieurs autres valeurs sont
+néanmoins encore inconnues et doivent être calculées à partir des
+informations de contact dont l'on dispose.
 
-Un coefficient de restitution $\varepsilon$, avec $0 \leq \varepsilon
+La vitesse relative normale $v_r$ correspond à la composante de la
+vitesse relative des deux corps le long la normale du contact. On peut
+calculer la vitesse $\vec{v}_l$ d'un point quelconque du repère absolu
+dans le repère local d'un corps avec la vitesse linéaire $\vec{v}$ du
+corps, sa vitesse angulaire $\vec{\omega}$, la position $\vec{C}$ de
+son centre de masse et la position $\vec{p}_a$ du point dans le repère
+absolu.
+\begin{align*}
+  \vec{v}_l &= \vec{v} + \vec{\omega} \times (\vec{p}_a - \vec{C}) \\
+            &= \frac{1}{m} \vec{L} + (I^{-1}_a \vec{A}) \times (\vec{p}_a - \vec{C})
+\end{align*}
+
+Pour obtenir, la vitesse relative normale, il reste à projeter sur la
+normale du contact considéré la vitesse relative du point de contact
+par rapport aux référentiels locaux des deux corps. Ici, $\vec{v}_a$
+et $\vec{v}_b$ correspondent aux vitesses du point de contact par
+rapport aux référentiels de $A$ et de $B$.
+\begin{align*}
+  v_r &= \vec{n} (\vec{v}_{A} - \vec{v}_{B})
+\end{align*}
+
+Le coefficient de restitution $\varepsilon$, avec $0 \leq \varepsilon
 \leq 1$, détermine le taux de rebond d'un corps. Reprenons l'exemple
 de la balle de caoutchouc utilisé en guise d'étude de cas. Si
 $\varepsilon = 1$, la balle rebondira avec autant d'énergie qu'elle
@@ -457,20 +504,16 @@ est arrivée; une situation concrètement impossible à retrouver dans le
 monde réel. Si $\varepsilon = 0$, la balle repartira avec une énergie
 nulle; autrement dit, elle restera collée au plan. Le coefficient de
 restitution dépend habituellement de la matière que l'on cherche à
-simuler : une balle en cahoutchoux aura un $\varepsilon$ elevé tandis
-qu'un bloc d'argile aura un $\varepsilon$ proche de zéro.
+simuler : une balle en cahoutchouc aura un $\varepsilon$ elevé tandis
+qu'un bloc d'argile aura un $\varepsilon$ proche de zéro. Dans le
+moteur physique, chaque objet possède son propre coefficient de
+restitution et on choisit d'utiliser pour la formulation de Newton le
+minimum des deux.
 
-[détails]
+Les vecteurs $\vec{r}_A$ et $\vec{r}_B$ correspondent aux positions du
+point de contact dans les référentiels respectifs des corps $A$ et $B$.
 
-\begin{align*}
-j = \frac{-(1 + \varepsilon) \vec{v}_{r}}{
-  \frac{1}{m_a} +
-  \frac{1}{m_b} +
-  n
-  (I_a^{-1} (r_a \times n)) \times r_a +
-  (I_b^{-1} (r_b \times n)) \times r_b
-}
-\end{align*}
+
 
 [friction]
 

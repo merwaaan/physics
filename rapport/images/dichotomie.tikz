@@ -46,6 +46,6 @@
 \coordinate (A2prec) at (A2);
 \coordinate (A2) at ($(A2)!0.5!(A2precT)$);
 \input{images/dichotomie_base.tikz}
-\draw[->,thick,vert] (A2prec) to node[black,auto] {$+ \frac{\deriv t}{8}$} (A2);
+\draw[->,thick,vert] (A2prec) to node[black,auto] {$- \frac{\deriv t}{8}$} (A2);
 
 \end{tikzpicture}

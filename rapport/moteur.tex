@@ -138,19 +138,20 @@ Néanmoins, une éventualité n'a pas été envisagée : que se passerait-il
 si un objet en traversait entièrement un autre pendant un pas de temps
 ? On peut imaginer un objet $A$ lancé vers un autre objet $B$
 fixe. \`A l'instant $t$, $A$ n'entre pas en collision avec $B$ mais se
-dirige dans sa direction. \`A l'instant $t+1$, $A$ a entièrement
-traversé $B$. \`A aucun de ces deux instants une collision n'a été
-détectée et pourtant $A$ est impunément passé à travers $B$. Le pas de
-temps utilisé pour réguler l'intégration du système était donc trop
-faible pour s'assurer des collisions entre corps évoluant à haute
-vitesse. \`A l'heure de l'écriture de ce rapport, le moteur physique
-est sensible à ce genre de situation. Réellement, ce cas ne se produit
-pas, puisque les simulations développées représentent des situations
-terrestres qui font participer des forces d'opposition telles que le
-frottement de l'air et donc les corps n'atteignent jamais de vitesses
-démesurées. On souhaite tout de même disposer d'un moteur physique
-solide et versatile, évaluons les possibilités qui s'offrent à nous
-pour pallier ce problème.
+dirige dans sa direction. \`A l'instant $t + \deriv t$, $A$ a
+entièrement traversé $B$. \`A aucun de ces deux instants une collision
+n'a été détectée et pourtant $A$ est impunément passé à travers
+$B$. Le pas de temps utilisé pour réguler l'intégration du système
+était donc trop faible pour s'assurer des collisions entre corps
+évoluant à haute vitesse. Ce phénomène est appelé
+\textit{tunneling}. \`A l'heure de l'écriture de ce rapport, le moteur
+physique est sensible à ce genre de situation. Réellement, ce cas ne
+se produit pas, puisque les simulations développées représentent des
+situations terrestres qui font participer des forces d'opposition
+telles que le frottement de l'air et donc les corps n'atteignent
+jamais de vitesses démesurées. On souhaite tout de même disposer d'un
+moteur physique solide et versatile, évaluons les possibilités qui
+s'offrent à nous pour pallier ce problème.
 
 \begin{figure}
   \centering
@@ -186,20 +187,24 @@ pourrait se réveler regrettable en terme de coûts de calcul.
   \label{tunneling2}
 \end{figure}
 
-La technique du ??? permet de contrôler de façon certain tout
+La technique de la détection de collision continue (\textit{continuous
+  collision detection}) permet de contrôler de façon certaine tout
 phénomène de tunneling. L'idée est la suivante : soit deux corps $A$
 et $B$ dont l'on veut détecter l'éventuelle collision. On construit
-deux volumes fantômes $F_A$ et $F_B$ englobant tous les points par
+deux volumes fantômes $C_A$ et $C_B$ englobant tous les points par
 lesquels passent respectivement $A$ et $B$ entre deux
 intégrations. Ces volumes n'interviendront pas dans les collisions des
-autres objets de la simulation, et on vérifie simplement s'ils
-rentrent tous deux en collision. Si tel est le cas, alors on sait
-qu'il est possible qu'un tunneling se soit produit. L'un des avantages
-majeurs de cette méthode, en plus du fait qu'elle ne rate aucun
+autres objets de la simulation, et on vérifie simplement s'ils entrent
+tous deux en collision. Si tel est le cas, alors on sait qu'il est
+possible qu'un tunneling se soit produit et on peut revenir en arrière
+jusqu'à ce que le problème soit résolu. Pour accélérer cette phase, il
+est envisageable d'utiliser des boîtes englobantes de la même façon
+que lors de la détection grossière de collision. L'un des avantages
+majeurs de cette méthode, en plus de sa certitude de ne manque aucun
 tunneling, est sa simplicité de mise en place puisque toutes les
-routines utilisées (détection de collision entre volumes, retour en
-arrière) ont été écrites et entrent déjà en jeu dans le fonctionnement
-de base du moteur physique.
+routines de détection et de retour en arrière utilisées ont déjà été
+écrites et entrent en jeu dans le fonctionnement de base du moteur
+physique.
 
 \begin{figure}
   \centering

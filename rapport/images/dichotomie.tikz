@@ -34,7 +34,17 @@
 \coordinate (B) at ($(B) + (0,-3)$);
 \coordinate (A2precT) at (A2prec);
 \coordinate (A2prec) at (A2);
-\coordinate (A2) at ($(A2)!-0.5!(A2precT)$);
+\coordinate (A2) at ($(A2)!-1!(A2precT)$);
+\input{images/dichotomie_base.tikz}
+\draw[->,thick,vert] (A2prec) to node[black,auto] {$+ \frac{\deriv t}{4}$} (A2);
+
+\coordinate (A1) at ($(A1) + (0,-3)$);
+\coordinate (A2) at ($(A2) + (0,-3)$);
+\coordinate (A2prec) at ($(A2prec) + (0,-3)$);
+\coordinate (B) at ($(B) + (0,-3)$);
+\coordinate (A2precT) at (A2prec);
+\coordinate (A2prec) at (A2);
+\coordinate (A2) at ($(A2)!0.5!(A2precT)$);
 \input{images/dichotomie_base.tikz}
 \draw[->,thick,vert] (A2prec) to node[black,auto] {$+ \frac{\deriv t}{8}$} (A2);
 

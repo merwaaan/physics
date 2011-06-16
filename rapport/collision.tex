@@ -304,15 +304,20 @@ déplacé de dix mètres pendant l'intégration sera au moins recalé un
 mètre avant tout contact réel, même si la profondeur de pénétration
 n'était que de quelques centimètres.
 
-Afin d'accélérer la phase de recherche et d'obtenir des résultats
-précis, on fait le choix de procéder par dichotomie. \`A chaque étape
-$i$ de cette recherche, on recule de $\frac{\deriv t}{2i}$ unité de
-temps si les corps s'interpénétrent, sinon on avance de cette même
-durée. On considère qu'une position de contact valide a été déterminée
-lorsqu'il n'y a plus d'interpénétration et que la distance entre les
-objets est inférieure à un seuil de tolérance choisi au préalable. Le
-processus est visible sur la figure \ref{dichotomie} et est détaillé
-dans l'algorithme \ref{algoDichotomie}.
+Afin d'accélérer cette recherche et d'obtenir des résultats précis, on
+fait le choix de procéder par dichotomie. La recherche se compose de
+deux phases qui s'alternent jusqu'à la découverte d'une solution : la
+phase de recul consiste en un retour en arrière dans le temps tandis
+que la phase d'approche est un avancement. On commence la recherche
+par la phase de recul. On passe de recul à approche lorsque les corps
+n'entrent plus en collision. On passe d'approche à recul lorsque les
+corps entrent à nouveau en collision. Le sous-pas de temps employé est
+divisé par deux à chaque changement de phase. On considère avoir
+trouvé une configuration satisfaisante lorsqu'il n'y a plus
+d'interpénétration et que la distance entre les objets est inférieure
+à un seuil de tolérance prédéfini. Ce processus est visible sur la
+figure \ref{dichotomie} et est détaillé dans l'algorithme récursif
+\ref{algoDichotomie}.
 
 \begin{figure}
   \centering
@@ -325,23 +330,48 @@ dans l'algorithme \ref{algoDichotomie}.
   \caption{Correction d'une collision}
   \label{algoDichotomie}
   \dontprintsemicolon
+  \SetKwData{RECUL}{RECUL}
+  \SetKwData{APPR}{APPR}
+  \SetKwFunction{distance}{distance}
+  \SetKwFunction{integrer}{integrer}
+  \SetKwFunction{correction}{correction}
   \Entree{
     Deux corps A et B,\\
+    $\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;$ une phase $P \in \{ \RECUL, \APPR \}$\\
     $\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;$ un pas de temps $\deriv t$,\\
     $\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;\;$ un seuil de tolérance $\theta$}
   \Sortie{Deux corps A et B corrigés}
   \BlankLine
-  $d =$ distance\_GJK(A,B)\;
+  $d =$ \distance{A,B}\;
+  \BlankLine
   \Si{$0 < d \leq \theta$}{
     \Retour{A et B}
   }
+  \BlankLine
   \SinonSi{$d = 0$}{
-    A.integrer(-dt/2)\;
-    B.integrer(-dt/2)
+    \lSi{$P \ne \RECUL$}{
+      $\deriv t_2 \leftarrow \frac{\deriv t}{2}$
+    }
+    \lSinon{
+      $\deriv t_2 \leftarrow \deriv t$
+    }
+    \BlankLine
+    \integrer{A,$- \deriv t_2$}\;
+    \integrer{B,$- \deriv t_2$}\;
+    \correction{A, B, \RECUL, $\deriv t_2$, $\theta$}
   }
+  \BlankLine
   \Sinon{
-    A.integrer(dt/2)\;
-    B.integrer(dt/2)
+    \lSi{$P \ne \APPR$}{
+      $\deriv t_2 \leftarrow \frac{\deriv t}{2}$
+    }
+    \lSinon{
+      $\deriv t_2 \leftarrow \deriv t$
+    }
+    \BlankLine
+    \integrer{A,$\deriv t_2$}\;
+    \integrer{B,$\deriv t_2$}\;
+    \correction{A, B, \APPR, $\deriv t_2$, $\theta$}
   }
 \end{algorithm}
 
@@ -351,8 +381,6 @@ mutuelle. On remarque que grâce à cette technique, la position n'est
 pas la seule valeur à avoir été recalée : orientation, élans angulaire
 et linéaires sont eux aussi revenus aux valeurs qu'ils auraient dû
 atteindre à l'instant du contact.
-
-[nouvelle version ?]
 
 \subsection{Réponse}
 

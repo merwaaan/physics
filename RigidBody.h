@@ -82,7 +82,7 @@ class RigidBody
 		virtual std::vector<Contact> getContacts(RigidBody* rb_p) = 0;
 		virtual Vector3 getSupportPoint(Vector3 direction) = 0;
 
-    double getInverseMass() { return this->inverseMass; }
+    double getInverseMass() { return this->isActive() ? this->inverseMass : 0; }
     Matrix3 getInverseInertiaTensor() { return this->inverseInertiaTensor; }
 
     void move(Vector3 displacement) { this->position += displacement; }
@@ -106,6 +106,11 @@ class RigidBody
 
     void setFixed(bool fixed) { this->fixed = fixed; }
 		bool isFixed() { return this->fixed; }
+
+		void setSleeping(bool sleeping) { this->sleeping = sleeping; }
+		bool isSleeping() { return this->sleeping; }
+
+		bool isActive() { return !this->fixed && ! this->sleeping; }
 
 		void setRestitution(double restitution) { this->restitution = restitution; }
 		double getRestitution() { return this->restitution; }

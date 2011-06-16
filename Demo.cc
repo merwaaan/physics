@@ -135,43 +135,6 @@ void demoRope()
 	e->run();
 }
 
-void demoPendulum()
-{
-	Constraint* c;
-
-	Sphere* sf = new Sphere(0.1, 1);
-	sf->setPosition(-2, 6, 0);
-	sf->setFixed(true);
-	e->addRigidBody_p(sf);
-
-	Sphere* sp = new Sphere(1, 1);
-	sp->setPosition(-8, 6, 0);
-	e->addRigidBody_p(sp);
-	
-	c = new DistanceConstraint(sf, sp, 6);
-	e->addConstraint_p(c);
-
-	for(int i = 0; i < 4; ++i)
-	{
-		sf = new Sphere(0.1, 1);
-		sf->setPosition(i*2, 6, 0);
-		sf->setFixed(true);
-		e->addRigidBody_p(sf);
-
-		sp = new Sphere(1, 1);
-		sp->setPosition(i*2, 0, 0);
-		e->addRigidBody_p(sp);	
-
-		c = new DistanceConstraint(sf, sp, 6);
-		e->addConstraint_p(c);
-	}
-
-  Force* g = new CenterForce(Vector3(0, -9.81, 0));
-  e->addEnvironmentalForce_p(g);
-
-	e->run();
-}
-
 void demoBalls()
 {
   for(int i = -2; i < 2; ++i)
@@ -197,33 +160,12 @@ void demoBalls()
   e->run();
 }
 
-void demoMixed()
-{
-	Cube* c = new Cube(2,1);
-	c->setPosition(0, 5, 0);
-  e->addRigidBody_p(c);
-
-	Sphere* s = new Sphere(1, 1);
-	s->setPosition(0, 4, 4);
-  e->addRigidBody_p(s);
-
-	Box* sol = new Box(30, 0.5, 30, 1);
-	sol->setPosition(0, -2.5, 0);
-  sol->setFixed(true);
-  e->addRigidBody_p(sol);
-
-  Force* g = new CenterForce(Vector3(0, -9.81, 0));
-  e->addEnvironmentalForce_p(g);
-
-  e->run();
-}
-
 void inputDemoBoxes(unsigned char k, int x, int y)
 {
   if(k == 97)
   {
 	  Cube* c = new Cube(4, 2);
-	  c->setPosition(randomf()*20-10, 10, 5 + randomf()*5);
+	  c->setPosition(randomf()*10-5, 10, randomf()*10-5);
 		c->prepare();
 	  e->addRigidBody_p(c);
   }
@@ -263,7 +205,7 @@ void inputDemoStairs(unsigned char k, int x, int y)
   }
 	if(k == 113) // Q
   {
-	  Sphere* s = new Sphere(1, 1);
+	  Sphere* s = new Sphere(1, 10);
 	  s->setPosition(randomf()*20-10, 10, 5 + randomf()*5);
 		s->prepare();
 	  e->addRigidBody_p(s);
@@ -307,7 +249,7 @@ void inputDemoPool(unsigned char k, int x, int y)
 {
   if(k == 97) // A
   {
-	  Cube* c = new Cube(3+randomf(), 3);
+	  Cube* c = new Cube(2+randomf(), 5);
 	  c->setPosition(0, 6, 0);
 		c->prepare();
 	  e->addRigidBody_p(c);
@@ -359,7 +301,7 @@ void demoPool()
 
 int main(int argc, char** argv)
 {
-	srand(123);//123
+	srand(12);//123
 
   e = new Engine(&argc, argv, 0.01);
   
@@ -368,9 +310,7 @@ int main(int argc, char** argv)
   //testTimeReversing();
 	
   //demoRope();
-  //demoPendulum();
-	//demoMixed();
-  //demoBoxes();
+  demoBoxes();
 	//demoStairs();
 	demoPool();
   

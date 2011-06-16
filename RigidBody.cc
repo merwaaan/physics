@@ -5,7 +5,7 @@
 extern Engine* E;
 
 RigidBody::RigidBody() :
-	restitution(0.7),
+	restitution(0.3),
 	friction(0.9),
   fixed(false),
 	sleeping(false)
@@ -38,7 +38,7 @@ void RigidBody::clearAccumulators()
 
 void RigidBody::applyCenterForce(Vector3 force, double dt)
 {
-	if(this->fixed)
+	if(!this->isActive())
 		return;
 
   this->accumulatedForces += force * dt * (dt < 0 ? -1 : 1);
@@ -46,7 +46,7 @@ void RigidBody::applyCenterForce(Vector3 force, double dt)
 
 void RigidBody::applyOffCenterForce(Vector3 force, Vector3 poa, double dt)
 {
-	if(this->fixed)
+	if(!this->isActive())
 		return;
 
 	this->accumulatedForces += (force * dt) * (dt < 0 ? -1 : 1);
@@ -55,16 +55,14 @@ void RigidBody::applyOffCenterForce(Vector3 force, Vector3 poa, double dt)
 
 void RigidBody::computeAuxiliaryQuantities()
 {
-	this->linearVelocity = this->linearMomentum * this->inverseMass;
-
-  Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
-  this->angularVelocity = inverseInertia * this->angularMomentum;
+	this->linearVelocity = this->inverseMass * this->linearMomentum;
+  this->angularVelocity = (this->orientation * this->inverseInertiaTensor * this->orientation.transpose()) * this->angularMomentum;
 }
 
 void RigidBody::integrate(double dt)
 {
-  // Short-circuit integration if the body is fixed.
-  if(this->fixed)
+  // Short-circuit integration if the body is fixed or asleep.
+  if(!this->isActive())
     return;
 
 	// LINEAR COMPONENT
@@ -103,7 +101,7 @@ void RigidBody::integrate(double dt)
 
 void RigidBody::integrateBackward(double dt)
 {
-	if(this->fixed)
+	if(!this->isActive())
 		return;
 
 	this->reverseTime();

@@ -56,7 +56,7 @@ void Engine::updateFixed()
 		for(int j = 0; j < i; ++j)
 		{
 			// No need to go further is the two bodies are fixed.
-			if(this->bodies_p[i]->isFixed() && this->bodies_p[j]->isFixed())
+			if(!this->bodies_p[i]->isActive() && !this->bodies_p[j]->isActive())
 				continue;
 			
 			// Broad-phase test.
@@ -97,7 +97,7 @@ void Engine::updateFixed()
 	
 	this->lastUpdateTime += this->timeStep;
 	
-	this->cleanUp();
+	//this->cleanUp();
 }
 
 void Engine::updateContinuous()
@@ -169,7 +169,7 @@ std::vector<Contact> Engine::predictContacts()
 			b->integrate(this->timeStep);
 
 			// Check for a collision.
-			if(a->isFixed() && b->isFixed())
+			if(!a->isActive() && !b->isActive())
 				continue;
 			if(a->isBoundingBoxCollidingWith(b))
 			{
@@ -209,30 +209,45 @@ Vector3* Engine::computeImpulse(Contact contact)
   Vector3 n = contact.normal;
 
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
-	Vector3 impulse;
 	std::cout << "vrel " << relativeVelocity << " " << n << " " << a->getVelocity(p) << " " << b->getVelocity(p) << std::endl;
-	// displacements of the contact points with respect to the center of mass of each body
-	Vector3 da = p - a->getPosition();
-	Vector3 db = p - b->getPosition();
 
-	Matrix3 inverseInertiaA = a->getOrientation() * a->getInverseInertiaTensor() * a->getOrientation().transpose();
-	Matrix3 inverseInertiaB = b->getOrientation() * b->getInverseInertiaTensor() * b->getOrientation().transpose();
+	// The bodies are separating.
+	/*if(relativeVelocity < 0)
+	{
+		return (Vector3[]){Vector3(0, 0, 0), Vector3(0, 0, 0)};
+	}
+	// The bodies are resting.
+	else if(relativeVelocity < 0.07)
+	{
+		a->setSleeping(true);
+		b->setSleeping(true);
+		}
+	// The bodies are colliding.
+	else*/
+	{
+		// displacements of the contact points with respect to the center of mass of each body
+		Vector3 da = p - a->getPosition();
+		Vector3 db = p - b->getPosition();
+
+		double restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
+
+		Matrix3 inverseInertiaA = a->getOrientation() * a->getInverseInertiaTensor() * a->getOrientation().transpose();
+		Matrix3 inverseInertiaB = b->getOrientation() * b->getInverseInertiaTensor() * b->getOrientation().transpose();
 	
-	double t1 = a->getInverseMass() + b->getInverseMass();
-	double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
-	double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
+		double t1 = a->getInverseMass() + b->getInverseMass();
+		double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
+		double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
 	
-	double restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
-	if(relativeVelocity < 0.1) restitution = 2;
+		Vector3 impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
+		Vector3 impulseA = impulse;// * (b->getInverseMass() / t1);
+		Vector3 impulseB = -1 * impulse;// * (a->getInverseMass() / t1);
 
-	impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
-
-	Vector3 impulseA = impulse;
-	Vector3 impulseB = -1 * impulse;
-
-	std::cout << "impulse A " << impulseA << " at " << contact.position << std::endl;
+		std::cout << impulse << std::endl;
+		std::cout << "impulse A " << impulseA << " at " << contact.position << std::endl;
+		std::cout << "impulse B " << impulseB << " at " << contact.position << std::endl;
 	
-	return (Vector3[]){impulseA, impulseB};
+		return (Vector3[]){impulseA, impulseB};
+	}
 }
 
 void Engine::applyEnvironmentalForces(RigidBody* rb_p, double dt)

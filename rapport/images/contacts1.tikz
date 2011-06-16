@@ -1,0 +1,27 @@
+\begin{tikzpicture}[scale=0.4]
+  % Avant.
+  \begin{scope}[canvas is xy plane at z=4]
+    \path[fill=gris!20] (0,0) rectangle (4,4);
+  \end{scope}
+  % Droite.
+  \begin{scope}[canvas is zy plane at x=4]
+    \path[fill=gris!50] (0,0) rectangle (4,4);
+  \end{scope}
+  % Haut.
+  \begin{scope}[canvas is zx plane at y=4]
+    \path[fill=gris!70] (0,0) rectangle (4,4);
+  \end{scope}
+
+  % Avant.
+  \begin{scope}[canvas is xy plane at z=2]
+    \path[fill=gris!20] (2,4) rectangle (6,8);
+  \end{scope}
+  % Droite.
+  \begin{scope}[canvas is yz plane at x=6]
+    \path[fill=gris!50] (4,2) rectangle (8,-2);
+  \end{scope}
+  % Haut.
+  \begin{scope}[canvas is xz plane at y=8]
+    \path[fill=gris!70] (2,2) rectangle (6,-2);
+  \end{scope}
+\end{tikzpicture}

@@ -1,4 +1,4 @@
-\begin{tikzpicture}[scale=0.7]
+\begin{tikzpicture}[scale=0.4]
   % Avant.
   \begin{scope}[canvas is xy plane at z=4]
     \path[draw=black, thick] (0,0) rectangle (4,4);
@@ -21,30 +21,30 @@
   \end{scope}
 
   % Avant.
-  \begin{scope}[canvas is xy plane at z=6]
+  \begin{scope}[canvas is xy plane at z=2]
     \path[draw=black, thick] (2,4) rectangle (6,8);
   \end{scope}
   % Droite.
-  \begin{scope}[canvas is zy plane at x=6]
-    \path[draw=black, thick] (6,4) rectangle (2,8);
+  \begin{scope}[canvas is yz plane at x=6]
+    \path[draw=black, thick] (4,2) rectangle (8,-2);
   \end{scope}
   % Haut.
-  \begin{scope}[canvas is zx plane at y=8]
-    \path[draw=black, thick] (2,6) rectangle (6,2);
+  \begin{scope}[canvas is xz plane at y=8]
+    \path[draw=black, thick] (2,2) rectangle (6,-2);
   \end{scope}
   % Arrière.
-  \begin{scope}[canvas is xy plane at z=2]
+  \begin{scope}[canvas is xy plane at z=-2]
     \path[draw=black,dashed,thin] (2,4) rectangle (6,8);
   \end{scope}
   % Gauche.
   \begin{scope}[canvas is yz plane at x=2]
-    \path[draw=black,dashed,thin] (4,6) rectangle (8,2);
+    \path[draw=black,dashed,thin] (4,2) rectangle (8,-2);
   \end{scope}
 
   \begin{scope}[canvas is xz plane at y=4]
-    \node[fill=bleu,circle] at (2,2) (c1) {};
-    \node[fill=rose,circle] at (2,4) (c2) {};
-    \node[fill=bleu,circle] at (4,4) (c3) {};    
-    \node[fill=rose,circle] at (4,2) (c4) {};
+    \node[fill=bleu,circle] at (2,0) (c1) {};
+    \node[fill=rose,circle] at (2,2) (c2) {};
+    \node[fill=bleu,circle] at (4,2) (c3) {};    
+    \node[fill=rose,circle] at (4,0) (c4) {};
   \end{scope}
 \end{tikzpicture}

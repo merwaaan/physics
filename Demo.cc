@@ -34,7 +34,7 @@ void testGeometry()
   std::cout << Geometry::closestPointOfTriangle(Vector3(-1,0.5,0), t) << std::endl;
 
   std::cout << "CLOSEST OF SPHERE" << std::endl;
-  Sphere s(3);
+  Sphere s(3, 1);
   std::cout << Geometry::closestPointOfSphere(Vector3(10,0,0), s) << std::endl;
   std::cout << Geometry::closestPointOfSphere(Vector3(-10,0,0), s) << std::endl;
   std::cout << Geometry::closestPointOfSphere(Vector3(3,3,0), s) << std::endl;
@@ -84,7 +84,7 @@ void testTimeReversing()
   double dt = 1;
 	double g = -1;
 
-  Sphere* s = new Sphere(1);
+  Sphere* s = new Sphere(1, 1);
   s->prepare();
   s->setAngularMomentum(1, 0, 0);
 
@@ -112,14 +112,14 @@ void demoRope()
 	Constraint* c;
 	Sphere* prev;
 
-	s = new Sphere(1);
+	s = new Sphere(1, 1);
 	s->setFixed(true);
 	e->addRigidBody_p(s);	
 	prev = s;
 
 	for(int i = 0; i < 15; ++i)
 	{
-		s = new Sphere(1);
+		s = new Sphere(1, 1);
 		s->setPosition(i*1.3, 3 + i * 3, 0);
 		e->addRigidBody_p(s);
 
@@ -139,12 +139,12 @@ void demoPendulum()
 {
 	Constraint* c;
 
-	Sphere* sf = new Sphere(0.1);
+	Sphere* sf = new Sphere(0.1, 1);
 	sf->setPosition(-2, 6, 0);
 	sf->setFixed(true);
 	e->addRigidBody_p(sf);
 
-	Sphere* sp = new Sphere(1);
+	Sphere* sp = new Sphere(1, 1);
 	sp->setPosition(-8, 6, 0);
 	e->addRigidBody_p(sp);
 	
@@ -153,12 +153,12 @@ void demoPendulum()
 
 	for(int i = 0; i < 4; ++i)
 	{
-		sf = new Sphere(0.1);
+		sf = new Sphere(0.1, 1);
 		sf->setPosition(i*2, 6, 0);
 		sf->setFixed(true);
 		e->addRigidBody_p(sf);
 
-		sp = new Sphere(1);
+		sp = new Sphere(1, 1);
 		sp->setPosition(i*2, 0, 0);
 		e->addRigidBody_p(sp);	
 
@@ -177,7 +177,7 @@ void demoBalls()
   for(int i = -2; i < 2; ++i)
     for(int j = -2; j < 2; ++j)
     {
-      Sphere* s = new Sphere(1);
+      Sphere* s = new Sphere(1, 1);
       s->setPosition(i * 3 + 0.1 * i, 5, j * 3 + 0.2 * j);
       e->addRigidBody_p(s);
     }
@@ -185,7 +185,7 @@ void demoBalls()
 	for(int i = -4; i < 4; ++i)
 		for(int j = -4; j < 4; ++j)
     {
-      Sphere* s = new Sphere(1);
+      Sphere* s = new Sphere(1, 1);
       s->setPosition(i * 3, 0, j * 3);
       s->setFixed(true);
       e->addRigidBody_p(s);
@@ -203,7 +203,7 @@ void demoMixed()
 	c->setPosition(0, 5, 0);
   e->addRigidBody_p(c);
 
-	Sphere* s = new Sphere(1);
+	Sphere* s = new Sphere(1, 1);
 	s->setPosition(0, 4, 4);
   e->addRigidBody_p(s);
 
@@ -263,7 +263,7 @@ void inputDemoStairs(unsigned char k, int x, int y)
   }
 	if(k == 113) // Q
   {
-	  Sphere* s = new Sphere(1);
+	  Sphere* s = new Sphere(1, 1);
 	  s->setPosition(randomf()*20-10, 10, 5 + randomf()*5);
 		s->prepare();
 	  e->addRigidBody_p(s);
@@ -305,9 +305,16 @@ void demoStairs()
 
 void inputDemoPool(unsigned char k, int x, int y)
 {
-  if(k == 97)
+  if(k == 97) // A
   {
-	  Sphere* s = new Sphere(1);
+	  Cube* c = new Cube(3+randomf(), 3);
+	  c->setPosition(0, 6, 0);
+		c->prepare();
+	  e->addRigidBody_p(c);
+  }
+  if(k == 113) // Q
+  {
+	  Sphere* s = new Sphere(1, 1);
 	  s->setPosition(0, 6, 0);
 		s->prepare();
 	  e->addRigidBody_p(s);
@@ -364,7 +371,7 @@ int main(int argc, char** argv)
   //demoPendulum();
 	//demoMixed();
   //demoBoxes();
-	demoStairs();
+	//demoStairs();
 	demoPool();
   
   delete e;

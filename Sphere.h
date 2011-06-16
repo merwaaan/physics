@@ -9,7 +9,7 @@ class Sphere : public RigidBody
     double radius;
 
   public:
-    Sphere(double radius);
+    Sphere(double radius, double mass);
     ~Sphere();
 		Sphere* copy();
 

@@ -210,11 +210,11 @@ Vector3* Engine::computeImpulse(Contact contact)
 
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
 	Vector3 impulse;
-
+	std::cout << "vrel " << relativeVelocity << " " << n << " " << a->getVelocity(p) << " " << b->getVelocity(p) << std::endl;
 	// displacements of the contact points with respect to the center of mass of each body
 	Vector3 da = p - a->getPosition();
 	Vector3 db = p - b->getPosition();
-	
+
 	Matrix3 inverseInertiaA = a->getOrientation() * a->getInverseInertiaTensor() * a->getOrientation().transpose();
 	Matrix3 inverseInertiaB = b->getOrientation() * b->getInverseInertiaTensor() * b->getOrientation().transpose();
 	
@@ -223,6 +223,8 @@ Vector3* Engine::computeImpulse(Contact contact)
 	double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
 	
 	double restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
+	if(relativeVelocity < 0.1) restitution = 2;
+
 	impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
 
 	Vector3 impulseA = impulse;

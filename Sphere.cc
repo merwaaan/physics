@@ -8,10 +8,12 @@
 
 extern Engine* E;
 
-Sphere::Sphere(double radius) :
+Sphere::Sphere(double radius, double mass) :
   radius(radius)
 {
 	this->type = SPHERE;
+
+	this->inverseMass= 1/mass;
 }
 
 Sphere::~Sphere()
@@ -20,7 +22,7 @@ Sphere::~Sphere()
 
 Sphere* Sphere::copy()
 {
-	Sphere* copy_p = new Sphere(this->radius);
+	Sphere* copy_p = new Sphere(this->radius, 1/this->inverseMass);
 
 	copy_p->inverseMass = this->inverseMass;
 	copy_p->inverseInertiaTensor = this->inverseInertiaTensor;
@@ -55,7 +57,6 @@ void Sphere::prepare()
   }
   else
   {
-    this->inverseMass = 1;
     this->computeInverseInertiaTensor();
   }
 

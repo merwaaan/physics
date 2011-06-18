@@ -542,17 +542,8 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
       {
         Contact contact;
 
-				if(second)
-				{
-					contact.a = rb1_p;
-					contact.b = rb2_p;
-				}
-				else
-				{
-					contact.a = rb2_p;
-					contact.b = rb1_p;
-				}
-
+				contact.a = rb1_p;
+				contact.b = rb2_p;
         contact.position = point;
         contact.normal = (vertex - point).normalize();
 
@@ -565,9 +556,7 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
   if(!second)
   {
     std::vector<Contact> contacts2 = Geometry::vertexFaceContacts(rb2_p, rb1_p, true);
-
-    for(int i = 0; i < contacts2.size(); ++i)
-      contacts.push_back(contacts2[i]);
+		contacts.insert(contacts.end(), contacts2.begin(), contacts2.end());
   }
  
   return contacts;
@@ -586,6 +575,7 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 	    Vector3 closest1, closest2;
 	    double distance = Geometry::edgeEdgeDistance(edges1[i], edges2[j], &closest1, &closest2);
 
+			// Dont record any edge-edge contact if it can be classified as a vertex-face one.
 			if(
 				edges1[i].a == closest1 ||
 				edges1[i].b == closest1 ||
@@ -607,7 +597,7 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 
 				// Make sure the contact normal is directed toward the first body
 		    Vector3 directionToFirst = contact.a->getPosition() - contact.position;
-				if(contact.normal * directionToFirst > contact.normal.negate() * directionToFirst)
+				if(contact.normal * directionToFirst < 0)
 					contact.normal = contact.normal.negate();
 
 		    contacts.push_back(contact);

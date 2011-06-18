@@ -164,7 +164,7 @@ void inputDemoBoxes(unsigned char k, int x, int y)
 {
   if(k == 97)
   {
-	  Cube* c = new Cube(4, 2);
+	  Cube* c = new Cube(2, 2);
 	  c->setPosition(randomf()*10-5, 10, randomf()*10-5);
 		c->prepare();
 	  e->addRigidBody_p(c);

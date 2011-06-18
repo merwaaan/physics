@@ -71,10 +71,12 @@ void Engine::updateFixed()
 				{
 					std::cout << "real collision detected between #" << i << " and #" << j << std::endl;
 					
+					// Security check for swapped pointers to the bodies.
+					contacts = this->checkContacts(contacts);
+
 					for(int k = 0; k < contacts.size(); ++k)
 					{
 						Vector3* impulses = this->computeImpulse(contacts[k]);
-						
 						contacts[k].a->applyOffCenterForce(impulses[0], contacts[k].position, 1);
 						contacts[k].b->applyOffCenterForce(impulses[1], contacts[k].position, 1);
 					}
@@ -88,6 +90,7 @@ void Engine::updateFixed()
 	for(int i = 0; i < this->bodies_p.size(); ++i)
 	{      
 		// Apply external forces.
+		//if(this->bodies_p[i]->accumulatedForces.length() < 0.1)
 		for(int j = 0; j < this->environmentalForces_p.size(); ++j)
 			this->environmentalForces_p[j]->apply(this->bodies_p[i], this->timeStep);
 		
@@ -147,6 +150,25 @@ void Engine::updateContinuous()
 bool sortContacts(Contact a, Contact b)
 {
 	return a.TOI < b.TOI;
+}
+
+std::vector<Contact> Engine::checkContacts(std::vector<Contact> contacts)
+{
+	if(contacts.size() > 1)
+	{
+		RigidBody* a = contacts[0].a;
+		RigidBody* b = contacts[0].b;
+
+		for(int i = 1; i < contacts.size(); ++i)
+			if(contacts[i].a != a)
+			{
+				contacts[i].a = a;
+				contacts[i].b = b;
+				contacts[i].normal = contacts[i].normal.negate();
+			}
+	}
+
+	return contacts;
 }
 
 std::vector<Contact> Engine::predictContacts()
@@ -209,6 +231,8 @@ Vector3* Engine::computeImpulse(Contact contact)
   Vector3 n = contact.normal;
 
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
+	if(relativeVelocity > 0) relativeVelocity *= -1;
+
 	std::cout << "vrel " << relativeVelocity << " " << n << " " << a->getVelocity(p) << " " << b->getVelocity(p) << std::endl;
 
 	// The bodies are separating.
@@ -239,8 +263,12 @@ Vector3* Engine::computeImpulse(Contact contact)
 		double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
 	
 		Vector3 impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
-		Vector3 impulseA = impulse;// * (b->getInverseMass() / t1);
-		Vector3 impulseB = -1 * impulse;// * (a->getInverseMass() / t1);
+
+		double massA = a->getInverseMass() == 0 ? 0 : 1/a->getInverseMass();
+		double massB = b->getInverseMass() == 0 ? 0 : 1/b->getInverseMass();
+		double ratioA = massA / (massA + massB);
+		Vector3 impulseA = impulse * ratioA;
+		Vector3 impulseB = impulse * (1 - ratioA) * -1;
 
 		std::cout << impulse << std::endl;
 		std::cout << "impulse A " << impulseA << " at " << contact.position << std::endl;

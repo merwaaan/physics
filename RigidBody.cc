@@ -92,11 +92,12 @@ void RigidBody::integrate(double dt)
   this->orientation = this->orientation.orthogonalize();
   this->orientation = this->orientation.normalize();
 
+  // Cache the auxiliary quantities.
+  this->computeAuxiliaryQuantities();
+
   // Clear the forces accumulated during the last frame.
   this->clearAccumulators();
 
-  // Cache the auxiliary quantities.
-  this->computeAuxiliaryQuantities();
 }
 
 void RigidBody::integrateBackward(double dt)

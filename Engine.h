@@ -37,13 +37,12 @@ class Engine
     void update();
     void updateFixed();
     void updateContinuous();
-		std::vector<RigidBody*> copyBodies();
+		std::vector<Contact> checkContacts(std::vector<Contact> contacts);
 		std::vector<Contact> predictContacts();
+		Vector3* computeImpulse(Contact contact);
     void applyEnvironmentalForces(RigidBody* rb_p, double dt);
 		void applyConstraints(double dt);
 		void cleanUp();
-
-		Vector3* computeImpulse(Contact contact);
 
     double getAbsoluteTime();
     double getLocalTime();

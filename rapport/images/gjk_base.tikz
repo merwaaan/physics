@@ -7,8 +7,8 @@
 \node[origine] (origin) at (O) {};
 \path[draw=black] (A) -- (B) -- (C) -- (D) -- cycle;
 
-\node at ($(A)+(0.4,0)$) (la) {$A$};
-\node at ($(B)+(0,-0.4)$) (lb) {$B$};
-\node at ($(C)+(-0.4,0)$) (la) {$C$};
-\node at ($(D)+(0,0.4)$) (la) {$D$};
-\node at ($(O)+(0.4,-0.4)$) (la) {$0$};
+\node[font=\Large] at ($(A)+(0.5,0)$) (la) {$A$};
+\node[font=\Large] at ($(B)+(0,-0.5)$) (lb) {$B$};
+\node[font=\Large] at ($(C)+(-0.5,0)$) (lc) {$C$};
+\node[font=\Large] at ($(D)+(0,0.5)$) (ld) {$D$};
+\node[font=\Large] at ($(O)+(0.5,-0.5)$) (lo) {$0$};

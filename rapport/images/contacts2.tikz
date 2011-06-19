@@ -1,4 +1,4 @@
-w\begin{tikzpicture}[scale=0.4]
+\begin{tikzpicture}[scale=0.4]
   % Avant.
   \begin{scope}[canvas is xy plane at z=4]
     \path[draw=black, thick] (0,0) rectangle (4,4);
@@ -42,9 +42,9 @@ w\begin{tikzpicture}[scale=0.4]
   \end{scope}
 
   \begin{scope}[canvas is xz plane at y=4]
-    \node[fill=bleu,circle] at (2,0) (c1) {};
-    \node[fill=rose,circle] at (2,2) (c2) {};
-    \node[fill=bleu,circle] at (4,2) (c3) {};    
-    \node[fill=rose,circle] at (4,0) (c4) {};
+    \node[fill=bleu,circle,inner sep=2] at (2,0) (c1) {};
+    \node[fill=rose,circle,inner sep=2] at (2,2) (c2) {};
+    \node[fill=bleu,circle,inner sep=2] at (4,2) (c3) {};    
+    \node[fill=rose,circle,inner sep=2] at (4,0) (c4) {};
   \end{scope}
 \end{tikzpicture}

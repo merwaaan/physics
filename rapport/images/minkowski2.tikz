@@ -6,7 +6,7 @@
   \input{images/minkowski_base.tikz}
   
   \draw[black,thick] (m1) -- (m2) -- (m3) -- (m4) -- (m5) -- cycle;
-  \node[black] at (3,3) (m) {$A \ominus B$};
+  \node[black,font=\Large] at ($(m1)!0.5!(m4)$) (m) {$A \ominus B$};
 
   \draw[<->,vert,thick, dashed] (0,0) -- ($(m2)!(0,0)!(m3)$);
 \end{tikzpicture}

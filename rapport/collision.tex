@@ -63,12 +63,12 @@ direction positive (\textit{max}).
   \Entree{Un corps C}
   \Sortie{Une boîte englobante B}
   \BlankLine
-  \PourCh{\axe A}{
-    B.A.min $\leftarrow +\inf$\;
-    B.A.max $\leftarrow -\inf$
+  \PourCh{\axe $A \in \{x,y,z\}$}{
+    B.A.min $\leftarrow +\infty$\;
+    B.A.max $\leftarrow -\infty$
   }
   \BlankLine
-  \PourCh{\axe A}{
+  \PourCh{\axe $A \in \{x,y,z\}$}{
     \PourCh{\sommet S $\in$ C}{
       \Si{S.A $<$ B.A.min}{
         B.A.min $\leftarrow$ S.A
@@ -99,17 +99,17 @@ différence que l'on parle de plan de séparation. L'algorithme
   \caption{Détection grossière}
   \label{algoDetectionGrossiere}
   \dontprintsemicolon
+  \SetKwData{axe}{axe}
+  \SetKw{ou}{ou}
   \Entree{Deux boîtes englobantes B1 et B2}
   \Sortie{Un booléen}
   \BlankLine
-  \Si{B1.x.min $>$ B2.x.max ou \\
-    $\;\;\;\;$ B1.x.max $<$ B2.x.min ou \\
-    $\;\;\;\;$ B1.y.min $>$ B2.y.max ou \\
-    $\;\;\;\;$ B1.y.max $<$ B2.y.min ou \\
-    $\;\;\;\;$ B1.z.min $>$ B2.z.max ou \\
-    $\;\;\;\;$ B1.z.max $<$ B2.z.min}{
-    \Retour{faux}
+  \PourCh{\axe $A \in \{x,y,z\}$}{
+    \Si{B1.A.min $>$ B2.A.max \ou \\ $\;\;\;\;$ B1.A.max $<$ B2.A.min}{
+      \Retour{faux}
+    }
   }
+  \BlankLine
   \Retour{vrai}
 \end{algorithm}
 
@@ -336,9 +336,10 @@ figure \ref{dichotomie} et est détaillé dans l'algorithme
   \caption{Correction d'une collision}
   \label{algoDichotomie}
   \dontprintsemicolon
+  \SetKw{et}{et}
   \SetKwData{RECUL}{RECUL}
   \SetKwData{APPR}{APPR}
-  \SetKwFunction{distance}{distance}
+  \SetKwFunction{distance}{distanceGJK}
   \SetKwFunction{integrer}{integrer}
   \SetKwFunction{correction}{correction}
   \Entree{
@@ -351,7 +352,7 @@ figure \ref{dichotomie} et est détaillé dans l'algorithme
   $d =$ \distance{A,B}\;
   \BlankLine
   \Si{$0 < d \leq \theta$}{
-    \Retour{A et B}
+    \Retour{A \et B}
   }
   \BlankLine
   \SinonSi{$d = 0$}{

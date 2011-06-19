@@ -3,5 +3,5 @@
 
   \node[gjkclosest] (closest) at ($(C)!(O)!(B)$) {};
 
-  \node at ($(closest)+(0.4,0)$) (lclosest) {$S_2$};
+  \node[font=\Large] at ($(closest)+(0.6,0.2)$) (lclosest) {$S_2$};
 \end{tikzpicture}

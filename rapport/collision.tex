@@ -16,7 +16,7 @@ Une collision fait entrer en jeu deux corps rigides dont l'intégrité
 physique a été corrompue, autrement dit : les corps rentrent l'un dans
 l'autre. Nous allons définir un traitement à appliquer à deux objets
 pour savoir si tel est le cas et ce, de façon certaine. Néanmoins,
-bien que l'algorithme que nous allons présenter ait fait ses preuves
+bien que l'algorithme que nous allons présenter a fait ses preuves
 dans le domaine des simulations physiques, il faut garder à l'esprit
 que ce test sera éxécuté à chaque intégration de la simulation et ce,
 pour chaque paire de solides. Dans de telles circonstances, l'usage
@@ -302,7 +302,7 @@ originel puisque le but de cette man\oe uvre est de déterminer à quel
 moment du pas de temps les corps sont réellement entrés en contact.
 
 Usuellement, ce retour en arrière s'effectue en intégrant plusieurs
-fois la simulation pas un pas de temps négatif et fixe, par exemple
+fois la simulation par un pas de temps négatif et fixe, par exemple
 $-\frac{\deriv t}{10}$. Néanmoins cette méthode s'adapte mal aux
 simulations contenant des objets évoluant à haute vitesse puisqu'en
 utilisant cette même fraction du pas de temps, un corps s'étant
@@ -514,7 +514,7 @@ est arrivée; une situation concrètement impossible à retrouver dans le
 monde réel. Si $\varepsilon = 0$, la balle repartira avec une énergie
 nulle; autrement dit, elle restera collée au plan. Le coefficient de
 restitution dépend habituellement de la matière que l'on cherche à
-simuler : une balle en cahoutchouc aura un $\varepsilon$ elevé tandis
+simuler : une balle en caoutchouc aura un $\varepsilon$ elevé tandis
 qu'un bloc d'argile aura un $\varepsilon$ proche de zéro. Dans le
 moteur physique, chaque objet possède son propre coefficient de
 restitution et on choisit d'utiliser le minimum des deux dans la

@@ -1,12 +1,12 @@
-\begin{tikzpicture}[scale=0.5,transform shape]
+\begin{tikzpicture}[scale=0.55,transform shape]
   \begin{scope}[scale=0.7]
     \input{images/repere.tikz}
   \end{scope}
 
   \input{images/minkowski_base.tikz}
   
-  \draw[black] (m1) -- (m2) -- (m3) -- (m4) -- (m5) -- cycle;
+  \draw[black,thick] (m1) -- (m2) -- (m3) -- (m4) -- (m5) -- cycle;
   \node[black] at (3,3) (m) {$A \ominus B$};
 
-  \draw[<->,bleu,thick, dashed] (0,0) -- ($(m2)!(0,0)!(m3)$);
+  \draw[<->,vert,thick, dashed] (0,0) -- ($(m2)!(0,0)!(m3)$);
 \end{tikzpicture}

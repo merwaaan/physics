@@ -29,12 +29,12 @@ void DistanceConstraint::apply(double dt)
 {
 	Vector3 axis = this->b_p->getPosition() - this->a_p->getPosition();
 	Vector3 normal = axis.normalize();
-	double relativeVelocity = (this->b_p->getVelocity() - this->a_p->getVelocity()) * normal;
+	double relativeVelocity = normal * (this->b_p->getVelocity() - this->a_p->getVelocity());
 
 	double relativeDistance = axis.length() - this->distance;
 	double remove = relativeVelocity + relativeDistance / dt;
 
-	Vector3 impulse = (remove / (this->a_p->getInverseMass() + this->b_p->getInverseMass())) * normal;
+	Vector3 impulse = normal * (remove / (this->a_p->getInverseMass() + this->b_p->getInverseMass()));
 
 	this->a_p->applyCenterForce(impulse, dt);
 	this->b_p->applyCenterForce(-1 * impulse, dt);

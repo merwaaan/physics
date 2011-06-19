@@ -1,4 +1,4 @@
-\begin{tikzpicture}[scale=0.4]
+w\begin{tikzpicture}[scale=0.4]
   % Avant.
   \begin{scope}[canvas is xy plane at z=4]
     \path[draw=black, thick] (0,0) rectangle (4,4);

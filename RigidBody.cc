@@ -70,7 +70,7 @@ void RigidBody::integrate(double dt)
 	if(dt > 0)
 		this->linearMomentum += this->accumulatedForces;
 
-  Vector3 velocity = this->linearMomentum / this->inverseMass;
+  Vector3 velocity = this->inverseMass * this->linearMomentum;
   this->position += velocity * dt * (dt < 0 ? -1 : 1);
 
 	if(dt < 0)
@@ -165,7 +165,7 @@ std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double 
   std::cout << "d = " << distance.length() << " ip = " << interPenetration << std::endl;
 
   // If the bodies are too far apart, integrate forward in time.
-  if(!interPenetration && distance.length() > E->getTolerance())
+  if(!interPenetration && distance.length() > E->getCollisionTolerance())
   {
 		double sdt = direction != FORWARD ? dt/2 : dt;
 		direction = FORWARD;

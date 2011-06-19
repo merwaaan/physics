@@ -19,7 +19,8 @@ class Engine
     std::vector<Force*> environmentalForces_p;
 		std::vector<Constraint*> constraints_p;
 
-		double tolerance;
+		double collisionTolerance;
+		double geometryTolerance;
 
 		UpdateType updateType;
 
@@ -63,7 +64,8 @@ class Engine
 		Display* getDisplay_p() { return &this->display; }
 		bool areBoundingBoxesDrawn() { return this->display.areBoundingBoxesDrawn(); }
 
-		double getTolerance() { return this->tolerance; }
+		double getCollisionTolerance() { return this->collisionTolerance; }
+		double getGeometryTolerance() { return this->geometryTolerance; }
 };
 
 #endif

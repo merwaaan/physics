@@ -116,7 +116,7 @@ représentera un corps rigide et de raccourcir les calculs, nous allons
 introduire la notion d'élan linéaire. Pour un corps rigide, l'élan
 linéaire $\vec{L}$ est le produit de sa masse et de sa vitesse. Cette
 nouvelle quantité a pour avantage majeur de posséder comme primitive
-la variation de force exercée sur le corps à un instant.
+la variation de force exercée instantanément sur le corps.
 \begin{align*}
   {\sum \vec{F}_i} = \frac{\deriv \vec{L}}{\deriv t} = \frac{\deriv (m\vec{v})}{\deriv t}
 \end{align*}
@@ -136,7 +136,9 @@ sa masse, mais l'inverse de celle-ci. L'avantage principal de ce choix
 est de pouvoir aisément fixer des objets. Si l'on veut qu'un élément
 de la simulation reste immobile, un mur fixe par exemple, on peut lui
 attribuer une masse inverse nulle. De cette façon, à chaque
-intégration il accumulera de l'élan mais sa position restera la même.
+intégration il accumulera de l'élan mais sa position restera la
+même. On élimine par la même occasion les problèmes de division par
+zéro.
 
 \subsubsection{Modélisation d'un corps}
 
@@ -170,7 +172,7 @@ mais il ne s'agit pas d'un simple centre géométrique puisque la masse
 de chaque sommet entre aussi en jeu. Cette position se nomme le centre
 de masse, ou barycentre, et sera calculée dans le repère absolu par la
 formule suivante, avec $M$ la masse totale des sommets du corps, $m_i$
-et $\vec{p}_i$ respectivement la masse et la position du sommet $i$
+et $\vec{p}_l$ respectivement la masse et la position du sommet $i$
 dans le repère absolu :
 \begin{align*}
   \vec{C} = \frac{1}{M} \sum m_i \vec{p}_i
@@ -191,7 +193,7 @@ est celle dans le repère absolu.
 \begin{figure}
   \centering
   \input{images/reperelocal.tikz}
-  \caption{Les repères absolu et local d'un rectangle}
+  \caption{Les repères absolu et local d'un corps rectangulaire}
   \label{reperelocal}
 \end{figure}
 
@@ -229,8 +231,8 @@ résumait à un centre de masse faisant office d'origine, mais un repère
 possède aussi des axes et ceux du repère local ne sont pas
 nécessairement alignés avec ceux du repère absolu. Pour représenter la
 direction des axes du repère local, et donc l'orientation du corps à
-qui il appartient, on utilise une matrice de dimension 3 dans laquelle
-chaque vecteur colonne correspondra à un des axes du repère
+qui il appartient, on utilise une matrice $R$ de dimension 3 dans
+laquelle chaque vecteur colonne correspondra à un des axes du repère
 local. Pour illustrer ces propos, analysons la matrice identité
 d'ordre 3, qui correspond à la matrice d'orientation d'un corps
 parfaitement aligné avec les axes du repère absolu et n'ayant encore
@@ -271,7 +273,7 @@ visuellement perceptibles. Le problème vient du fait qu'avec chaque
 mise à jour de la simulation, les axes du repère local (donc les
 vecteurs colonne de la matrice) perdent progressivement de leur
 normalité et de leur orthogonalité. En conséquence, l'orientation
-n'est pas aussi réaliste qu'on le souhaiterait, pire, l'objet est
+n'est pas aussi précise qu'on le souhaiterait, pire, l'objet est
 gravement déformé lorsqu'on le dessine.
 
 Afin de contrer cet effet indésirable, on ajoutera deux étapes de
@@ -280,11 +282,11 @@ normaliser les axes du repère local. Chaque axe correspondant à un
 vecteur colonne de la matrice d'orientation, il suffit de les extraire
 un par un et de recalculer leur magnitude pour s'assurer de leur
 normalité. En second lieu, il sera nécessaire de réorthogonaliser le
-repère local, autrement dit s'assurer que ses axes restent orthogonaux
-entre eux. Pour cela, on orthogonalisera la matrice d'orientation par
-le processus de Gram-Schmidt \cite{weber}, une méthode
-d'orthogonalisation fonctionnant par projection itérative des axes les
-uns sur les autres.
+repère local, autrement dit de s'assurer que ses axes restent
+orthogonaux entre eux. Pour cela, on orthogonalisera la matrice
+d'orientation par le processus de Gram-Schmidt \cite{weber}, une
+méthode d'orthogonalisation fonctionnant par projection itérative des
+axes les uns sur les autres.
 
 Maintenant que l'orientation d'un corps a été définie, penchons nous
 sur l'élan angulaire. On pourrait utiliser vitesse et accélération
@@ -423,7 +425,7 @@ angulaire d'un corps sont désormais réunies.
 
 On part de la somme des composantes angulaires de chaque force subie
 par le corps pendant une itération et on obtient le nouvel élan
-angulaire. Ce dernier, utilisé conjointement avec l'inverse du torseur
+angulaire. Ce dernier, utilisé conjointement avec l'inverse du tenseur
 d'inertie absolu, fournit la vitesse angulaire du corps. Il reste
 alors à mettre à jour la matrice d'orientation en lui ajoutant le
 produit de $\vec{\omega}^*$ et de l'ancienne orientation, le tout

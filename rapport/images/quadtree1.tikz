@@ -1,0 +1,8 @@
+\begin{tikzpicture}[scale=0.5]
+  \draw[fill=rose,draw=rose] (3.5,3.5) circle (3);
+  \draw[fill=bleu,draw=bleu] (8,8.7) circle (1);
+  \draw[fill=vert,draw=vert] (9, 3.4) circle (0.7);
+  \draw[fill=vert,draw=vert] (1, 6.5) circle (0.6);
+  \draw[step=2.5] (0,0) grid (10,10);
+\end{tikzpicture}
+

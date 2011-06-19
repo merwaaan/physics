@@ -58,11 +58,18 @@ direction positive (\textit{max}).
   \caption{Construction d'une AABB}
   \label{algoConstructionAABB}
   \dontprintsemicolon
+  \SetKwData{axe}{axe}
+  \SetKwData{sommet}{sommet}
   \Entree{Un corps C}
   \Sortie{Une boîte englobante B}
   \BlankLine
-  \PourCh{axe A}{
-    \PourCh{sommet S de C}{
+  \PourCh{\axe A}{
+    B.A.min $\leftarrow +\inf$\;
+    B.A.max $\leftarrow -\inf$
+  }
+  \BlankLine
+  \PourCh{\axe A}{
+    \PourCh{\sommet S $\in$ C}{
       \Si{S.A $<$ B.A.min}{
         B.A.min $\leftarrow$ S.A
       }
@@ -133,7 +140,7 @@ détection fine sera appelée et confirmera la collision.
   \subfloat[]{ \input{images/boundingboxes2.tikz} }
   \qquad
   \subfloat[]{ \input{images/boundingboxes3.tikz} }
-  \caption{Trois configurations de boîtes englobantes}
+  \caption{Trois configurations impliquant deux boîtes englobantes}
   \label{aabb}
 \end{figure}
 
@@ -147,7 +154,7 @@ Introduisons en premier lieu la somme de Minkowski, une opération
 mathématique notée $A \oplus B = \{a + b \mid a \in A, b \in B\}$ avec
 $A$ et $B$ deux corps. On peut résumer la somme de Minkowski en un
 balayage de chaque corps par l'autre. Nous utiliserons une variante de
-cette opération : la différence de Minkowski, notée $A \ominus B = A
+cette opération, la différence de Minkowski, notée $A \ominus B = A
 \oplus (-B)$. La propriété de cette opération qui nous intéresse le
 plus est le fait que la plus petite distance entre les points qui la
 forment et l'origine du repère absolu est égale à la plus petite
@@ -163,7 +170,7 @@ en état d'interpénétration.
   \centering
   \subfloat[]{ \input{images/minkowski1.tikz} }
   \subfloat[]{ \input{images/minkowski2.tikz} }
-  \caption{Différence de Minkowski entre un rectangle et un triangle}
+  \caption{Différence de Minkowski d'un rectangle et d'un triangle}
   \label{minkowski}
 \end{figure}
 
@@ -273,16 +280,15 @@ temps d'éxécution au détriment du réalisme se contentent de
 repositionner les corps à un point de contact calculé en fonction de
 la profondeur de l'interpénétration. Mais même si la position de
 contact est corrigée par cette technique, il n'en sera pas de même
-pour les autres quantités physiques. Le corps recalé aura une position
-correcte mais son élan linéaire, par exemple, restera le même qu'à la
-fin de l'intégration.  Même si la vitesse d'éxecution est un facteur
-important dans nos choix de conception, nous allons prendre un chemin
-différent et sélectionner une méthode plus précise qui fonctionnera
-par retour en arrière.
+pour les autres quantités physiques, notamment l'orientation, qui est
+plus complexe à manipuler. Même si la vitesse d'éxecution est un
+facteur important dans nos choix de conception, nous allons prendre un
+chemin différent et sélectionner une méthode plus précise qui
+fonctionnera par retour en arrière.
 
-La fonction d'intégration du moteur prend comme seul argument le pas
-de temps duquel faire avancer la simulation et pour l'instant on
-utilisait un pas constant. Or, une caractéristique intéressante de
+La fonction d'intégration du moteur physique prend comme seul argument
+le pas de temps duquel faire avancer la simulation et pour l'instant
+on utilisait un pas constant. Or, une caractéristique intéressante de
 cette fonction et qu'elle peut prendre en argument un pas de temps
 négatif et simuler l'évolution d'un système en sens inverse. Cette
 possibilité nous permet notamment de revenir en arrière dans la
@@ -316,7 +322,7 @@ divisé par deux à chaque changement de phase. On considère avoir
 trouvé une configuration satisfaisante lorsqu'il n'y a plus
 d'interpénétration et que la distance entre les objets est inférieure
 à un seuil de tolérance prédéfini. Ce processus est visible sur la
-figure \ref{dichotomie} et est détaillé dans l'algorithme récursif
+figure \ref{dichotomie} et est détaillé dans l'algorithme
 \ref{algoDichotomie}.
 
 \begin{figure}
@@ -398,7 +404,7 @@ des configurations dégénérés de ces deux cas. Par exemple, un contact
 entre une arête et une face peut être assimilée à deux contacts
 sommet-face, chaque sommet étant une extrémité de l'arête. La figure
 \ref{contacts} illustre une configuration comprenant quatre points de
-contact : deux sommet-face et deux arête-arête.
+contact : deux sommet-face (en rose) et deux arête-arête (en bleu).
 
 \begin{figure}
   \centering
@@ -473,10 +479,10 @@ On y voit apparaître plusieurs quantités présentées plus tôt,
 notamment les tenseurs d'inertie absolus de chaque corps impliqué dans
 la collision ainsi que leur masse. On observe que le vecteur normal
 $\vec{n}$ enregistré lors de la recherche des points de contact y joue
-un rôle important puisqu'au final, l'impulsion correspondra à un
-produit entre $\vec{n}$ et un scalaire. Plusieurs autres valeurs sont
-néanmoins encore inconnues et doivent être calculées à partir des
-informations de contact dont l'on dispose.
+un rôle important puisqu'au final, l'impulsion correspondra au produit
+de $\vec{n}$ et d'un scalaire. Plusieurs autres valeurs sont néanmoins
+encore inconnues et doivent être calculées à partir des informations
+de contact dont l'on dispose.
 
 La vitesse relative normale $v_r$ correspond à la composante de la
 vitesse relative des deux corps le long la normale du contact. On peut
@@ -510,8 +516,8 @@ restitution dépend habituellement de la matière que l'on cherche à
 simuler : une balle en cahoutchouc aura un $\varepsilon$ elevé tandis
 qu'un bloc d'argile aura un $\varepsilon$ proche de zéro. Dans le
 moteur physique, chaque objet possède son propre coefficient de
-restitution et on choisit d'utiliser pour la formulation de Newton le
-minimum des deux.
+restitution et on choisit d'utiliser le minimum des deux dans la
+formule de Newton.
 
 Les vecteurs $\vec{r}_A$ et $\vec{r}_B$ correspondent aux positions du
 point de contact dans les référentiels respectifs des corps $A$ et $B$.

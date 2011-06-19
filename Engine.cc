@@ -10,9 +10,10 @@
 Engine* E = NULL;
 
 Engine::Engine(int* argc, char** argv, double timeStep) :
-	tolerance(0.01),
   timeStep(timeStep),
 	updateType(FIXED),
+	collisionTolerance(0.005),
+	geometryTolerance(0.001),
 	startingTime(getAbsoluteTime()),
 	lastUpdateTime(0),
   display(argc, argv, 600, 600)
@@ -85,12 +86,12 @@ void Engine::updateFixed()
 		}
 
 	// Apply constraints.
-	this->applyConstraints(this->timeStep);
-	
+	this->applyConstraints(1);
+
+	std::cout << "INTEGRATION" << std::endl;
 	for(int i = 0; i < this->bodies_p.size(); ++i)
 	{      
 		// Apply external forces.
-		//if(this->bodies_p[i]->accumulatedForces.length() < 0.1)
 		for(int j = 0; j < this->environmentalForces_p.size(); ++j)
 			this->environmentalForces_p[j]->apply(this->bodies_p[i], this->timeStep);
 		
@@ -220,7 +221,7 @@ std::vector<Contact> Engine::predictContacts()
 void Engine::applyConstraints(double dt)
 {
 	for(int i = 0; i < this->constraints_p.size(); ++i)
-		this->constraints_p[i]->apply(1);
+		this->constraints_p[i]->apply(dt);
 }
 
 Vector3* Engine::computeImpulse(Contact contact)
@@ -233,49 +234,40 @@ Vector3* Engine::computeImpulse(Contact contact)
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
 	if(relativeVelocity > 0) relativeVelocity *= -1;
 
+	std::cout << a->getVelocity(p) << a->linearVelocity << a->angularVelocity << std::endl;
 	std::cout << "vrel " << relativeVelocity << " " << n << " " << a->getVelocity(p) << " " << b->getVelocity(p) << std::endl;
 
-	// The bodies are separating.
-	/*if(relativeVelocity < 0)
-	{
-		return (Vector3[]){Vector3(0, 0, 0), Vector3(0, 0, 0)};
-	}
-	// The bodies are resting.
-	else if(relativeVelocity < 0.07)
-	{
-		a->setSleeping(true);
-		b->setSleeping(true);
-		}
-	// The bodies are colliding.
-	else*/
-	{
-		// displacements of the contact points with respect to the center of mass of each body
-		Vector3 da = p - a->getPosition();
-		Vector3 db = p - b->getPosition();
+	// displacements of the contact points with respect to the center of mass of each body
+	Vector3 da = p - a->getPosition();
+	Vector3 db = p - b->getPosition();
 
-		double restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
-
-		Matrix3 inverseInertiaA = a->getOrientation() * a->getInverseInertiaTensor() * a->getOrientation().transpose();
-		Matrix3 inverseInertiaB = b->getOrientation() * b->getInverseInertiaTensor() * b->getOrientation().transpose();
+	double restitution;
+	if(relativeVelocity < 0.5)
+		restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
+	else
+		restitution = 0;
 	
-		double t1 = a->getInverseMass() + b->getInverseMass();
-		double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
-		double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
+	Matrix3 inverseInertiaA = a->getOrientation() * a->getInverseInertiaTensor() * a->getOrientation().transpose();
+	Matrix3 inverseInertiaB = b->getOrientation() * b->getInverseInertiaTensor() * b->getOrientation().transpose();
 	
-		Vector3 impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
-
-		double massA = a->getInverseMass() == 0 ? 0 : 1/a->getInverseMass();
-		double massB = b->getInverseMass() == 0 ? 0 : 1/b->getInverseMass();
-		double ratioA = massA / (massA + massB);
-		Vector3 impulseA = impulse * ratioA;
-		Vector3 impulseB = impulse * (1 - ratioA) * -1;
-
-		std::cout << impulse << std::endl;
-		std::cout << "impulse A " << impulseA << " at " << contact.position << std::endl;
-		std::cout << "impulse B " << impulseB << " at " << contact.position << std::endl;
+	double t1 = a->getInverseMass() + b->getInverseMass();
+	double t2 = n * ((inverseInertiaA * (da ^ n)) ^ da);
+	double t3 = n * ((inverseInertiaB * (db ^ n)) ^ db);
 	
-		return (Vector3[]){impulseA, impulseB};
-	}
+	Vector3 impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
+
+	double massA = a->getInverseMass() == 0 ? 0 : 1/a->getInverseMass();
+	double massB = b->getInverseMass() == 0 ? 0 : 1/b->getInverseMass();
+	double ratioA = massA / (massA + massB);
+	Vector3 impulseA = impulse * ratioA;
+	Vector3 impulseB = impulse * (1 - ratioA) * -1;
+
+	std::cout << this->getLocalTime() << "s" << std::endl;
+	std::cout << impulse << std::endl;	
+	std::cout << "impulse A " << impulseA << " at " << contact.position << " " << a->getPosition() - contact.position << std::endl;
+	std::cout << "impulse B " << impulseB << " at " << contact.position << std::endl;
+	
+	return (Vector3[]){impulseA, impulseB};
 }
 
 void Engine::applyEnvironmentalForces(RigidBody* rb_p, double dt)

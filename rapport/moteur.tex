@@ -12,9 +12,8 @@ se produit au départ.
 En premier lieu, on vérifie pour chaque paire de corps s'ils entrent
 en collision. Si tel est le cas, on corrige leur état puis on applique
 les impulsions adaptées. Ensuite, on applique des forces
-environnementales, telles que la gravité, puis on intègre l'état de
-tous les corps. L'algorithme \ref{algoMoteur1} résume cette
-organisation.
+environnementales, telles que la gravité, et on intègre l'état de tous
+les corps. L'algorithme \ref{algoMoteur1} résume cette organisation.
 
 \begin{algorithm}[h]
   \caption{Boucle principale}
@@ -156,7 +155,7 @@ s'offrent à nous pour pallier ce problème.
 \begin{figure}
   \centering
   \input{images/tunneling1.tikz}
-  \caption{}
+  \caption{Le phénomène du tunneling}
   \label{tunneling1}
 \end{figure}
 
@@ -183,7 +182,7 @@ pourrait se réveler regrettable en terme de coûts de calcul.
 \begin{figure}
   \centering
   \input{images/tunneling2.tikz}
-  \caption{}
+  \caption{Lancer de rayons pour la détection de tunneling}
   \label{tunneling2}
 \end{figure}
 
@@ -200,7 +199,7 @@ possible qu'un tunneling se soit produit et on peut revenir en arrière
 jusqu'à ce que le problème soit résolu. Pour accélérer cette phase, il
 est envisageable d'utiliser des boîtes englobantes de la même façon
 que lors de la détection grossière de collision. L'un des avantages
-majeurs de cette méthode, en plus de sa certitude de ne manque aucun
+majeurs de cette méthode, en plus de sa certitude de ne manquer aucun
 tunneling, est sa simplicité de mise en place puisque toutes les
 routines de détection et de retour en arrière utilisées ont déjà été
 écrites et entrent en jeu dans le fonctionnement de base du moteur
@@ -209,7 +208,7 @@ physique.
 \begin{figure}
   \centering
   \input{images/tunneling3.tikz}
-  \caption{}
+  \caption{Boîtes englobantes pour la détection de tunneling}
   \label{tunneling3}
 \end{figure}
 
@@ -252,8 +251,17 @@ objets, et le gain de performance sera peu flagrant. Si au contraire
 les cases de la grille sont trop petites, les plus grands objets ne
 pourront pas rentrer dans leur intégralité à l'intérieur d'une unique
 case. Une solution à ce problème est de ranger un même objet dans
-plusieurs cases différentes de la grille, mais une fois encore, si des
+plusieurs cases adjacentes de la grille, mais une fois encore, si des
 corps sont démultipliés de la sorte, le temps de maintenance d'une
 telle structure sera augmenté.
 
 [Quatree, octree]
+
+\begin{figure}
+  \centering
+  \input{images/quadtree1.tikz}
+  \qquad
+  \input{images/quadtree2.tikz}
+  \caption{}
+  \label{quadtree}
+\end{figure}

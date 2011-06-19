@@ -201,7 +201,7 @@ double Geometry::edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, V
   double e = d2 * d2;
   double f = d2 * r;
 
-  if(a <= E->getTolerance() && e <= E->getTolerance())
+  if(a <= 0.01 && e <= 0.01)
   {
     s = t = 0;
     *closest1_p = edge1.a;
@@ -210,7 +210,7 @@ double Geometry::edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, V
     return (*closest1_p - *closest2_p) * (*closest1_p - *closest2_p);
   }
 
-  if(a <= E->getTolerance())
+  if(a <= 0.01)
   {
     s = 0;
     t = Geometry::clamp(f / e, 0, 1);
@@ -219,7 +219,7 @@ double Geometry::edgeEdgeDistance(Edge edge1, Edge edge2, Vector3* closest1_p, V
   {
     double c = d1 * r;
     
-    if(e <= E->getTolerance())
+    if(e <= 0.01)
     {
       t = 0;
       s = Geometry::clamp(-c / a, 0, 1);
@@ -545,7 +545,12 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
 				contact.a = rb1_p;
 				contact.b = rb2_p;
         contact.position = point;
-        contact.normal = (vertex - point).normalize();
+        contact.normal = (face.points[1] - face.points[0]) ^ (face.points[2] - face.points[0]);
+
+				// Make sure the contact normal is directed toward the vertex body.
+		    Vector3 directionToFirst = contact.a->getPosition() - contact.position;
+				if(contact.normal * directionToFirst < 0)
+					contact.normal = contact.normal.negate();
 
         contacts.push_back(contact);  
       }

@@ -1,0 +1,22 @@
+\begin{tikzpicture}[scale=0.3]
+  \begin{scope}[canvas is zx plane at y=0]
+    \begin{scope}[rotate around={90:(5,5)}]
+      \draw[step=10] (0,0) grid (10,10);
+      \draw[fill=rose,draw=rose] (3.5,3.5) circle (3);
+      \end{scope}
+  \end{scope}
+  \begin{scope}[canvas is zx plane at y=-5]
+    \begin{scope}[rotate around={90:(5,5)}]
+      \draw[fill=bleu,draw=bleu] (8,8.7) circle (1);
+      \draw[step=5] (0,0) grid (10,10);
+    \end{scope}
+  \end{scope}
+  \begin{scope}[canvas is zx plane at y=0-10]
+    \begin{scope}[rotate around={90:(5,5)}]
+      \draw[fill=vert,draw=vert] (9, 3.4) circle (0.7);
+      \draw[fill=vert,draw=vert] (1, 6.5) circle (0.6);
+      \draw[step=2.5] (0,0) grid (10,10);
+    \end{scope}
+  \end{scope}
+\end{tikzpicture}
+

@@ -1,15 +1,15 @@
-\begin{tikzpicture}[scale=0.5,transform shape]
+\begin{tikzpicture}[scale=0.55,transform shape]
   \begin{scope}[scale=0.7]
     \input{images/repere.tikz}
   \end{scope}
 
   \input{images/minkowski_base.tikz}
 
-  \draw[black] (a1) -- (a2) -- (a3) -- (a4) -- cycle;
+  \draw[rose,thick] (a1) -- (a2) -- (a3) -- (a4) -- cycle;
   \node[black] at (5,4) (a) {$A$};
 
-  \draw[black] (b1) -- (b2)-- (b3) -- cycle;
+  \draw[bleu,thick] (b1) -- (b2)-- (b3) -- cycle;
   \node[black] at (1.5,1.5) (b) {$B$};
 
-  \draw[<->,bleu,thick,dashed] (a2) -- ($(b1)!(a2)!(b3)$);
+  \draw[<->,vert,thick,dashed] (a2) -- ($(b1)!(a2)!(b3)$);
 \end{tikzpicture}

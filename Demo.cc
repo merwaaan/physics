@@ -106,8 +106,18 @@ void testTimeReversing()
   s->applyCenterForce(Vector3(0, g, 0), dt); s->integrate(dt); std::cout << *s << std::endl;
 }
 
+void inputDemoRope(unsigned char k, int x, int y)
+{
+	if(k == 115) // S
+		e->getDisplay_p()->getCamera_p()->radius += 1;
+	else if(k == 122) // Z
+		e->getDisplay_p()->getCamera_p()->radius -= 1;
+}
+
 void demoRope()
 {
+	glutKeyboardFunc(&inputDemoRope);
+
 	Sphere* s;
 	Constraint* c;
 	Sphere* prev;
@@ -120,7 +130,7 @@ void demoRope()
 	for(int i = 0; i < 15; ++i)
 	{
 		s = new Sphere(1, 1);
-		s->setPosition(i*1.3, 3 + i * 3, 0);
+		s->setPosition(i*3, 3 + i * 3, 0);
 		e->addRigidBody_p(s);
 
 		c = new DistanceConstraint(s, prev, 3);
@@ -165,7 +175,7 @@ void inputDemoBoxes(unsigned char k, int x, int y)
   if(k == 97)
   {
 	  Cube* c = new Cube(2, 2);
-	  c->setPosition(randomf()*10-5, 10, randomf()*10-5);
+	  c->setPosition(randomf()*8-4, 10, randomf()*8-4);
 		c->prepare();
 	  e->addRigidBody_p(c);
   }
@@ -223,8 +233,8 @@ void demoStairs()
 
 	Box* c = NULL;
 	int height = 7;
-	int steps = 10;
-	int stepSize = 1;
+	int steps = 5;
+	int stepSize = 2;
 
 	for(int i = 0; i < steps; ++i)
 	{
@@ -301,18 +311,18 @@ void demoPool()
 
 int main(int argc, char** argv)
 {
-	srand(12);//123
+	srand(12); // 12 
 
-  e = new Engine(&argc, argv, 0.01);
+  e = new Engine(&argc, argv, 0.001);
   
   //testGeometry();
   //testGJK();
   //testTimeReversing();
 	
   //demoRope();
-  demoBoxes();
-	//demoStairs();
-	demoPool();
+  //demoBoxes();
+	demoStairs();
+	//demoPool();
   
   delete e;
 

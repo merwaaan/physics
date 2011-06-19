@@ -25,7 +25,7 @@ Vector3::~Vector3()
 
 bool Vector3::operator==(const Vector3& v) const
 {
-	return (*this - v).length() < 0.001;
+	return (*this - v).length() < E->getGeometryTolerance();
 }
 
 bool Vector3::operator!=(const Vector3& v) const

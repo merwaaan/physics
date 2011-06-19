@@ -11,9 +11,12 @@ séparés et donc qu'aucune interpénétration ne se produit au départ.
 
 En premier lieu, on vérifie pour chaque paire de corps s'ils entrent
 en collision. Si tel est le cas, on corrige leur état puis on applique
-les impulsions adaptées. Ensuite, on applique des forces
-environnementales, telles que la gravité, et on intègre l'état de tous
-les corps. L'algorithme \ref{algoMoteur1} résume cette organisation.
+les impulsions adaptées. Ensuite, on administre des forces
+environnementales, telles que la gravité. Il ne reste plus qu'à
+intègrer l'état de tous les corps, c'est à dire mettre à jour leurs
+position et orientation en fonction des élans transmis par les
+impulsions et les forces extérieures. L'algorithme \ref{algoMoteur1}
+résume cette organisation.
 
 \begin{algorithm}[h]
   \caption{Boucle principale}
@@ -91,33 +94,37 @@ collision.
 
 De plus, l'organisation actuelle prive la simulation de toute
 cohérence temporelle. En effet, à chaque itération tous les corps
-avancent d'un pas de temps fixe $\deriv t$ et l'état de ceux subissant
-une collision sera inmanquablement corrigé pour correspondre à l'état
-qu'ils auraient dû atteindre lors de la collision. blabla
+avancent d'un pas de temps fixe $\deriv t$ mais l'état de ceux
+subissant une collision sera inmanquablement corrigé pour correspondre
+à l'état qu'ils auraient dû atteindre au moment du contact. On se
+retrouve ainsi avec des corps n'ayant pas subi de collision, côtoyant
+des corps en ayant subit et dont l'état correspond à un temps
+précédent.
 
-Autre problème de taille : toujours à cause de l'ordre dans lequel les
-corps sont ordonnés, la simulation empruntera des chemins différents
-selon l'ordre dans lequel les collisions sont détectées. La figure
-\ref{issues} nous montre deux corp ainsi que la position qu'ils
-atteindront à l'itération suivante si on ignore les collisions. On
-peut aisément se rendre compte des conséquences de l'ordre dans lequel
-les objets sont traîtés. Si le corps bleu est traîté en premier, il
-entrera en collision avec le corps rose, son état sera corrigé, et une
-impulsion sera plus tard générée pour séparer les deux corps. Au
-final, l'objet bleu sera projeté vers la gauche et le corps rose sera
-dévié de sa trajectoire originelle. Par contre, si c'est le corps rose
-qui est traîté en premier, il avancera, aucune collision ne sera
-détectée, puis l'autre corps avancera à son tour et puisque le corps
-rose ne se trouvera plus sur sa trajectoire, rien ne se passera !
+Autre problème de taille : la simulation empruntera des chemins
+différents selon l'ordre dans lequel les collisions sont détectées. La
+figure \ref{issues} nous montre deux corp ainsi que la position qu'ils
+atteindraient à l'itération suivante si l'on ignorait les collisions
+(en pointillés). On peut aisément se rendre compte des conséquences de
+l'ordre dans lequel les objets sont traîtés. Si le corps bleu est
+traîté en premier, il entrera en collision avec le corps rose, son
+état sera corrigé, et une impulsion sera plus tard générée pour
+séparer les deux corps. Au final, l'objet bleu sera projeté vers la
+gauche et le corps rose sera dévié de sa trajectoire originelle. Par
+contre, si c'est le corps rose qui est traîté en premier, il avancera
+vers sa prochaine position, puis ce sera autour de l'autre corps de se
+déplacer. Puisque le corps rose ne se trouvera plus sur sa
+trajectoire, rien ne se passera !
 
 \begin{figure}
   \centering
   \subfloat[]{ \input{images/issues.tikz} }
-  \caption{Deux issues possibles selon l'ordre de détection des collisions}
+  \caption{Deux issues possibles selon l'ordre du traitement des collisions}
   \label{issues}
 \end{figure}
 
-[tout est lié au temps collision]
+Tous les problèmes cités sont clairement liés à un manque de cohérence
+temporelle. blablabla
 
 \cite{garstenauer}
 
@@ -174,6 +181,8 @@ rose ne se trouvera plus sur sa trajectoire, rien ne se passera !
 \end{algorithm}
 
 \subsection{Démonstrations}
+
+Ouais, bah ça on verra.
 
 \subsection{Perspectives d'évolution}
 
@@ -309,13 +318,12 @@ plusieurs cases adjacentes de la grille, mais une fois encore, si des
 corps sont démultipliés de la sorte, le temps de maintenance d'une
 telle structure sera augmenté.
 
-[Quatree, octree]
+[Quadtree, octree]
 
 \begin{figure}
   \centering
-  \input{images/quadtree1.tikz}
-  \qquad
-  \input{images/quadtree2.tikz}
-  \caption{}
+  \subfloat[]{ \input{images/quadtree1.tikz} }
+  \subfloat[]{ \input{images/quadtree2.tikz} }
+  \caption{blablabla}
   \label{quadtree}
 \end{figure}

@@ -1,4 +1,4 @@
-\begin{tikzpicture}[scale=0.5]
+\begin{tikzpicture}[scale=0.3]
   \draw[fill=rose,draw=rose] (3.5,3.5) circle (3);
   \draw[fill=bleu,draw=bleu] (8,8.7) circle (1);
   \draw[fill=vert,draw=vert] (9, 3.4) circle (0.7);

@@ -5,9 +5,9 @@
 Nous disposons désormais des briques de base nécessaires à la
 construction de l'algorithme général du moteur physique. Un appel à
 cette procédure intégrera les états de tous les corps de la simulation
-d'un pas de temps $\deriv t$. On part de l'hypothèse que tous les
-corps sont initialement séparés et donc qu'aucune interpénétration ne
-se produit au départ.
+d'un pas de temps $\deriv t$ en tenant compte des interactions
+possibles. On part de l'hypothèse que tous les corps sont initialement
+séparés et donc qu'aucune interpénétration ne se produit au départ.
 
 En premier lieu, on vérifie pour chaque paire de corps s'ils entrent
 en collision. Si tel est le cas, on corrige leur état puis on applique
@@ -54,18 +54,72 @@ les corps. L'algorithme \ref{algoMoteur1} résume cette organisation.
 \end{algorithm}
 
 Cette structure simple fonctionne de façon satisfaisante lorsque la
-simulation comporte peu de corps et que les collisions n'impliquent
-pas plus de deux objets à la fois.
+simulation comporte peu d'objets. Néanmoins, sa stabilité est
+fortement compromise lorsque de nombreux corps entrent en jeu et ce,
+pour plusieurs raisons.
 
-[problèmes]
+Depuis le début de la conception du moteur physique, nous détectons,
+corrigeons et traîtons les collisions entre paire de corps. On part de
+l'hypothèse qu'au début de la simulation aucun solide n'entre en
+collision avec un autre et grâce à la phase de correction
+collisionnelle, cette hypothèse est vérifiée au début de chaque
+intégration. Un problème majeur de l'algorithme actuel est qu'il
+provoque des situation d'interpénétration non corrigeables, notamment
+lorsque des amas d'objets se forment. La sous-figure $a$ de la figure
+\ref{probleme} prend place au début d'une itération de la simulation.
+On y voit un corps $A$, attiré par la gravité, et s'étant enfoncé dans
+le sol. Le corps $B$ subit quand à lui la même influence mais ne tombe
+pas assez bas pour qu'une collision avec $A$ s'opère. La sous-figure
+$b$ nous montre le résultat de la correction de l'interpénétration
+entre $A$ et le sol et on remarque qu'une nouvelle collision entre $B$
+et $A$ en découle. L'issue de cette situation dépend de $B$; si sa
+phase de détection de collision est déjà passée alors il est déjà trop
+tard et $A$ et $B$ seront en état d'interpénétration à l'itération
+suivante et l'hypothèse de non-pénétration ne sera pas respectée. Le
+comportement de la simulation sera alors imprévisible. La stabilité du
+moteur physique est donc gravement dépendante de l'ordre arbitraire
+dans lequel les corps sont rangés et exécutent leur détection de
+collision.
 
-[meilleure algorithme]
+\begin{figure}
+  \centering
+  \subfloat[]{ \input{images/probleme1.tikz} }
+  \subfloat[]{ \input{images/probleme2.tikz} }
+  \caption{Interpénétration collatéralement provoquée par une correction collisionnelle}
+  \label{probleme}
+\end{figure}
 
-[ordre des collisions]
+De plus, l'organisation actuelle prive la simulation de toute
+cohérence temporelle. En effet, à chaque itération tous les corps
+avancent d'un pas de temps fixe $\deriv t$ et l'état de ceux subissant
+une collision sera inmanquablement corrigé pour correspondre à l'état
+qu'ils auraient dû atteindre lors de la collision. blabla
+
+Autre problème de taille : toujours à cause de l'ordre dans lequel les
+corps sont ordonnés, la simulation empruntera des chemins différents
+selon l'ordre dans lequel les collisions sont détectées. La figure
+\ref{issues} nous montre deux corp ainsi que la position qu'ils
+atteindront à l'itération suivante si on ignore les collisions. On
+peut aisément se rendre compte des conséquences de l'ordre dans lequel
+les objets sont traîtés. Si le corps bleu est traîté en premier, il
+entrera en collision avec le corps rose, son état sera corrigé, et une
+impulsion sera plus tard générée pour séparer les deux corps. Au
+final, l'objet bleu sera projeté vers la gauche et le corps rose sera
+dévié de sa trajectoire originelle. Par contre, si c'est le corps rose
+qui est traîté en premier, il avancera, aucune collision ne sera
+détectée, puis l'autre corps avancera à son tour et puisque le corps
+rose ne se trouvera plus sur sa trajectoire, rien ne se passera !
+
+\begin{figure}
+  \centering
+  \subfloat[]{ \input{images/issues.tikz} }
+  \caption{Deux issues possibles selon l'ordre de détection des collisions}
+  \label{issues}
+\end{figure}
+
+[tout est lié au temps collision]
 
 \cite{garstenauer}
-
-[image de conflits collisionels]
 
 \begin{algorithm}[h]
   \caption{Boucle principale améliorée}

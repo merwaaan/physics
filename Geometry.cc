@@ -537,15 +537,15 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
 
       double distance;
       Vector3 point = Geometry::closestPointOfPolygon(vertex, face, &distance);
-
-      if(distance < 0.1)
+			std::cout << j << "/" << i << " " << distance << std::endl;
+      if(distance < E->getCollisionTolerance())
       {
         Contact contact;
 
 				contact.a = rb1_p;
 				contact.b = rb2_p;
         contact.position = point;
-        contact.normal = (face.points[1] - face.points[0]) ^ (face.points[2] - face.points[0]);
+        contact.normal = ((face.points[1] - face.points[0]) ^ (face.points[2] - face.points[0])).normalize();
 
 				// Make sure the contact normal is directed toward the vertex body.
 		    Vector3 directionToFirst = contact.a->getPosition() - contact.position;
@@ -588,7 +588,7 @@ std::vector<Contact> Geometry::edgeEdgeContacts(CustomRigidBody* rb1_p, CustomRi
 				edges2[j].b == closest2)
 				continue;
 
-			if(distance < 0.1)
+			if(distance < E->getCollisionTolerance())
 			{
 		    Contact contact;
 

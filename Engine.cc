@@ -12,8 +12,8 @@ Engine* E = NULL;
 Engine::Engine(int* argc, char** argv, double timeStep) :
   timeStep(timeStep),
 	updateType(FIXED),
-	collisionTolerance(0.005),
-	geometryTolerance(0.001),
+	collisionTolerance(0.1),
+	geometryTolerance(0.01),
 	startingTime(getAbsoluteTime()),
 	lastUpdateTime(0),
   display(argc, argv, 600, 600)
@@ -241,12 +241,12 @@ Vector3* Engine::computeImpulse(Contact contact)
 	Vector3 da = p - a->getPosition();
 	Vector3 db = p - b->getPosition();
 
-	double restitution;
-	if(relativeVelocity < 0.5)
+	double restitution = 0.5;
+/*	if(relativeVelocity < 0.5)
 		restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
 	else
 		restitution = 0;
-	
+*/
 	Matrix3 inverseInertiaA = a->getOrientation() * a->getInverseInertiaTensor() * a->getOrientation().transpose();
 	Matrix3 inverseInertiaB = b->getOrientation() * b->getInverseInertiaTensor() * b->getOrientation().transpose();
 	
@@ -256,11 +256,8 @@ Vector3* Engine::computeImpulse(Contact contact)
 	
 	Vector3 impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
 
-	double massA = a->getInverseMass() == 0 ? 0 : 1/a->getInverseMass();
-	double massB = b->getInverseMass() == 0 ? 0 : 1/b->getInverseMass();
-	double ratioA = massA / (massA + massB);
-	Vector3 impulseA = impulse * ratioA;
-	Vector3 impulseB = impulse * (1 - ratioA) * -1;
+	Vector3 impulseA = impulse;
+	Vector3 impulseB = impulse * -1;
 
 	std::cout << this->getLocalTime() << "s" << std::endl;
 	std::cout << impulse << std::endl;	

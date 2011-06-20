@@ -49,13 +49,13 @@ void RigidBody::applyOffCenterForce(Vector3 force, Vector3 poa, double dt)
 	if(!this->isActive())
 		return;
 
-	this->accumulatedForces += (force * dt) * (dt < 0 ? -1 : 1);
+	this->accumulatedForces += force * dt * (dt < 0 ? -1 : 1);
   this->accumulatedTorques += (poa - this->position) ^ (force * dt) * (dt < 0 ? -1 : 1);
 }
 
 void RigidBody::computeAuxiliaryQuantities()
 {
-	this->linearVelocity = this->inverseMass * this->linearMomentum;
+	this->linearVelocity = this->linearMomentum * this->getInverseMass();
   this->angularVelocity = (this->orientation * this->inverseInertiaTensor * this->orientation.transpose()) * this->angularMomentum;
 }
 
@@ -70,7 +70,7 @@ void RigidBody::integrate(double dt)
 	if(dt > 0)
 		this->linearMomentum += this->accumulatedForces;
 
-  Vector3 velocity = this->inverseMass * this->linearMomentum;
+  Vector3 velocity = this->linearMomentum * this->getInverseMass();
   this->position += velocity * dt * (dt < 0 ? -1 : 1);
 
 	if(dt < 0)

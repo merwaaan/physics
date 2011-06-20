@@ -174,8 +174,9 @@ void inputDemoBoxes(unsigned char k, int x, int y)
 {
   if(k == 97)
   {
-	  Cube* c = new Cube(2, 2);
-	  c->setPosition(randomf()*8-4, 10, randomf()*8-4);
+	  Cube* c = new Cube(2, 100);
+	  //c->setPosition(randomf()*7-4, 5, randomf()*7-4);
+		c->setPosition(2.3,5,0);
 		c->prepare();
 	  e->addRigidBody_p(c);
   }
@@ -193,10 +194,10 @@ void demoBoxes()
   c->setFixed(true);
   e->addRigidBody_p(c);
 
-	Box* sol = new Box(50, 0.5, 50, 1);
-	sol->setPosition(0, -2.5, 0);
-  sol->setFixed(true);
-  e->addRigidBody_p(sol);
+	Box* floor = new Box(50, 3, 50, 1);
+	floor->setPosition(0, -3.5, 0);
+  floor->setFixed(true);
+  e->addRigidBody_p(floor);
 
   Force* g = new CenterForce(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);
@@ -313,15 +314,15 @@ int main(int argc, char** argv)
 {
 	srand(12); // 12 
 
-  e = new Engine(&argc, argv, 0.001);
+  e = new Engine(&argc, argv, 0.01);
   
   //testGeometry();
   //testGJK();
   //testTimeReversing();
 	
   //demoRope();
-  //demoBoxes();
-	demoStairs();
+  demoBoxes();
+	//demoStairs();
 	//demoPool();
   
   delete e;

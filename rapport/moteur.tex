@@ -13,7 +13,7 @@ En premier lieu, on vérifie pour chaque paire de corps s'ils entrent
 en collision. Si tel est le cas, on corrige leur état puis on applique
 les impulsions adaptées. Ensuite, on administre des forces
 environnementales, telles que la gravité. Il ne reste plus qu'à
-intègrer l'état de tous les corps, c'est à dire mettre à jour leurs
+intégrer l'état de tous les corps, c'est à dire mettre à jour leurs
 position et orientation en fonction des élans transmis par les
 impulsions et les forces extérieures. L'algorithme \ref{algoMoteur1}
 résume cette organisation.
@@ -118,15 +118,30 @@ trajectoire, rien ne se passera !
 
 \begin{figure}
   \centering
-  \subfloat[]{ \input{images/issues.tikz} }
+  \subfloat{ \input{images/issues.tikz} }
   \caption{Deux issues possibles selon l'ordre du traitement des collisions}
   \label{issues}
 \end{figure}
 
 Tous les problèmes cités sont clairement liés à un manque de cohérence
-temporelle. blablabla
+temporelle. Lors de l'utilisation d'un tel algorithme, on utilise un
+pas de temps dit explicite \cite{garstenauer}. Nous allons maintenant
+nous tourner vers une version améliorée, dont le pas de temps sera dit
+implicite.
 
-\cite{garstenauer}
+L'algorithme \ref{algoMoteur2} est plus solide dans la mesure o\`u il
+détecte à chaque itération le temps du premier contact et intègre tous
+les corps de la simulation jusqu'à cet instant de façon à traîter les
+collisions dans leur ordre réel. Détaillons le fonctionnement de cette
+nouvelle méthodologie. En premier lieu, on copie chaque corps afin de
+s'assurer que les modifications qui vont suivre ne changent pas leur
+véritable état de départ. On avance ensuite l'état de chaque copie
+pour détecter si une collion se produira avec l'autre. Si tel est le
+cas, on corrige la pénétration et on détermine les informations de
+contact. \`A la fin de cette phase de prédiction, on dispose d'une
+liste de contacts potentiels qu'il est nécessaire de trier en fonction
+du temps d'impact. On intègre l'état de tous les objets d'un pas de
+temps égal au plus faible temps d'impact.
 
 \begin{algorithm}[h]
   \caption{Boucle principale améliorée}
@@ -143,23 +158,23 @@ temporelle. blablabla
   \SetKwFunction{appliquer}{appliquer}
   \SetKwFunction{integrer}{integrer}
   \SetKwFunction{trierContacts}{trierContacts}
-  \SetKwFunction{reinitialiser}{reinitialiser}
   \SetKwFunction{appliquerForcesEnvironnementales}{appliquerForcesEnvironnementales}
   \SetKwFunction{mint}{min}
   \Entree{Un pas de temps $\deriv t$}
   \BlankLine
   $C \leftarrow \emptyset$\;
   \PourCh{\pairedecorps (A,B)}{
-    \reinitialiser{A,B}
-    \appliquerForcesEnvironnementales{A}\;
-    \integrer{A, $\deriv t$}
-    \appliquerForcesEnvironnementales{B}\;
-    \integrer{B, $\deriv t$}
+    $A_2 \leftarrow A$\;
+    $B_2 \leftarrow B$\:
+    \appliquerForcesEnvironnementales{$A_2$}\;
+    \integrer{$A_2$, $\deriv t$}
+    \appliquerForcesEnvironnementales{$B_2$}\;
+    \integrer{$B_2$, $\deriv t$}
     \BlankLine
-    \Si{\collisionGrossiere{A,B}}{
-      \Si{\collisionFine{A,B}}{
-        \corrigerCollision{A,B}\;
-        $C \leftarrow C u$ \detecterContacts{A,B}\;
+    \Si{\collisionGrossiere{$A_2$, $B_2$}}{
+      \Si{\collisionFine{$A_2$, $B_2$}}{
+        \corrigerCollision{$A_2$, $B_2$}\;
+        $C \leftarrow C \cup$ \detecterContacts{$A_2$, $B_2$}\;
       }
     }
   }
@@ -172,7 +187,7 @@ temporelle. blablabla
     \integrer{A, $\deriv t_2$}
   }
   \BlankLine
-  \PourCh{\contact $c \in C | c.t = \deriv.t_2$}{
+  \PourCh{\contact $c \in C | c.t = \deriv t_2$}{
     $I \leftarrow$ \calculerImpulsion{c}\;
     \appliquer{I, A}\;
     \appliquer{-I, B}\;
@@ -180,9 +195,23 @@ temporelle. blablabla
   \BlankLine
 \end{algorithm}
 
+Ce nouvel algorithme assure la cohérence temporelle car les corps sont
+maintenant tous intégrés à l'aide du même pas de temps à chaque
+itération. De plus l'ordre des collisions est respecté puisqu'on se
+limite au traitement de celles apparaissant le plus tôt. Il se révèle
+tout de même moins économique que son prédécesseur dans la mesure o\`u
+l'on intègre chaque corps non pas une fois, mais $k-1$ fois, avec $k$
+le nombre d'objets de la simulation. Ce coût supplémentaire est
+nécessaire si l'on veut obtenir des informations de contact isolées à
+une paire de corps et ignorant les autres objets.
+
 \subsection{Démonstrations}
 
+boîte simple
 
+escalier
+
+corde
 
 \subsection{Perspectives d'évolution}
 
@@ -214,7 +243,6 @@ telles que le frottement de l'air et donc les corps n'atteignent
 jamais de vitesses démesurées. On souhaite tout de même disposer d'un
 moteur physique solide et versatile, évaluons les possibilités qui
 s'offrent à nous pour pallier ce problème.
-
 \begin{figure}
   \centering
   \input{images/tunneling1.tikz}
@@ -286,15 +314,15 @@ les corps qui peuplent notre système se déroule en deux étapes : une
 détection grossière visant à vérifier de façon économique si deux
 objets se touchent et une détection fine servant à confirmer ou à
 infirmer de façon sûre ce résultat. Bien que la détection grossière
-soit peu coûteuse en termes de calcul, elle est éxécutée $???$ à
-chaque itération, o\`u $n$ est le nombre de corps actifs dans la
-simulation. Pourtant, il est très souvent inutile de détecter si deux
-objets sont en situation d'interpénétration, par exemple lorsqu'ils
-sont très éloignés l'un de l'autre. Il serait tout à notre avantage
+soit peu coûteuse en termes de calcul, elle est éxécutée $(k-1)^2$ à
+chaque itération. Pourtant, il est très souvent inutile de détecter si
+deux objets sont en situation d'interpénétration, par exemple lorsque
+la distance les séparant est grande. Il serait tout à notre avantage
 d'ajouter au moteur une couche supplémentaire tenant compte de ces
-disparités spatiales pour accélérer la détection de collisions.
+disparités spatiales pour accélérer la phase de détection de
+collision.
 
-Le principe général du partitionnement de l'espace (\textit{Spatial
+Le principe général du partitionnement de l'espace (\textit{spatial
   partitioning}) est de subdiviser l'environnement de la simulation en
 sous-espaces. La répartition des corps dans ces sous-espaces dépend
 bien évidemment de leur position dans le repère global mais aussi du
@@ -310,7 +338,7 @@ structure présente plusieurs inconvénients majeurs, notamment le fait
 que le gain de performance variera fortement selon le nombre d'objets
 considérés, leur taille et la finesse de la grille. Par exemple, si
 une grille a des cases trop grandes, chacune contiendra de nombreux
-objets, et le gain de performance sera peu flagrant. Si au contraire
+objets et le gain de performance sera peu flagrant. Si au contraire
 les cases de la grille sont trop petites, les plus grands objets ne
 pourront pas rentrer dans leur intégralité à l'intérieur d'une unique
 case. Une solution à ce problème est de ranger un même objet dans
@@ -318,12 +346,20 @@ plusieurs cases adjacentes de la grille, mais une fois encore, si des
 corps sont démultipliés de la sorte, le temps de maintenance d'une
 telle structure sera augmenté.
 
-[Quadtree, octree]
+Une variante plus subtile de partitionnement de l'espace est
+l'utilisation de \textit{quadtrees} (\textit{octrees} en trois
+dimensions). Cette structure prend la forme d'un arbre représentant
+l'espace à subdiviser. Chaque n\oe ud de l'arbre possède quatre fils,
+chacun correspondant à un quadrant de la surface du père. Lorsqu'un
+corps est introduit dans la simulation, ou quand un corps déjà
+existant se déplace, il faut le ranger dans l'arbre. Pour ce faire, on
+part de la racine et on descend récursivement jusqu'à ce que le corps
+soit trop volumineux pour appartenir à une subdivision de l'espace,
+auquel cas on le stocke dans le père. Habituellement, un objet
+volumineux se situera vers le haut de l'arbre car les n\oe uds
+inférieurs ne peuvent pas l'accueillir.
 
-\begin{figure}
-  \centering
-  \subfloat[]{ \input{images/quadtree1.tikz} }
-  \subfloat[]{ \input{images/quadtree2.tikz} }
-  \caption{blablabla}
-  \label{quadtree}
-\end{figure}
+Cette structure sert à stocker les corps de la simulation, et si on
+l'implémentait elle remplacerait la liste qui contient nos objets et
+dont l'ordre est actuellement arbitraire. Elle devient
+particulièrement intéressante lors 

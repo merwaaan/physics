@@ -1,14 +1,17 @@
-\documentclass[twocolumn]{article}
+\documentclass[a4paper,twocolumn]{article}
 
 \usepackage[francais]{babel}
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
+\usepackage{float}
+\usepackage[top=4cm,bottom=4cm,right=2.5cm,left=2.5cm]{geometry}
 \usepackage{color}
 \usepackage{tikz}
 \usepackage{subfig}
 \usepackage[french,ruled,noend]{algorithm2e}
 \usepackage[adobe-utopia]{mathdesign}
 \usepackage{url}
+\usepackage{biblatex}
 
 % Couleurs inspirées de famfamfam.com
 \definecolor{vert}{HTML}{59FF2D}
@@ -60,13 +63,15 @@
 \author{Merwan Achibet}
 \date{}
 
-\begin{document}
+\bibliography{references.bib}
 
-\maketitle
-\tableofcontents
+\begin{document}
 
 \shorthandoff{!} % Pour éviter bug de Tikz + Babel french
 
+\maketitle
+
+\tableofcontents
 \input{intro}
 \input{dynamique}
 \input{collision}
@@ -74,7 +79,6 @@
 \input{conclusion}
 \input{notes}
 
-\bibliographystyle{unsrt}
-\bibliography{references}
+\printbibliography
 
 \end{document}

@@ -256,7 +256,7 @@ Vector3* Engine::computeImpulse(Contact contact)
 	
 	Vector3 impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
 
-	Vector3 impulseA = impulse;
+	Vector3 impulseA = impulse * a->getInverseMass();
 	Vector3 impulseB = impulse * -1;
 
 	std::cout << this->getLocalTime() << "s" << std::endl;

@@ -139,7 +139,7 @@ void demoRope()
 		prev = s;
 	}
 
-  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  Force* g = new Gravity(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);
 
 	e->run();
@@ -164,7 +164,7 @@ void demoBalls()
       e->addRigidBody_p(s);
     }
 
-  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  Force* g = new Gravity(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);
 
   e->run();
@@ -174,7 +174,7 @@ void inputDemoBoxes(unsigned char k, int x, int y)
 {
   if(k == 97)
   {
-	  Cube* c = new Cube(2, 100);
+	  Cube* c = new Cube(2, 10);
 	  //c->setPosition(randomf()*7-4, 5, randomf()*7-4);
 		c->setPosition(2.3,5,0);
 		c->prepare();
@@ -199,7 +199,7 @@ void demoBoxes()
   floor->setFixed(true);
   e->addRigidBody_p(floor);
 
-  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  Force* g = new Gravity(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);
 
   e->run();
@@ -250,7 +250,7 @@ void demoStairs()
   floor->setFixed(true);
   e->addRigidBody_p(floor);
 
-  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  Force* g = new Gravity(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);
 
   e->run();
@@ -304,7 +304,7 @@ void demoPool()
 	e->addRigidBody_p(wall);
 
 
-  Force* g = new CenterForce(Vector3(0, -9.81, 0));
+  Force* g = new Gravity(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);
 
   e->run();

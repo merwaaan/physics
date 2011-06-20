@@ -37,3 +37,19 @@ void OffCenterForce::apply(RigidBody* rb_p, double dt)
 {
   rb_p->applyOffCenterForce(this->force, this->pointOfApplication, dt);
 }
+
+
+Gravity::Gravity(Vector3 force) :
+  CenterForce(force)
+{
+}
+
+Gravity::~Gravity()
+{
+}
+
+void Gravity::apply(RigidBody* rb_p, double dt)
+{
+	Vector3 g = (1/rb_p->getInverseMass()) * this->force;
+  rb_p->applyCenterForce(g, dt);
+}

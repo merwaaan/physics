@@ -76,7 +76,7 @@ void Engine::updateFixed()
 					if(contacts[0].b->isSleeping())
 						contacts[0].b->setSleeping(false);
 
-					std::cout << "real collision detected between #" << i << " and #" << j << std::endl;
+					std::cout << "exact collision detected between #" << i << " and #" << j << std::endl;
 					
 					// Security check for swapped pointers to the bodies.
 					contacts = this->checkContacts(contacts);
@@ -87,7 +87,6 @@ void Engine::updateFixed()
 						contacts[k].a->applyOffCenterForce(impulses[0], contacts[k].position, 1);
 						contacts[k].b->applyOffCenterForce(impulses[1], contacts[k].position, 1);
 					}
-					std::cout << *contacts[0].a << std::endl;
 				}
 			}
 		}
@@ -95,7 +94,6 @@ void Engine::updateFixed()
 	// Apply constraints.
 	this->applyConstraints(1);
 
-	std::cout << "INTEGRATION" << std::endl;
 	for(int i = 0; i < this->bodies_p.size(); ++i)
 	{      
 		// Apply external forces.
@@ -108,13 +106,12 @@ void Engine::updateFixed()
 	
 	this->lastUpdateTime += this->timeStep;
 	
-	//this->cleanUp();
+	this->cleanUp();
 }
 
 void Engine::updateContinuous()
 {
 	// Predict contacts to come.
-	std::cout << "CONTACT PREDICTION" << std::endl;
 	std::vector<Contact> futureContacts = this->predictContacts();
 	//for(int i = 0; i < futureContacts.size(); ++i)
 	//std::cout << "fc " << futureContacts[i].TOI << std::endl;
@@ -241,13 +238,12 @@ Vector3* Engine::computeImpulse(Contact contact)
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
 	if(relativeVelocity > 0) relativeVelocity *= -1;
 
-	if(relativeVelocity < 0.1)
+	if(relativeVelocity > -0.5)
 	{
 		a->couldSleep = true;
 		b->couldSleep = true;
 	}
 
-	std::cout << a->getVelocity(p) << a->linearVelocity << a->angularVelocity << std::endl;
 	std::cout << "vrel " << relativeVelocity << " " << n << " " << a->getVelocity(p) << " " << b->getVelocity(p) << std::endl;
 
 	// displacements of the contact points with respect to the center of mass of each body
@@ -272,10 +268,7 @@ Vector3* Engine::computeImpulse(Contact contact)
 	Vector3 impulseA = impulse;
 	Vector3 impulseB = impulse * -1;
 
-	std::cout << this->getLocalTime() << "s" << std::endl;
-	std::cout << impulse << std::endl;	
 	std::cout << "impulse A " << impulseA << " at " << contact.position << " " << a->getPosition() - contact.position << std::endl;
-	std::cout << "impulse B " << impulseB << " at " << contact.position << std::endl;
 	
 	return (Vector3[]){impulseA, impulseB};
 }
@@ -317,7 +310,7 @@ void Engine::cleanUp()
 	Vector3 origin(0, 0, 0);
 
 	for(int i = 0; i < this->bodies_p.size(); ++i)
-		if((this->bodies_p[i]->getPosition() - origin).length() > 200)
+		if((this->bodies_p[i]->getPosition() - origin).length() > 100)
 		{
 			this->bodies_p.erase(this->bodies_p.begin() + i);
 			--i;

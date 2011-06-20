@@ -83,7 +83,7 @@ void update()
     // Set an orthogonal perspective.
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(50, 1, 1, 200);
+    gluPerspective(50, 1, 1, 2000);
     //glOrtho(-100, 100, -100, 100, 1, 200);
 
     // Set the camera.

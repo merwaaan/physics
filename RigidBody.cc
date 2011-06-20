@@ -61,7 +61,8 @@ void RigidBody::integrate(double dt)
   if(!this->isActive())
     return;
 
-	this->couldSleep = false;
+	// Check if switching to sleep is necesary.
+	this->handleSleep();
 
 	// LINEAR COMPONENT
 
@@ -92,9 +93,6 @@ void RigidBody::integrate(double dt)
 
   // Clear the forces accumulated during the last frame.
   this->clearAccumulators();
-
-	// Check if switching to sleep is necesary.
-	this->handleSleep();
 }
 
 void RigidBody::integrateBackward(double dt)
@@ -115,8 +113,8 @@ void RigidBody::reverseTime()
 
 void RigidBody::handleSleep()
 {
-	std::cout << "kkkkkk " << this->getKineticEnergy() << std::endl;
-	if(this->couldSleep == true && this->getKineticEnergy() < 0.5)
+	std::cout << "kkkkkk " << this->getKineticEnergy() << " could" << this->couldSleep << std::endl;
+	if(this->couldSleep == true && this->getKineticEnergy() < 3)
 	{
 		++this->kineticEnergyLowFor;
 
@@ -124,7 +122,10 @@ void RigidBody::handleSleep()
 			this->setSleeping(true);
 	}
 	else
+	{
 		this->kineticEnergyLowFor = 0;
+		couldSleep = false;
+	}
 }
 
 bool RigidBody::isBoundingBoxCollidingWith(RigidBody* rb_p)
@@ -153,12 +154,7 @@ std::vector<Contact> RigidBody::isCollidingWith(RigidBody* rb_p, double dt)
 
   // Check for a true collision.
 	if(!interPenetration)
-  {
-	  std::cout << "No collision" << std::endl;
     return std::vector<Contact>();
-  }
- 
-	std::cout << "Collision" << std::endl;
 
   return this->resolveInterPenetration(rb_p, dt, FORWARD, dt);
 }
@@ -168,7 +164,7 @@ std::vector<Contact> RigidBody::isCollidingWith(RigidBody* rb_p, double dt)
  */
 std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double dt, Dir direction, double TOI)
 {
-	std::cout << "TOI " << TOI << std::endl;
+	//std::cout << "TOI " << TOI << std::endl;
   // Compute the distance between the two bodies.
 	bool interPenetration;
   Vector3 distance = Geometry::gjkDistance(this, rb_p, &interPenetration);
@@ -189,7 +185,7 @@ std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double 
     this->integrate(sdt);
     rb_p->integrate(sdt);
 
-    std::cout << *this << std::endl;
+    //std::cout << *this << std::endl;
 
     return this->resolveInterPenetration(rb_p, sdt, direction, TOI+sdt);
   }
@@ -207,7 +203,7 @@ std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double 
     this->integrateBackward(sdt);
     rb_p->integrateBackward(sdt);
 
-		std::cout << *this << std::endl;
+//		std::cout << *this << std::endl;
 
     return this->resolveInterPenetration(rb_p, sdt, direction, TOI-sdt);
   }

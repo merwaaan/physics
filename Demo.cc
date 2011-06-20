@@ -174,8 +174,8 @@ void inputDemoBoxes(unsigned char k, int x, int y)
 {
   if(k == 97)
   {
-	  Box* c = new Box(2,2,10, 10);
-	  c->setPosition(randomf()*7-4, 5, randomf()*7-4);
+	  Box* c = new Box(randomf()*10, randomf()*10, randomf()*10, 10);
+	  c->setPosition(randomf()*50-25, 10, randomf()*50-25);
 		c->prepare();
 	  e->addRigidBody_p(c);
   }
@@ -200,6 +200,32 @@ void demoBoxes()
 
   Force* g = new Gravity(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);
+
+  e->run();
+}
+
+void inputDemoZeroG(unsigned char k, int x, int y)
+{
+  if(k == 97)
+  {
+	  Box* c = new Box(randomf()*10, randomf()*10, randomf()*10, 10);
+	  c->setPosition(randomf()*50-25, 0, randomf()*50-25);
+		c->prepare();
+		c->applyOffCenterForce(
+			Vector3(randomf()*10-5, randomf()*10-5, randomf()*10-5),
+			Vector3(randomf()*10-5, randomf()*10-5, randomf()*10-5),
+			1);
+	  e->addRigidBody_p(c);
+  }
+	else if(k == 115) // S
+		e->getDisplay_p()->getCamera_p()->radius += 1;
+	else if(k == 122) // Z
+		e->getDisplay_p()->getCamera_p()->radius -= 1;
+}
+
+void demoZeroG()
+{  
+  glutKeyboardFunc(&inputDemoZeroG);
 
   e->run();
 }
@@ -302,7 +328,6 @@ void demoPool()
 	wall->setFixed(true);
 	e->addRigidBody_p(wall);
 
-
   Force* g = new Gravity(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);
 
@@ -320,6 +345,7 @@ int main(int argc, char** argv)
   //testTimeReversing();
 	
   //demoRope();
+	demoZeroG();
   demoBoxes();
 	//demoStairs();
 	//demoPool();

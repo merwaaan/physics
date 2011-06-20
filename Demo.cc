@@ -174,9 +174,8 @@ void inputDemoBoxes(unsigned char k, int x, int y)
 {
   if(k == 97)
   {
-	  Cube* c = new Cube(2, 10);
-	  //c->setPosition(randomf()*7-4, 5, randomf()*7-4);
-		c->setPosition(2.3,5,0);
+	  Box* c = new Box(2,2,10, 10);
+	  c->setPosition(randomf()*7-4, 5, randomf()*7-4);
 		c->prepare();
 	  e->addRigidBody_p(c);
   }
@@ -312,7 +311,7 @@ void demoPool()
 
 int main(int argc, char** argv)
 {
-	srand(12); // 12 
+	srand(12);
 
   e = new Engine(&argc, argv, 0.01);
   

@@ -537,7 +537,7 @@ std::vector<Contact> Geometry::vertexFaceContacts(CustomRigidBody* rb1_p, Custom
 
       double distance;
       Vector3 point = Geometry::closestPointOfPolygon(vertex, face, &distance);
-			std::cout << j << "/" << i << " " << distance << std::endl;
+
       if(distance < E->getCollisionTolerance())
       {
         Contact contact;

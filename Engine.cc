@@ -70,6 +70,12 @@ void Engine::updateFixed()
 				
 				if(contacts.size() > 0)
 				{
+					if(contacts[0].a->isSleeping())
+						contacts[0].a->setSleeping(false);
+
+					if(contacts[0].b->isSleeping())
+						contacts[0].b->setSleeping(false);
+
 					std::cout << "real collision detected between #" << i << " and #" << j << std::endl;
 					
 					// Security check for swapped pointers to the bodies.
@@ -81,6 +87,7 @@ void Engine::updateFixed()
 						contacts[k].a->applyOffCenterForce(impulses[0], contacts[k].position, 1);
 						contacts[k].b->applyOffCenterForce(impulses[1], contacts[k].position, 1);
 					}
+					std::cout << *contacts[0].a << std::endl;
 				}
 			}
 		}
@@ -234,6 +241,12 @@ Vector3* Engine::computeImpulse(Contact contact)
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
 	if(relativeVelocity > 0) relativeVelocity *= -1;
 
+	if(relativeVelocity < 0.1)
+	{
+		a->couldSleep = true;
+		b->couldSleep = true;
+	}
+
 	std::cout << a->getVelocity(p) << a->linearVelocity << a->angularVelocity << std::endl;
 	std::cout << "vrel " << relativeVelocity << " " << n << " " << a->getVelocity(p) << " " << b->getVelocity(p) << std::endl;
 
@@ -256,7 +269,7 @@ Vector3* Engine::computeImpulse(Contact contact)
 	
 	Vector3 impulse = (-(1 + restitution) * relativeVelocity) / (t1 + t2 + t3) * n;
 
-	Vector3 impulseA = impulse * a->getInverseMass();
+	Vector3 impulseA = impulse;
 	Vector3 impulseB = impulse * -1;
 
 	std::cout << this->getLocalTime() << "s" << std::endl;

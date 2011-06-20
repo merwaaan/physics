@@ -8,7 +8,9 @@ RigidBody::RigidBody() :
 	restitution(0.3),
 	friction(0.9),
   fixed(false),
-	sleeping(false)
+	sleeping(false),
+	kineticEnergyLowFor(0),
+	couldSleep(false)
 {
   // The initial orientation is aligned with the axis.
   this->orientation.set(0, 0, 1);
@@ -53,25 +55,21 @@ void RigidBody::applyOffCenterForce(Vector3 force, Vector3 poa, double dt)
   this->accumulatedTorques += (poa - this->position) ^ (force * dt) * (dt < 0 ? -1 : 1);
 }
 
-void RigidBody::computeAuxiliaryQuantities()
-{
-	this->linearVelocity = this->linearMomentum * this->getInverseMass();
-  this->angularVelocity = (this->orientation * this->inverseInertiaTensor * this->orientation.transpose()) * this->angularMomentum;
-}
-
 void RigidBody::integrate(double dt)
 {
   // Short-circuit integration if the body is fixed or asleep.
   if(!this->isActive())
     return;
 
+	this->couldSleep = false;
+
 	// LINEAR COMPONENT
 
 	if(dt > 0)
 		this->linearMomentum += this->accumulatedForces;
 
-  Vector3 velocity = this->linearMomentum * this->getInverseMass();
-  this->position += velocity * dt * (dt < 0 ? -1 : 1);
+  this->linearVelocity = this->linearMomentum * this->getInverseMass();
+  this->position += this->linearVelocity * dt * (dt < 0 ? -1 : 1);
 
 	if(dt < 0)
 		this->linearMomentum += this->accumulatedForces;
@@ -82,8 +80,8 @@ void RigidBody::integrate(double dt)
 		this->angularMomentum += this->accumulatedTorques;
 
   Matrix3 inverseInertia = this->orientation * this->inverseInertiaTensor * this->orientation.transpose();
-  Vector3 angularVelocity = inverseInertia * this->angularMomentum;
-  this->orientation += (angularVelocity.skew() * this->orientation) * dt * (dt < 0 ? -1 : 1);
+  this->angularVelocity = inverseInertia * this->angularMomentum;
+  this->orientation += (this->angularVelocity.skew() * this->orientation) * dt * (dt < 0 ? -1 : 1);
 
 	if(dt < 0)
 		this->angularMomentum += this->accumulatedTorques;
@@ -92,12 +90,11 @@ void RigidBody::integrate(double dt)
   this->orientation = this->orientation.orthogonalize();
   this->orientation = this->orientation.normalize();
 
-  // Cache the auxiliary quantities.
-  this->computeAuxiliaryQuantities();
-
   // Clear the forces accumulated during the last frame.
   this->clearAccumulators();
 
+	// Check if switching to sleep is necesary.
+	this->handleSleep();
 }
 
 void RigidBody::integrateBackward(double dt)
@@ -114,6 +111,20 @@ void RigidBody::reverseTime()
 {
 	this->linearMomentum *= -1;
 	this->angularMomentum *= -1;
+}
+
+void RigidBody::handleSleep()
+{
+	std::cout << "kkkkkk " << this->getKineticEnergy() << std::endl;
+	if(this->couldSleep == true && this->getKineticEnergy() < 0.5)
+	{
+		++this->kineticEnergyLowFor;
+
+		if(kineticEnergyLowFor > 3)
+			this->setSleeping(true);
+	}
+	else
+		this->kineticEnergyLowFor = 0;
 }
 
 bool RigidBody::isBoundingBoxCollidingWith(RigidBody* rb_p)
@@ -205,16 +216,9 @@ std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double 
 	std::vector<Contact> contacts = this->getContacts(rb_p);
 
 	if(contacts.size() > 0)
-	{
-		// Recompute auxiliary quantities as they could have been
-		// corrupted during the binary search.
-		contacts[0].a->computeAuxiliaryQuantities();
-		contacts[0].b->computeAuxiliaryQuantities();
-
 		// Append the time of impact to the contacts.
 		for(int i = 0; i < contacts.size(); ++i)
 			contacts[i].TOI = TOI;
-	}
 
 	return contacts;
 }
@@ -232,4 +236,9 @@ Vector3 RigidBody::getVelocity() const
 Vector3 RigidBody::getVelocity(const Vector3& point) const
 {
 	return this->linearVelocity + (this->angularVelocity ^ (point - this->position));
+}
+
+double RigidBody::getKineticEnergy()
+{
+	return (1/this->getInverseMass()) * pow(this->getVelocity().length(), 2) / 2;
 }

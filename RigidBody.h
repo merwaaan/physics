@@ -53,6 +53,9 @@ class RigidBody
     bool fixed;
 		bool sleeping;
 
+		int kineticEnergyLowFor;
+		bool couldSleep;
+
   public:
     RigidBody();
     ~RigidBody();
@@ -66,11 +69,11 @@ class RigidBody
     void clearAccumulators();
     void applyCenterForce(Vector3 force, double dt);
     void applyOffCenterForce(Vector3 force, Vector3 poa, double dt);
-    void computeAuxiliaryQuantities();
 
     virtual void integrate(double dt);
 		void integrateBackward(double dt);
 		void reverseTime();
+		void handleSleep();
 
     virtual void draw() = 0;
 
@@ -83,6 +86,7 @@ class RigidBody
 		virtual Vector3 getSupportPoint(Vector3 direction) = 0;
 
     double getInverseMass() { return this->isActive() ? this->inverseMass : 0; }
+
     Matrix3 getInverseInertiaTensor() { return this->inverseInertiaTensor; }
 
     void move(Vector3 displacement) { this->position += displacement; }
@@ -110,13 +114,15 @@ class RigidBody
 		void setSleeping(bool sleeping) { this->sleeping = sleeping; }
 		bool isSleeping() { return this->sleeping; }
 
-		bool isActive() { return !this->fixed && ! this->sleeping; }
+		bool isActive() { return !this->fixed && !this->sleeping; }
 
 		void setRestitution(double restitution) { this->restitution = restitution; }
 		double getRestitution() { return this->restitution; }
 
 		void setFriction(double friction) { this->friction = friction; }
 		double getFriction() { return this->friction; }
+
+		double getKineticEnergy();
 };
 
 #endif

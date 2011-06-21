@@ -207,7 +207,17 @@ void demoPachinko()
 	e->getDisplay_p()->setCamera(80, -30);
 
 	// Wall.
-	Box* wall = new Box(50, 50, 5, 1);
+	Box* wall = new Box(50, 50, 0.5, 1);
+	wall->setFixed(true);
+	e->addRigidBody_p(wall);
+
+	wall = new Box(3, 50, 20, 1);
+	wall->setPosition(-26.5, 0, 10);
+	wall->setFixed(true);
+	e->addRigidBody_p(wall);
+
+	wall = new Box(3, 50, 20, 1);
+	wall->setPosition(26.5, 0, 10);
 	wall->setFixed(true);
 	e->addRigidBody_p(wall);
 

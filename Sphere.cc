@@ -119,23 +119,22 @@ std::vector<Contact> Sphere::getContacts(CustomRigidBody* rb_p)
 {
 	std::vector<Contact> contacts;
 
-	Vector3 dirSphereToCustom = rb_p->getPosition() - this->position;
-	Vector3 closestSphere = this->position + this->radius * dirSphereToCustom.normalize();
+	Vector3 distance = Geometry::gjkDistance(this, rb_p).normalize();
+	Vector3 closestSphere = this->position + this->radius * distance.normalize();
 
   for(int i = 0; i < rb_p->structure.polygons.size(); ++i)
 	{
 		Polygon face = rb_p->structure.polygons[i].getPolygon();
 
-		double distance;
-		Vector3 closestCustom = Geometry::closestPointOfPolygon(closestSphere, face, &distance);
+		Vector3 distance = Geometry::gjkDistance(this, rb_p);
 
-		if(distance < 0.1)
+		if(distance.length() < 0.5)
 		{
 			Contact contact;
 
 			contact.a = this;
 			contact.b = rb_p;
-			contact.position = (closestCustom + closestSphere) / 2;
+			contact.position = closestSphere + distance;
 			contact.normal = Geometry::gjkDistance(this, rb_p).normalize();
 
 			contacts.push_back(contact);  

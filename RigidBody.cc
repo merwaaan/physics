@@ -6,7 +6,6 @@ extern Engine* E;
 
 RigidBody::RigidBody() :
 	restitution(0.1),
-	friction(0.9),
   fixed(false),
 	sleeping(false),
 	kineticEnergyLowFor(0),

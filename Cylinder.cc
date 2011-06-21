@@ -14,8 +14,8 @@ Cylinder::Cylinder(double radius, int sides, double height, double mass) :
 	double* z = new double[sides];
 	for(int i = 0; i < sides; ++i)
 	{
-		x[i] = radius * cos(i * a);
-		z[i] = radius * sin(i * a);
+		x[sides-i-1] = radius * cos(i * a); // Reverse the order for CCW drawing.
+		z[sides-i-1] = radius * sin(i * a);
 	}
 
 	// Add vertices.
@@ -23,16 +23,24 @@ Cylinder::Cylinder(double radius, int sides, double height, double mass) :
 	{
 		this->addVertex(i, x[i], -hh, z[i], m);
 		this->addVertex(i + sides, x[i], +hh, z[i], m);
-		std::cout << "added " << i << " and " << i + sides << std::endl;
 	}
 
-	// Link vertices.
+	// Link vertices of sides.
 	for(int i = 0; i < sides; ++i)
 		this->addPolygon(4, (int[]){i, i + sides, (i + 1) % sides + sides, (i + 1) % sides });
 
-	std::cout << 1 << std::endl;
-	delete[] x, z;
-	std::cout << 1 << std::endl;
+	// Link vertices of bottom and top.
+	int* bottom = new int[sides];
+	int* top = new int[sides];
+	for(int i = 0; i < sides; ++i)
+	{
+		bottom[i] = i;
+		top[i] = i + sides;
+	}
+	this->addPolygon(sides, bottom);
+	this->addPolygon(sides, top);
+
+	delete[] x, z, bottom, top;
 }
 
 Cylinder::~Cylinder()

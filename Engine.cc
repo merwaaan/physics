@@ -183,8 +183,8 @@ std::vector<Contact> Engine::predictContacts()
 	for(int i = 1; i < this->bodies_p.size(); ++i)
 		for(int j = 0; j < i; ++j)
 		{
-		  RigidBody* a = a->type == SPHERE ? a = new Sphere((Sphere&)*(this->bodies_p[i])) : a = new Box((Box&)*(this->bodies_p[i]));
-			RigidBody* b = b->type == SPHERE ? b = new Sphere((Sphere&)*(this->bodies_p[j])) : b = new Box((Box&)*(this->bodies_p[j]));
+		  RigidBody* a = a->getType() == SPHERE ? a = new Sphere((Sphere&)*(this->bodies_p[i])) : a = new Box((Box&)*(this->bodies_p[i]));
+			RigidBody* b = b->getType() == SPHERE ? b = new Sphere((Sphere&)*(this->bodies_p[j])) : b = new Box((Box&)*(this->bodies_p[j]));
 
 			// Integrate forward in time.
 			for(int k = 0; k < this->environmentalForces_p.size(); ++k)
@@ -240,8 +240,8 @@ Vector3* Engine::computeImpulse(Contact contact)
 
 	if(relativeVelocity > -0.5)
 	{
-		a->couldSleep = true;
-		b->couldSleep = true;
+		a->setCouldSleep(true);
+		b->setCouldSleep(true);
 	}
 
 	std::cout << "vrel " << relativeVelocity << " " << n << " " << a->getVelocity(p) << " " << b->getVelocity(p) << std::endl;

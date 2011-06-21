@@ -22,107 +22,104 @@ enum Dir{FORWARD, BACKWARD};
 
 class RigidBody
 {
-  public:
+protected:
 
-	  Type type;
+	Type type;
+	
+	double inverseMass;
+	Matrix3 inverseInertiaTensor;
+	
+	// LINEAR
+	Vector3 position;
+	Vector3 linearMomentum;
+	Vector3 accumulatedForces;
+	
+	// ANGULAR
+	Matrix3 orientation;
+	Vector3 angularMomentum;
+	Vector3 accumulatedTorques;
+	
+	BoundingBox boundingBox;
+	
+	// Cached auxiliary quantities
+	Vector3 linearVelocity;
+	Vector3 angularVelocity;
 
-//  protected:
+	double restitution;
 
-    double inverseMass;
-    Matrix3 inverseInertiaTensor;
+	bool fixed;
+	bool sleeping;
 
-    // LINEAR
-    Vector3 position;
-    Vector3 linearMomentum;
-    Vector3 accumulatedForces;
+	int kineticEnergyLowFor;
+	bool couldSleep;
 
-    // ANGULAR
-    Matrix3 orientation;
-    Vector3 angularMomentum;
-    Vector3 accumulatedTorques;
+public:
+	RigidBody();
+	~RigidBody();
 
-    BoundingBox boundingBox;
+	friend std::ostream& operator<<(std::ostream& os, const RigidBody& rb);
 
-    // Cached auxiliary quantities
-    Vector3 linearVelocity;
-    Vector3 angularVelocity;
+	virtual void prepare() = 0;
+	virtual void computeInverseInertiaTensor() = 0;
+	virtual void computeBoundingBox() = 0;
 
-		double restitution;
-		double friction;
+	void clearAccumulators();
+	void applyCenterForce(Vector3 force, double dt);
+	void applyOffCenterForce(Vector3 force, Vector3 poa, double dt);
 
-    bool fixed;
-		bool sleeping;
+	virtual void integrate(double dt);
+	void integrateBackward(double dt);
+	void reverseTime();
+	void handleSleep();
 
-		int kineticEnergyLowFor;
-		bool couldSleep;
+	virtual void draw() = 0;
 
-  public:
-    RigidBody();
-    ~RigidBody();
-
-    friend std::ostream& operator<<(std::ostream& os, const RigidBody& rb);
-
-    virtual void prepare() = 0;
-    virtual void computeInverseInertiaTensor() = 0;
-    virtual void computeBoundingBox() = 0;
-
-    void clearAccumulators();
-    void applyCenterForce(Vector3 force, double dt);
-    void applyOffCenterForce(Vector3 force, Vector3 poa, double dt);
-
-    virtual void integrate(double dt);
-		void integrateBackward(double dt);
-		void reverseTime();
-		void handleSleep();
-
-    virtual void draw() = 0;
-
-    bool isBoundingBoxCollidingWith(RigidBody* rb_p);
-    BoundingBox getBoundingBox();
+	bool isBoundingBoxCollidingWith(RigidBody* rb_p);
+	BoundingBox getBoundingBox();
     
-    std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt);
-		std::vector<Contact> resolveInterPenetration(RigidBody* rb_p, double dt, Dir direction, double TOI);
-		virtual std::vector<Contact> getContacts(RigidBody* rb_p) = 0;
-		virtual Vector3 getSupportPoint(Vector3 direction) = 0;
+	std::vector<Contact> isCollidingWith(RigidBody* rb_p, double dt);
+	std::vector<Contact> resolveInterPenetration(RigidBody* rb_p, double dt, Dir direction, double TOI);
+	virtual std::vector<Contact> getContacts(RigidBody* rb_p) = 0;
+	virtual Vector3 getSupportPoint(Vector3 direction) = 0;
 
-    double getInverseMass() { return this->isActive() ? this->inverseMass : 0; }
+	double getInverseMass() { return this->isActive() ? this->inverseMass : 0; }
 
-    Matrix3 getInverseInertiaTensor() { return this->inverseInertiaTensor; }
+	Matrix3 getInverseInertiaTensor() { return this->inverseInertiaTensor; }
 
-    void move(Vector3 displacement) { this->position += displacement; }
-    void setPosition(Vector3 position) { this->position = position; }
-    void setPosition(double x, double y, double z) { this->position = Vector3(x, y, z); }
-    Vector3 getPosition() { return this->position; }
+	void move(Vector3 displacement) { this->position += displacement; }
+	void setPosition(Vector3 position) { this->position = position; }
+	void setPosition(double x, double y, double z) { this->position = Vector3(x, y, z); }
+	Vector3 getPosition() { return this->position; }
 
-    void setOrientation(Matrix3 orientation) { this->orientation = orientation; }
-		Matrix3 getOrientation() { return this->orientation; }
+	void setOrientation(Matrix3 orientation) { this->orientation = orientation; }
+	Matrix3 getOrientation() { return this->orientation; }
 
-    Vector3 getVelocity() const;
-    Vector3 getVelocity(const Vector3& point) const;
+	Vector3 getVelocity() const;
+	Vector3 getVelocity(const Vector3& point) const;
+	double getKineticEnergy();
 
-    void setLinearMomentum(Vector3 momentum) { this->linearMomentum = momentum; }
-    void setLinearMomentum(double mx, double my, double mz) { this->linearMomentum = Vector3(mx, my, mz); }
-    Vector3 getLinearMomentum() { return this->linearMomentum; }
+	void setLinearMomentum(Vector3 momentum) { this->linearMomentum = momentum; }
+	void setLinearMomentum(double mx, double my, double mz) { this->linearMomentum = Vector3(mx, my, mz); }
+	Vector3 getLinearMomentum() { return this->linearMomentum; }
 
-    void setAngularMomentum(Vector3 momentum) { this->angularMomentum = momentum; }
-    void setAngularMomentum(double mx, double my, double mz) { this->angularMomentum = Vector3(mx, my, mz); }
-    Vector3 getAngularMomentum() { return this->angularMomentum; }
+	void setAngularMomentum(Vector3 momentum) { this->angularMomentum = momentum; }
+	void setAngularMomentum(double mx, double my, double mz) { this->angularMomentum = Vector3(mx, my, mz); }
+	Vector3 getAngularMomentum() { return this->angularMomentum; }
 
-    void setFixed(bool fixed) { this->fixed = fixed; }
-		bool isFixed() { return this->fixed; }
+	void setFixed(bool fixed) { this->fixed = fixed; }
+	bool isFixed() { return this->fixed; }
 
-		void setSleeping(bool sleeping) { this->sleeping = sleeping; }
-		bool isSleeping() { return this->sleeping; }
+	void setSleeping(bool sleeping) { this->sleeping = sleeping; }
+	bool isSleeping() { return this->sleeping; }
+	bool setCouldSleep(bool couldSleep) { this->couldSleep = couldSleep; }
+	bool getCouldSleep() { return this->couldSleep; }
 
-		bool isActive() { return !this->fixed && !this->sleeping; }
+	bool isActive() { return !this->fixed && !this->sleeping; }
 
-		void setRestitution(double restitution) { this->restitution = restitution; }
-		double getRestitution() { return this->restitution; }
+	void setRestitution(double restitution) { this->restitution = restitution; }
+	double getRestitution() { return this->restitution; }
 
-		void setFriction(double friction) { this->friction = friction; }
-		double getFriction() { return this->friction; }
-
-		double getKineticEnergy();
+	Type getType() { return this->type; }
 };
 
 #endif

@@ -188,10 +188,10 @@ void inputDemoPachinko(unsigned char k, int x, int y)
 
   if(k == 97) // A
   {
-	  Cube* c = new Cube(3, 3);
-	  c->setPosition(randomf()*40-20, 30, 10);
-		c->prepare();
-	  e->addRigidBody_p(c);
+	  Sphere* s = new Sphere(1, 1);
+	  s->setPosition(randomf()*40-20, 30, 10);
+		s->prepare();
+	  e->addRigidBody_p(s);
   }
 }
 
@@ -207,6 +207,11 @@ void demoPachinko()
 	wall->setFixed(true);
 	e->addRigidBody_p(wall);
 
+	Matrix3 o;
+	o.setRow(0, Vector3(1, 0, 0));
+	o.setRow(1, Vector3(0, 0, -1));
+	o.setRow(2, Vector3(0, -1, 0));
+
 	// Pins (odd)
 	for(int i = 0; i < 5; ++i)
 	{
@@ -214,8 +219,9 @@ void demoPachinko()
 
 		for(int j = 0; j < 5; ++j)
 		{
-			Box* pin = new Box(1, 1, 20, 1);
+			Cylinder* pin = new Cylinder(1, 10, 20,1);
 			pin->setPosition(j * 10 - 25 + 5, i * 10 - 25 + 5, 10);
+			pin->setOrientation(o);
 			pin->setFixed(true);
 			e->addRigidBody_p(pin);
 		}
@@ -228,8 +234,9 @@ void demoPachinko()
 
 		for(int j = 0; j < 4; ++j)
 		{
-			Box* pin = new Box(1, 1, 20, 1);
+			Cylinder* pin = new Cylinder(1, 10, 20,1);
 			pin->setPosition(j * 10 - 25 + 10, i * 10 - 25 + 5, 10);
+			pin->setOrientation(o);
 			pin->setFixed(true);
 			e->addRigidBody_p(pin);
 		}
@@ -335,7 +342,7 @@ int main(int argc, char** argv)
   //testTimeReversing();
 
 	//demoZeroG();
-  demoBoxes();
+  //demoBoxes();
 	demoPachinko();
 	//demoStairs();
   //demoRope();

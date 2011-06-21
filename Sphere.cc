@@ -80,7 +80,7 @@ void Sphere::draw()
 
 std::vector<Contact> Sphere::getContacts(RigidBody* rb_p)
 {
-	if(rb_p->type == SPHERE)
+	if(rb_p->getType() == SPHERE)
 		return this->getContacts((Sphere*)rb_p);
 
 	return this->getContacts((CustomRigidBody*)rb_p);

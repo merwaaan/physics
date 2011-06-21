@@ -174,6 +174,12 @@ void CustomRigidBody::draw()
   {
     Vector3 normal = this->structure.polygons[i].getNormal();
 
+		// Check if the normal is directed outward.
+		/*Vector3 outward = this->structure.polygons[0].vertices_p[0]->localPosition - this->position;
+		if(normal * outward < 0)
+			normal = normal.negate();
+		*/
+
     glBegin(GL_POLYGON);
 
     // draw each vertex
@@ -221,7 +227,7 @@ void CustomRigidBody::computeVerticesAbsolutePositions()
 
 std::vector<Contact> CustomRigidBody::getContacts(RigidBody* rb_p)
 {
-	if(rb_p->type == CUSTOM)
+	if(rb_p->getType() == CUSTOM)
 		return this->getContacts((CustomRigidBody*)rb_p);
 
 	return ((Sphere*)rb_p)->getContacts((CustomRigidBody*)this);

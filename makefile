@@ -2,6 +2,7 @@ EXEC=demo
 COMP=g++
 OBJ= \
 	Box.o \
+	Cylinder.o \
 	Constraint.o \
 	CustomRigidBody.o \
 	Demo.o \

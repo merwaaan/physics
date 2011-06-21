@@ -2,6 +2,7 @@
 #include <GL/glut.h>
 
 #include "Box.h"
+#include "Cylinder.h"
 #include "Engine.h"
 #include "Geometry.h"
 #include "Sphere.h"
@@ -128,8 +129,9 @@ void inputDemoBoxes(unsigned char k, int x, int y)
 
   if(k == 97) // A
   {
-	  Box* c = new Box(randomf()*10, randomf()*10, randomf()*10, 10);
-	  c->setPosition(randomf()*50-25, 10, randomf()*50-25);
+	  //Box* c = new Box(randomf()*10, randomf()*10, randomf()*10, 10);
+		Cylinder* c = new Cylinder(1, 6, 5, 1);
+		c->setPosition(randomf()*50-25, 10, randomf()*50-25);
 		c->prepare();
 	  e->addRigidBody_p(c);
   }
@@ -197,6 +199,8 @@ void demoPachinko()
 {
 	srand(1);
   glutKeyboardFunc(&inputDemoPachinko);
+
+	e->getDisplay_p()->setCamera(80, -30);
 
 	// Wall.
 	Box* wall = new Box(50, 50, 5, 1);
@@ -331,7 +335,7 @@ int main(int argc, char** argv)
   //testTimeReversing();
 
 	//demoZeroG();
-  //demoBoxes();
+  demoBoxes();
 	demoPachinko();
 	//demoStairs();
   //demoRope();

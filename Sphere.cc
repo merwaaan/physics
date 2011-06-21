@@ -28,9 +28,7 @@ void Sphere::prepare()
     this->inverseInertiaTensor.reset();
   }
   else
-  {
     this->computeInverseInertiaTensor();
-  }
 
   this->computeBoundingBox();
 }

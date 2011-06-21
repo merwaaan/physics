@@ -16,7 +16,7 @@ struct BoundingBox
   Vector3 b;
 };
 
-enum Type{SPHERE, BOX};
+enum Type{SPHERE, CUSTOM};
 
 enum Dir{FORWARD, BACKWARD};
 

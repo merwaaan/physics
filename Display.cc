@@ -55,6 +55,12 @@ void Display::run()
   glutMainLoop();
 }
 
+void Display::setCamera(double radius, double angle)
+{
+	camera.radius = radius;
+	camera.angle = angle;
+}
+
 void Display::setBoundingBoxesDrawn(bool draw)
 {
   this->drawBoundingBoxes = draw;
@@ -90,10 +96,11 @@ void update()
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     Camera* cam_p = E->getDisplay_p()->getCamera_p();
+		double angleRad = cam_p->angle * M_PI/180;
     gluLookAt(
-      cam_p->radius * sin(cam_p->angle),
+      cam_p->radius * sin(angleRad),
       10,
-      cam_p->radius * cos(cam_p->angle),
+      cam_p->radius * cos(angleRad),
       0, 0, 0,
       0, 1, 0);
 		
@@ -120,7 +127,7 @@ void mouseMoved(int x, int y)
   if(cam_p->lastX < 0)
     cam_p->lastX = x;
 
-  cam_p->angle += 0.01 * (x - cam_p->lastX);
+  cam_p->angle += 0.4 * (x - cam_p->lastX);
   cam_p->lastX = x;
 }
 

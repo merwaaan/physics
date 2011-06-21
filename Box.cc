@@ -5,13 +5,10 @@ Box::Box(double width, double height, double depth, double mass) :
   height(height),
   depth(depth)
 {
-	this->type = BOX;
-
 	double hw = width / 2;
 	double hh = height / 2;
 	double hd = depth / 2;
-
-	double m = mass/8;
+	double m = mass / 8;
 
   this->addVertex(0, -hw, hh, hd, m);
   this->addVertex(1, -hw, -hh, hd, m);
@@ -38,13 +35,14 @@ void Box::computeInverseInertiaTensor()
 {
   Matrix3 inertiaTensor;
 
+	double m = (1/this->inverseMass) / 12;
 	double sh = this->height * this->height;
 	double sw = this->width * this->width;
 	double sd = this->depth * this->depth;
 
-  inertiaTensor.set(0, 0, 1 / this->inverseMass / 12 * (sh + sd));
-  inertiaTensor.set(1, 1, 1 / this->inverseMass / 12 * (sw + sd));
-  inertiaTensor.set(2, 2, 1 / this->inverseMass / 12 * (sw + sh));
+  inertiaTensor.set(0, 0, m * (sh + sd));
+  inertiaTensor.set(1, 1, m * (sw + sd));
+	inertiaTensor.set(2, 2, m * (sw + sh));
 
   this->inverseInertiaTensor = inertiaTensor.inverse();
 }

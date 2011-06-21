@@ -11,6 +11,7 @@ extern Engine* E;
 
 CustomRigidBody::CustomRigidBody()
 {
+	this->type = CUSTOM;
 }
 
 CustomRigidBody::~CustomRigidBody()
@@ -220,7 +221,7 @@ void CustomRigidBody::computeVerticesAbsolutePositions()
 
 std::vector<Contact> CustomRigidBody::getContacts(RigidBody* rb_p)
 {
-	if(rb_p->type == BOX)
+	if(rb_p->type == CUSTOM)
 		return this->getContacts((CustomRigidBody*)rb_p);
 
 	return ((Sphere*)rb_p)->getContacts((CustomRigidBody*)this);

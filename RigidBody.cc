@@ -112,7 +112,6 @@ void RigidBody::reverseTime()
 
 void RigidBody::handleSleep()
 {
-	std::cout << "kkkkkk " << this->getKineticEnergy() << " could" << this->couldSleep << std::endl;
 	if(this->couldSleep == true && this->getKineticEnergy() < 3)
 	{
 		++this->kineticEnergyLowFor;
@@ -149,7 +148,7 @@ std::vector<Contact> RigidBody::isCollidingWith(RigidBody* rb_p, double dt)
 	bool interPenetration;
 	Vector3 distance = Geometry::gjkDistance(this, rb_p, &interPenetration);
 
-	std::cout << "ip " << interPenetration << " dist " << distance << std::endl;
+	std::cout << "distance " << distance << std::endl;
 
   // Check for a true collision.
 	if(!interPenetration)
@@ -168,7 +167,7 @@ std::vector<Contact> RigidBody::resolveInterPenetration(RigidBody* rb_p, double 
 	bool interPenetration;
   Vector3 distance = Geometry::gjkDistance(this, rb_p, &interPenetration);
 
-  std::cout << "d = " << distance.length() << " ip = " << interPenetration << std::endl;
+  std::cout << "distance " << distance.length() << std::endl;
 
   // If the bodies are too far apart, integrate forward in time.
   if(!interPenetration && distance.length() > E->getCollisionTolerance())

@@ -63,7 +63,7 @@ void Engine::updateFixed()
 			// Broad-phase test.
 			if(this->bodies_p[i]->isBoundingBoxCollidingWith(this->bodies_p[j]))
 			{
-				std::cout << "bounding box collision detected between #" << i << " and #" << j << std::endl;
+				std::cout << "AABB collision between #" << i << " and #" << j << std::endl;
 				
 				// Narrow-phase test.
 				std::vector<Contact> contacts = this->bodies_p[i]->isCollidingWith(this->bodies_p[j], this->timeStep);
@@ -76,7 +76,7 @@ void Engine::updateFixed()
 					if(contacts[0].b->isSleeping())
 						contacts[0].b->setSleeping(false);
 
-					std::cout << "exact collision detected between #" << i << " and #" << j << std::endl;
+					std::cout << "GJK collision detected between #" << i << " and #" << j << std::endl;
 					
 					// Security check for swapped pointers to the bodies.
 					contacts = this->checkContacts(contacts);
@@ -244,8 +244,6 @@ Vector3* Engine::computeImpulse(Contact contact)
 		b->setCouldSleep(true);
 	}
 
-	std::cout << "vrel " << relativeVelocity << " " << n << " " << a->getVelocity(p) << " " << b->getVelocity(p) << std::endl;
-
 	// displacements of the contact points with respect to the center of mass of each body
 	Vector3 da = p - a->getPosition();
 	Vector3 db = p - b->getPosition();
@@ -268,7 +266,7 @@ Vector3* Engine::computeImpulse(Contact contact)
 	Vector3 impulseA = impulse;
 	Vector3 impulseB = impulse * -1;
 
-	std::cout << "impulse A " << impulseA << " at " << contact.position << " " << a->getPosition() - contact.position << std::endl;
+	std::cout << "impulse" << impulseA << " at " << contact.position << " " << a->getPosition() - contact.position << std::endl;
 	
 	return (Vector3[]){impulseA, impulseB};
 }

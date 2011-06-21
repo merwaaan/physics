@@ -197,7 +197,7 @@ void inputDemoPachinko(unsigned char k, int x, int y)
 
 void demoPachinko()
 {
-	srand(1);
+	srand(68760);
   glutKeyboardFunc(&inputDemoPachinko);
 
 	e->getDisplay_p()->setCamera(80, -30);

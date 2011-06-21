@@ -133,6 +133,9 @@ std::vector<Contact> Sphere::getContacts(CustomRigidBody* rb_p)
 			contact.normal = (closest - point).normalize();
 			
 			contacts.push_back(contact);  
+
+			// No need to continue, only one possible contact.
+			return contacts;
 		}
 	}
 

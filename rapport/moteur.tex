@@ -347,19 +347,23 @@ corps sont démultipliés de la sorte, le temps de maintenance d'une
 telle structure sera augmenté.
 
 Une variante plus subtile de partitionnement de l'espace est
-l'utilisation de \textit{quadtrees} (\textit{octrees} en trois
-dimensions). Cette structure prend la forme d'un arbre représentant
-l'espace à subdiviser. Chaque n\oe ud de l'arbre possède quatre fils,
-chacun correspondant à un quadrant de la surface du père. Lorsqu'un
-corps est introduit dans la simulation, ou quand un corps déjà
-existant se déplace, il faut le ranger dans l'arbre. Pour ce faire, on
-part de la racine et on descend récursivement jusqu'à ce que le corps
-soit trop volumineux pour appartenir à une subdivision de l'espace,
-auquel cas on le stocke dans le père. Habituellement, un objet
-volumineux se situera vers le haut de l'arbre car les n\oe uds
-inférieurs ne peuvent pas l'accueillir.
+l'utilisation d'\textit{octrees} (\textit{quadtrees} en deux
+dimensions). Cette structure de données prend la forme d'un arbre
+représentant l'espace à subdiviser. Chaque n\oe ud de l'arbre possède
+huit fils, chacun correspondant à un octant du volume de leur père. La
+racine de l'arbre est associée au volume complet de l'environnement
+que l'on souhaite diviser. Lorsqu'un corps est introduit dans la
+simulation, il faut le ranger dans l'arbre. Pour ce faire, on part de
+la racine et on descend récursivement jusqu'à une feuille de l'arbre
+en se guidant dans les embranchements selon la position et le volume
+de l'objet à insérer. L'octree n'est pas nécessairement équilibré et
+plus une zone contient de corps et plus elle pourra être subdivisée.
 
-Cette structure sert à stocker les corps de la simulation, et si on
-l'implémenter elle remplacerait la liste qui contient nos objets et
+Cette structure sert à stocker les corps de la simulation, et si nous
+l'implémentions elle remplacerait la liste qui contient nos objets et
 dont l'ordre est actuellement arbitraire. Elle devient
-particulièrement intéressante lors
+particulièrement intéressante lors de la phase de détection de
+collision car il n'est plus désormais nécessaire de tester tous les
+corps deux à deux; il suffit de vérifier les collisions entre les
+corps du même sous-espace, autrement dit avec tous ceux contenus dans
+la même feuille.

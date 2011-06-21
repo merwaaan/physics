@@ -401,7 +401,7 @@ corps rigide est structuré par trois types d'élément : les sommets,
 les arêtes et les faces et il est usuellement admis que seuls les
 contacts sommet-face et arête-arête sont nécessaires à nos
 besoins. Les autres associations d'éléments peuvent être ramenées à
-des configurations dégénérés de ces deux cas. Par exemple, un contact
+des configurations dégénérées de ces deux cas. Par exemple, un contact
 entre une arête et une face peut être assimilée à deux contacts
 sommet-face, chaque sommet étant une extrémité de l'arête. La figure
 \ref{contacts} illustre une configuration comprenant quatre points de
@@ -420,17 +420,18 @@ contact : deux sommet-face (en rose) et deux arête-arête (en bleu).
 Pour énumérer les points de contact entre deux corps, on effectue des
 tests de proximité entre chaque paire sommet-face et
 arête-arête. Cette phase repose sur plusieurs procédures géométriques
-utilitaires, qui déterminent la plus faible distance entre deux
-éléments par projection. Ici aussi, on utilise un seuil de tolérance
-adapté et en accord avec celui utilisé lors de la correction de l'état
-collisionnel afin de juger si deux éléments sont en contact.
+utilitaires qui déterminent la plus faible distance entre deux
+éléments par projection. On considère que deux éléments sont en
+contact si leur distance est inférieure à un seuil fixé qui doit être
+en accord avec celui utilisé lors de la correction de l'état
+collisionnel.
 
 Nous référerons désormais aux informations concernant un point de
 contact entre deux corps en tant que \textit{contact}. Un contact ne
 s'agit pas uniquement d'une unique position à laquelle deux corps se
-touchent, il doit aussi renseigner sur la direction de la collision,
-et contiendra donc un vecteur normal $\vec{n}$ qui variera selon le
-type de contact. Pour un contact sommet-face, il s'agira d'un vecteur
+touchent, il doit aussi renseigner sur la direction de la collision et
+contiendra donc un vecteur normal $\vec{n}$ qui variera selon le type
+de contact. Pour un contact sommet-face, il s'agira d'un vecteur
 normal à la face et dirigée vers le sommet. Pour un contact
 arête-arête, il s'agira d'un vecteur unité orthogonal aux deux arêtes,
 et donc de direction $\vec{a}_1 \times \vec{a}_2$, avec $\vec{a}_1$
@@ -499,9 +500,9 @@ absolu.
 
 Pour obtenir, la vitesse relative normale, il reste à projeter sur la
 normale du contact considéré la vitesse relative du point de contact
-par rapport aux référentiels locaux des deux corps. Ici, $\vec{v}_a$
-et $\vec{v}_b$ correspondent aux vitesses du point de contact par
-rapport aux référentiels de $A$ et de $B$.
+par rapport aux référentiels des deux corps. Ici, $\vec{v}_a$ et
+$\vec{v}_b$ correspondent aux vitesses du point de contact par rapport
+aux repères locaux de $A$ et de $B$.
 \begin{align*}
   v_r &= \vec{n} (\vec{v}_{A} - \vec{v}_{B})
 \end{align*}
@@ -523,5 +524,40 @@ formule de Newton.
 Les vecteurs $\vec{r}_A$ et $\vec{r}_B$ correspondent aux positions du
 point de contact dans les référentiels respectifs des corps $A$ et $B$.
 
-[cas des contact de repos]
-[sommeil]
+Une fois l'impulsion calculée, il reste à l'appliquer à un des deux
+corps impliqué dans la collision et à appliquer son inverse à l'autre
+corps pour les séparer.
+
+Il nous reste à traîter le cas des contacts de repos, c'est à dire les
+collisions entre solides posés l'un contre l'autre, comme par exemple
+une boîte placée sur la surface d'une table. Nous avons évoqué plus
+tôt le fait que les contacts de repos sont analogues aux contacts
+classiques dans la mesure o\`u la séparation des deux corps sera
+exécutée par des impulsions. La seule différence vient du fait que
+dans ce cas, on forcera l'utilisation d'un coefficient de restitution
+nul, afin de produire des impulsions non-élastiques. Autrement dit,
+les objets seront séparés afin de d'éliminer toute interpénétration
+mais aucun rebond supplémentaire ne sera injecté dans la formule. Pour
+détecter s'il est nécessaire d'appliquer un tel traitement, on vérifie
+si la vitesse relative normale des objets considérés est inférieure à
+un seuil fixé.
+
+Bien que ce choix permette de simuler le repos d'un corps, il souffre
+de défauts majeurs, notamment le fait qu'à cause de l'utilisation
+d'impulsions, si faibles soit-elles, on remarque un léger effet de
+vibration provoqué par les forces qu'un corps subit continuellement
+pour rester à la surface d'une autre. Parfois, un corps au repos
+accumulera même tellement d'énergie qu'un faible rebond sera
+perceptible. Ce type d'occurence appauvrit grandement la stabilité du
+système. Pour les contrer, on désactive temporairement les objets en
+état de repos; on parle de mise en sommeil. L'avantage est double
+puisqu'en plus d'améliorer la stabilité générale, on économise les
+ressources car les corps endormis ne sont plus intégrés. Pour
+déterminer si un objet doit être mis en sommeil, on observe la
+magnitude de sa vitesse. On ne peut pas se baser sur ce facteur de
+façon instantanée car un solide projeté en hauteur aura une vitesse
+nulle au sommet de sa trajectoire et on ne voudrait pas l'endormir à
+ce moment. On surveille plutôt sa vitesse pendant un nombre fixé de
+mises à jour et on l'endort si elle reste faible assez longtemps. On
+réveille un corps quand un objet actif génère une collision avec ce
+dernier.

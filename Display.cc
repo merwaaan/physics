@@ -11,7 +11,7 @@ Display::Display(int* argc, char** argv, int w, int h) :
   drawBoundingBoxes(false)
 {
   glutInit(argc, argv);
-  glutInitDisplayMode(GLUT_RGBA | GLUT_DOUBLE | GLUT_DEPTH);
+  glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
   glutInitWindowSize(w, h);
   glutCreateWindow("Demo");
 
@@ -35,7 +35,9 @@ Display::Display(int* argc, char** argv, int w, int h) :
   GLfloat lightPosition[] = {5, 10, 0.0, 1.0};
   glLightfv(GL_LIGHT0, GL_POSITION, lightPosition);
   
-  glutDisplayFunc(&update);
+	glEnable(GL_COLOR_MATERIAL);
+  
+	glutDisplayFunc(&update);
   glutMouseFunc(&mousePressed);
   glutPassiveMotionFunc(&mouseMoved);
 
@@ -92,7 +94,6 @@ void update()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(50, 1, 1, 2000);
-    //glOrtho(-100, 100, -100, 100, 1, 200);
 
     // Set the camera.
     glMatrixMode(GL_MODELVIEW);

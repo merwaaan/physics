@@ -53,6 +53,8 @@ protected:
 	int kineticEnergyLowFor;
 	bool couldSleep;
 
+	float* color;
+
 public:
 	RigidBody();
 	~RigidBody();
@@ -120,6 +122,9 @@ public:
 	double getRestitution() { return this->restitution; }
 
 	Type getType() { return this->type; }
+
+	void setColor(int r, int g, int b);
+	float* getColor() { return this->color; }
 };
 
 #endif

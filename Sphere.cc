@@ -17,62 +17,69 @@ Sphere::Sphere(double radius, double mass) :
 	this->inverseMass= 1/mass;
 
 	this->restitution = 0.2;
-}
+ }
 
-Sphere::~Sphere()
-{
-}
+ Sphere::~Sphere()
+ {
+ }
 
-void Sphere::prepare()
-{
-  if(this->fixed)
-  {
-    this->inverseMass = 0;
-    this->inverseInertiaTensor.reset();
-  }
-  else
-    this->computeInverseInertiaTensor();
+ void Sphere::prepare()
+ {
+	 if(this->fixed)
+	 {
+		 this->inverseMass = 0;
+		 this->inverseInertiaTensor.reset();
+	 }
+	 else
+		 this->computeInverseInertiaTensor();
 
-  this->computeBoundingBox();
-}
+	 this->computeBoundingBox();
+ }
 
-/**
- * Compute the inverse inertia tensor
- */
-void Sphere::computeInverseInertiaTensor()
-{
-  double i = (2.0 / 5) * (1 / this->inverseMass) * this->radius * this->radius;
-  
-  Matrix3 inertiaTensor;
-  inertiaTensor.set(0, 0, i);
-  inertiaTensor.set(1, 1, i);
-  inertiaTensor.set(2, 2, i);
+ /**
+	* Compute the inverse inertia tensor
+	*/
+ void Sphere::computeInverseInertiaTensor()
+ {
+	 double i = (2.0 / 5) * (1 / this->inverseMass) * this->radius * this->radius;
 
-  this->inverseInertiaTensor = inertiaTensor.inverse();
-}
+	 Matrix3 inertiaTensor;
+	 inertiaTensor.set(0, 0, i);
+	 inertiaTensor.set(1, 1, i);
+	 inertiaTensor.set(2, 2, i);
 
-/**
- * Compute the bounding box
- */
-void Sphere::computeBoundingBox()
-{
-  this->boundingBox.a = this->position + Vector3(-this->radius, -this->radius, -this->radius);
-  this->boundingBox.b = this->position + Vector3(this->radius, this->radius, this->radius);
-}
+	 this->inverseInertiaTensor = inertiaTensor.inverse();
+ }
 
-void Sphere::integrate(double dt)
-{
-  RigidBody::integrate(dt);
+ /**
+	* Compute the bounding box
+	*/
+ void Sphere::computeBoundingBox()
+ {
+	 this->boundingBox.a = this->position + Vector3(-this->radius, -this->radius, -this->radius);
+	 this->boundingBox.b = this->position + Vector3(this->radius, this->radius, this->radius);
+ }
 
-  this->computeBoundingBox();
-}
+ void Sphere::integrate(double dt)
+ {
+	 RigidBody::integrate(dt);
 
-void Sphere::draw()
-{
-  glPushMatrix();
+	 this->computeBoundingBox();
+ }
 
-  glTranslatef(this->position.X(), this->position.Y(), this->position.Z());
-  glutSolidSphere(this->radius, 20, 20);
+ void Sphere::draw()
+ {
+	 glPushMatrix();
+
+	 glTranslatef(this->position.X(), this->position.Y(), this->position.Z());
+
+	 glColor3f(this->color[0], this->color[1], this->color[2]);
+
+	 // From http://techiethings.blogspot.com/2008/12/opengl-solid-sphere-without-glut.html
+	 GLUquadricObj* quadric = gluNewQuadric();
+	 gluQuadricDrawStyle(quadric, GLU_FILL);
+	 gluSphere(quadric, this->radius, 20, 20);
+	 gluDeleteQuadric(quadric);
 
   // draw the bounding box
   if(E->areBoundingBoxesDrawn())

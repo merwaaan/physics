@@ -169,20 +169,16 @@ void CustomRigidBody::integrate(double dt)
  */
 void CustomRigidBody::draw()
 {
-  // draw each polygon
+  // Draw each polygon.
   for(int i = 0; i < this->structure.polygons.size(); ++i)
   {
     Vector3 normal = this->structure.polygons[i].getNormal();
 
-		// Check if the normal is directed outward.
-		/*Vector3 outward = this->structure.polygons[0].vertices_p[0]->localPosition - this->position;
-		if(normal * outward < 0)
-			normal = normal.negate();
-		*/
-
     glBegin(GL_POLYGON);
 
-    // draw each vertex
+		glColor3f(this->color[0], this->color[1], this->color[2]);
+
+    // Draw each vertex.
     for(int j = 0; j < this->structure.polygons[i].size; ++j)
     {
       glNormal3f(normal.X(), normal.Y(), normal.Z());
@@ -196,7 +192,7 @@ void CustomRigidBody::draw()
     glEnd();
   }
 
-  // draw the bounding box
+  // Draw the bounding box.
   if(E->areBoundingBoxesDrawn())
   {
     glPushMatrix();

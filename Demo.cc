@@ -193,9 +193,10 @@ void inputDemoPachinko(unsigned char k, int x, int y)
   {
 		for(int i = 0; i < 3; ++i)
 		{
-			Sphere* s = new Sphere(1, 1);
+			Sphere* s = new Sphere(1.3, 1);
 			double offset = randomf()*5;
 			s->setPosition(-15 + i * 10 + offset, 30 + randomf()*5-2.5, 10);
+			s->setColor(100, 100, 100);
 			s->prepare();
 			e->addRigidBody_p(s);
 		}
@@ -207,20 +208,23 @@ void demoPachinko()
 	srand(0);
   glutKeyboardFunc(&inputDemoPachinko);
 
-	e->getDisplay_p()->setCamera(80, -30, 20);
+	e->getDisplay_p()->setCamera(90, -30, 25);
 
 	// Wall.
 	Box* wall = new Box(50, 50, 0.5, 1);
+	wall->setColor(232, 127, 2);
 	wall->setFixed(true);
 	e->addRigidBody_p(wall);
 
 	wall = new Box(3, 50, 20, 1);
 	wall->setPosition(-26.5, 0, 10);
+ 	wall->setColor(232, 127, 2);
 	wall->setFixed(true);
 	e->addRigidBody_p(wall);
 
 	wall = new Box(3, 50, 20, 1);
 	wall->setPosition(26.5, 0, 10);
+	wall->setColor(232, 127, 2);
 	wall->setFixed(true);
 	e->addRigidBody_p(wall);
 
@@ -239,6 +243,8 @@ void demoPachinko()
 			Cylinder* pin = new Cylinder(1, 30, 20,1);
 			pin->setPosition(j * 10 - 25 + 5, i * 10 - 25 + 5, 10);
 			pin->setOrientation(o);
+			pin->setColor(73, 10, 61);
+			pin->setColor(220, 140, 50);
 			pin->setFixed(true);
 			e->addRigidBody_p(pin);
 		}
@@ -254,6 +260,7 @@ void demoPachinko()
 			Cylinder* pin = new Cylinder(1, 30, 20,1);
 			pin->setPosition(j * 10 - 25 + 10, i * 10 - 25 + 5, 10);
 			pin->setOrientation(o);
+			pin->setColor(220, 140, 50);
 			pin->setFixed(true);
 			e->addRigidBody_p(pin);
 		}

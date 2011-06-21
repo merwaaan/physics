@@ -15,10 +15,14 @@ RigidBody::RigidBody() :
   this->orientation.set(0, 0, 1);
   this->orientation.set(1, 1, 1);
   this->orientation.set(2, 2, 1);
+
+	this->color = new float[3];
+	this->color[0] = this->color[1] = this->color[2] = 0.5;
 }
 
 RigidBody::~RigidBody()
 {
+	delete[] this->color;
 }
 
 std::ostream& operator<<(std::ostream& os, const RigidBody& rb)
@@ -235,4 +239,11 @@ Vector3 RigidBody::getVelocity(const Vector3& point) const
 double RigidBody::getKineticEnergy()
 {
 	return (1/this->getInverseMass()) * pow(this->getVelocity().length(), 2) / 2;
+}
+
+void RigidBody::setColor(int r, int g, int b)
+{
+	this->color[0] = r/255.;
+	this->color[1] = g/255.;
+	this->color[2] = b/255.;
 }

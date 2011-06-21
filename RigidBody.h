@@ -109,7 +109,7 @@ public:
 	void setFixed(bool fixed) { this->fixed = fixed; }
 	bool isFixed() { return this->fixed; }
 
-	void setSleeping(bool sleeping) { this->sleeping = sleeping; }
+	void setSleeping(bool sleeping) { this->sleeping = sleeping; std::cout << "sleeeep" << std::endl;}
 	bool isSleeping() { return this->sleeping; }
 	bool setCouldSleep(bool couldSleep) { this->couldSleep = couldSleep; }
 	bool getCouldSleep() { return this->couldSleep; }

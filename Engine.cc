@@ -106,7 +106,7 @@ void Engine::updateFixed()
 	
 	this->lastUpdateTime += this->timeStep;
 	
-	this->cleanUp();
+	//this->cleanUp();
 }
 
 void Engine::updateContinuous()
@@ -238,6 +238,8 @@ Vector3* Engine::computeImpulse(Contact contact)
   double relativeVelocity = n * (a->getVelocity(p) - b->getVelocity(p));
 	if(relativeVelocity > 0) relativeVelocity *= -1;
 
+	std::cout << relativeVelocity << " " << p << " " << n << std::endl;
+
 	if(relativeVelocity > -0.5)
 	{
 		a->setCouldSleep(true);
@@ -266,8 +268,10 @@ Vector3* Engine::computeImpulse(Contact contact)
 	Vector3 impulseA = impulse;
 	Vector3 impulseB = impulse * -1;
 
-	std::cout << "impulse" << impulseA << " at " << contact.position << " " << a->getPosition() - contact.position << std::endl;
-	
+	std::cout << Geometry::gjkDistance(a, b) << " hinhiii" << std::endl;
+
+	std::cout << "impulse " << impulseA << " at " << contact.position << " " << a->getPosition() - contact.position << std::endl;
+
 	return (Vector3[]){impulseA, impulseB};
 }
 

@@ -3,6 +3,7 @@
 #include <GL/glut.h>
 
 #include "CustomRigidBody.h"
+#include "Cylinder.h"
 #include "Display.h"
 #include "Engine.h"
 
@@ -94,16 +95,21 @@ std::vector<Contact> Sphere::getContacts(Sphere* s_p)
 	Vector3 closest1 = this->position + from1to2.normalize() * this->radius;
 	Vector3 closest2 = s_p->getPosition() + (-1 * from1to2).normalize() * s_p->getRadius();
 
-	//if((closest1 - closest2).length() < E->getTolerance())
-	if(closest1 == closest2)
-	{
-		Contact c;
-		c.a = this;
-		c.b = s_p;
-		c.position = closest1 + (closest2 - closest1) / 2;
-		c.normal = from1to2.normalize();
+	Vector3 distance = Geometry::gjkDistance(this, s_p);
 
-		contacts.push_back(c);
+	if(distance.length() < 0.1)
+	{
+		Contact contact;
+
+		contact.a = this;
+		contact.b = s_p;
+		contact.position = closest1 + (closest2 - closest1) / 2;
+		contact.normal = distance.normalize();
+
+		contacts.push_back(contact);
+
+		// No need to continue, only possible contact.
+		return contacts;
 	}
 
 	return contacts;
@@ -114,24 +120,24 @@ std::vector<Contact> Sphere::getContacts(CustomRigidBody* rb_p)
 	std::vector<Contact> contacts;
 
 	Vector3 dirSphereToCustom = rb_p->getPosition() - this->position;
-	Vector3 closest = this->position + this->radius * dirSphereToCustom.normalize();
+	Vector3 closestSphere = this->position + this->radius * dirSphereToCustom.normalize();
 
   for(int i = 0; i < rb_p->structure.polygons.size(); ++i)
 	{
 		Polygon face = rb_p->structure.polygons[i].getPolygon();
 
 		double distance;
-		Vector3 point = Geometry::closestPointOfPolygon(closest, face, &distance);
+		Vector3 closestCustom = Geometry::closestPointOfPolygon(closestSphere, face, &distance);
 
 		if(distance < 0.1)
 		{
 			Contact contact;
-			
-			contact.a = rb_p;
-			contact.b = this;
-			contact.position = point;
-			contact.normal = (closest - point).normalize();
-			
+
+			contact.a = this;
+			contact.b = rb_p;
+			contact.position = (closestCustom + closestSphere) / 2;
+			contact.normal = Geometry::gjkDistance(this, rb_p).normalize();
+
 			contacts.push_back(contact);  
 
 			// No need to continue, only one possible contact.

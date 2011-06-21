@@ -188,16 +188,20 @@ void inputDemoPachinko(unsigned char k, int x, int y)
 
   if(k == 97) // A
   {
-	  Sphere* s = new Sphere(1, 1);
-	  s->setPosition(randomf()*40-20, 30, 10);
-		s->prepare();
-	  e->addRigidBody_p(s);
+		for(int i = 0; i < 3; ++i)
+		{
+			Sphere* s = new Sphere(1, 1);
+			double offset = randomf()*5;
+			s->setPosition(-15 + i * 10 + offset, 30 + randomf()*5-2.5, 10);
+			s->prepare();
+			e->addRigidBody_p(s);
+		}
   }
 }
 
 void demoPachinko()
 {
-	srand(68760);
+	srand(0);
   glutKeyboardFunc(&inputDemoPachinko);
 
 	e->getDisplay_p()->setCamera(80, -30);
@@ -212,14 +216,14 @@ void demoPachinko()
 	o.setRow(1, Vector3(0, 0, -1));
 	o.setRow(2, Vector3(0, -1, 0));
 
-	// Pins (odd)
+	// Pins (even)
 	for(int i = 0; i < 5; ++i)
 	{
 		if(i % 2) continue;
 
 		for(int j = 0; j < 5; ++j)
 		{
-			Cylinder* pin = new Cylinder(1, 10, 20,1);
+			Cylinder* pin = new Cylinder(1, 30, 20,1);
 			pin->setPosition(j * 10 - 25 + 5, i * 10 - 25 + 5, 10);
 			pin->setOrientation(o);
 			pin->setFixed(true);
@@ -227,14 +231,14 @@ void demoPachinko()
 		}
 	}
 
-	// Pins (even)
+	// Pins (odd)
 	for(int i = 0; i < 5; ++i)
 	{
 		if(!(i % 2)) continue;
 
 		for(int j = 0; j < 4; ++j)
 		{
-			Cylinder* pin = new Cylinder(1, 10, 20,1);
+			Cylinder* pin = new Cylinder(1, 30, 20,1);
 			pin->setPosition(j * 10 - 25 + 10, i * 10 - 25 + 5, 10);
 			pin->setOrientation(o);
 			pin->setFixed(true);

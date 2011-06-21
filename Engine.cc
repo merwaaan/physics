@@ -11,7 +11,7 @@ Engine* E = NULL;
 
 Engine::Engine(int* argc, char** argv, double timeStep) :
   timeStep(timeStep),
-	updateType(FIXED),
+	updateType(IMPLICIT),
 	collisionTolerance(0.1),
 	geometryTolerance(0.01),
 	startingTime(getAbsoluteTime()),
@@ -44,9 +44,9 @@ void Engine::run()
 
 void Engine::update()
 {
-	if(this->updateType == FIXED)
+	if(this->updateType == IMPLICIT)
 		this->updateFixed();
-	else if(this->updateType == CONTINUOUS)
+	else if(this->updateType == EXPLICIT)
 		this->updateContinuous();
 }
 
@@ -249,8 +249,8 @@ Vector3* Engine::computeImpulse(Contact contact)
 	// displacements of the contact points with respect to the center of mass of each body
 	Vector3 da = p - a->getPosition();
 	Vector3 db = p - b->getPosition();
-
-	double restitution = 0.5;
+	
+	double restitution = 0.2;
 /*	if(relativeVelocity < 0.5)
 		restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
 	else

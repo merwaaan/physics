@@ -10,7 +10,7 @@
 #include "Force.h"
 #include "RigidBody.h"
 
-enum UpdateType {FIXED, CONTINUOUS};
+enum UpdateType {IMPLICIT, EXPLICIT};
 
 class Engine
 {

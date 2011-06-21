@@ -180,6 +180,63 @@ void demoZeroG()
   e->run();
 }
 
+void inputDemoPachinko(unsigned char k, int x, int y)
+{
+	inputBasic(k, x, y);
+
+  if(k == 97) // A
+  {
+	  Cube* c = new Cube(3, 3);
+	  c->setPosition(randomf()*40-20, 30, 10);
+		c->prepare();
+	  e->addRigidBody_p(c);
+  }
+}
+
+void demoPachinko()
+{
+	srand(1);
+  glutKeyboardFunc(&inputDemoPachinko);
+
+	// Wall.
+	Box* wall = new Box(50, 50, 5, 1);
+	wall->setFixed(true);
+	e->addRigidBody_p(wall);
+
+	// Pins (odd)
+	for(int i = 0; i < 5; ++i)
+	{
+		if(i % 2) continue;
+
+		for(int j = 0; j < 5; ++j)
+		{
+			Box* pin = new Box(1, 1, 20, 1);
+			pin->setPosition(j * 10 - 25 + 5, i * 10 - 25 + 5, 10);
+			pin->setFixed(true);
+			e->addRigidBody_p(pin);
+		}
+	}
+
+	// Pins (even)
+	for(int i = 0; i < 5; ++i)
+	{
+		if(!(i % 2)) continue;
+
+		for(int j = 0; j < 4; ++j)
+		{
+			Box* pin = new Box(1, 1, 20, 1);
+			pin->setPosition(j * 10 - 25 + 10, i * 10 - 25 + 5, 10);
+			pin->setFixed(true);
+			e->addRigidBody_p(pin);
+		}
+	}
+
+  Force* g = new Gravity(Vector3(0, -9.81, 0));
+  e->addEnvironmentalForce_p(g);
+
+  e->run();
+}
+
 void inputDemoStairs(unsigned char k, int x, int y)
 {
 	inputBasic(k, x, y);
@@ -275,7 +332,7 @@ int main(int argc, char** argv)
 
 	//demoZeroG();
   //demoBoxes();
-	//demoPachinko();
+	demoPachinko();
 	//demoStairs();
   //demoRope();
   

@@ -89,7 +89,7 @@ une unité de temps et de la variation de temps $\deriv t$ par rapport
 Si l'on adapte cette méthode à notre problème, on obtient la
 succession de calculs suivante :
 \begin{align*}
-  \vec{a}_{n+1} &= \frac{1}{m} \sum \vec{F}_i \\ \\
+  \vec{a}_{n+1} &= \frac{1}{m} \sum_i \vec{F}_i \\ \\
   \vec{v}_{n+1} &= \vec{v}_n + \vec{a}_{n+1} \deriv t \\ \\
   \vec{p}_{n+1} &= \vec{p}_n + \vec{v}_{n+1} \deriv t
 \end{align*}
@@ -106,10 +106,11 @@ par seconde.
 
 On aurait pu choisir une autre méthode d'intégration, telle que
 l'intégration Runge-Kutta d'ordre 4 qui calcule les pentes des
-subdivisions d'un pas de temps pour obtenir des résultats plus précis
-\cite{fiedler}, ou bien l'intégration de Verlet qui dispose d'une
-meilleure stabilité \cite{bitterli}, mais Euler reste le choix le plus
-économique et fournit des résultats relativement satisfaisants.
+subdivisions d'un pas de temps pour obtenir des résultats moins
+sensible aux perturbations \cite{fiedler}, ou bien l'intégration de
+Verlet qui dispose d'une meilleure stabilité \cite{bitterli}, mais
+Euler reste le choix le plus économique et fournit des résultats
+relativement satisfaisants.
 
 Afin de réduire la complexité de la structure informatique qui
 représentera un corps rigide et de raccourcir les calculs, nous allons
@@ -118,13 +119,13 @@ linéaire $\vec{L}$ est le produit de sa masse et de sa vitesse. Cette
 nouvelle quantité a pour avantage majeur de posséder comme primitive
 la variation de force exercée instantanément sur le corps.
 \begin{align*}
-  {\sum \vec{F}_i} = \frac{\deriv \vec{L}}{\deriv t} = \frac{\deriv (m\vec{v})}{\deriv t}
+  {\sum_i \vec{F}_i} = \frac{\deriv \vec{L}}{\deriv t} = \frac{\deriv (m\vec{v})}{\deriv t}
 \end{align*}
 
 Ce qui signifie que l'on peut réduire l'intégration de l'état d'un
 corps à :
 \begin{align*}
-  \vec{L}_{n+1} &= \vec{L}_n + {\sum \vec{F}_i} \\ \\
+  \vec{L}_{n+1} &= \vec{L}_n + {\sum_i \vec{F}_i} \\ \\
   \vec{p}_{n+1} &= \vec{p}_n + \frac{1}{m}\vec{L}_{n+1} \deriv t
 \end{align*}
 
@@ -175,7 +176,7 @@ formule suivante, avec $M$ la masse totale des sommets du corps, $m_i$
 et $\vec{p}_l$ respectivement la masse et la position du sommet $i$
 dans le repère absolu :
 \begin{align*}
-  \vec{C} = \frac{1}{M} \sum m_i \vec{p}_i
+  \vec{C} = \frac{1}{M} \sum_i m_i \vec{p}_i
 \end{align*}
 
 Une fois le centre de masse déterminé, la position locale $\vec{r}_i$
@@ -320,14 +321,14 @@ $\vec{F}$ dans le repère absolu.
 Lorsqu'une force est appliquée à un objet, elle est décomposée en sa
 composante linéaire et en sa composante angulaire. Ces deux quantités
 sont ensuite stockées dans des accumulateurs de force et de couple,
-qui seront remis à zéro après chaque intégration. Ici, $\sum
+qui seront remis à zéro après chaque intégration. Ici, $\sum_i
 \vec{\tau}_i$ correspond à la somme des composantes angulaires des
-différentes forces $\vec{F}_i$ subies pendant une itération. Le $\sum
+différentes forces $\vec{F}_i$ subies pendant une itération. Le $\sum_i
 \vec{F}_i$ de l'intégration de la composante linéaire vue plus tôt
 correspond quant à lui à la somme des composantes linéaires.
 \begin{align*}
-  \vec{A}_{n+1} &= \vec{A}_n + {\sum \vec{\tau}_i} \\ \\
-  \vec{L}_{n+1} &= \vec{L}_n + {\sum \vec{F}_i}
+  \vec{A}_{n+1} &= \vec{A}_n + {\sum_i \vec{\tau}_i} \\ \\
+  \vec{L}_{n+1} &= \vec{L}_n + {\sum_i \vec{F}_i}
 \end{align*}
 
 \subsubsection{Quantités auxiliaires}
@@ -342,15 +343,15 @@ tenseur d'inertie absolu et la vitesse angulaire, avant de mesurer
 l'étendue de la variation d'orientation induite par des influences
 extérieures.
 
-Concrètement, un tenseur d'inertie est une matrice de dimension 3 dont
-les coefficients servent de facteurs lors du calcul de la variation
-d'orientation d'un corps à partir de son élan angulaire et représente
-la répartition de la densité d'un corps. Il dépend directement de la
-forme du corps considéré et affecte ses axes de rotation
-principaux. Pour calculer un tenseur d'inertie local, on doit
-effectuer des intégrations par rapport au volume du solide
-considéré. Ces opérations sont un travail complexe en elles-mêmes mais
-pour notre plus grande satisfaction, la plupart des manuels de
+Le moment d'inertie d'un corps représente la résistance qu'il oppose
+lorsque l'on le fait tourner autour d'un de ses axes. Un tenseur
+d'inertie est une matrice de dimension 3 dont chaque vecteur colonne
+correspond au moment d'inertie d'un axe du corps \cite{eberly}. Il
+dépend directement de la forme de l'objet considéré et affecte ses
+axes de rotation principaux. Pour calculer un tenseur d'inertie local,
+on doit effectuer des intégrations par rapport au volume du solide
+considéré et à la distribution de sa masse. Ces opérations sont un
+travail complexe en elles-mêmes mais la plupart des manuels de
 mécanique listent en annexe les tenseurs d'inertie usuels. Ci-suit, en
 exemple, le tenseur d'inertie local d'une boîte, avec $d_i$ son
 étendue le long de l'axe $i$ et $m$ sa masse.
@@ -417,7 +418,7 @@ en :
 Toutes les quantités nécessaires à l'intégration de la composante
 angulaire d'un corps sont désormais réunies.
 \begin{align*}
-  \vec{A}_{n+1} &= \vec{A}_n + \sum \vec{\tau}_i \\ \\
+  \vec{A}_{n+1} &= \vec{A}_n + \sum_i \vec{\tau}_i \\ \\
   I_a &= R_n I_l {}^t\!\!R_n \\ \\
   \vec{\omega} &= I^{-1}_a \vec{A}_{n+1} \\ \\
   R_{n+1} &= R_n + \vec{\omega}^* R_n \deriv t

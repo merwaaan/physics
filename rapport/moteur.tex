@@ -200,16 +200,18 @@ maintenant tous intégrés à l'aide du même pas de temps à chaque
 itération. De plus l'ordre des collisions est respecté puisqu'on se
 limite au traitement de celles apparaissant le plus tôt. Il se révèle
 tout de même moins économique que son prédécesseur dans la mesure o\`u
-l'on intègre chaque corps non pas une fois, mais $k-1$ fois, avec $k$
-le nombre d'objets de la simulation. Ce coût supplémentaire est
-nécessaire si l'on veut obtenir des informations de contact isolées à
-une paire de corps et ignorant les autres objets.
+l'on intègre chaque corps non pas une fois, mais $\frac{n(n-1)}{2}$
+fois, avec $n$ le nombre d'objets de la simulation. Ce coût
+supplémentaire est nécessaire si l'on veut obtenir des informations de
+contact isolées à une paire de corps et ignorant les autres objets.
 
 \subsection{Démonstrations}
 
-boîte simple
+boîtes
 
 escalier
+
+bowling
 
 corde
 
@@ -314,13 +316,15 @@ les corps qui peuplent notre système se déroule en deux étapes : une
 détection grossière visant à vérifier de façon économique si deux
 objets se touchent et une détection fine servant à confirmer ou à
 infirmer de façon sûre ce résultat. Bien que la détection grossière
-soit peu coûteuse en termes de calcul, elle est éxécutée $(k-1)^2$ à
-chaque itération. Pourtant, il est très souvent inutile de détecter si
-deux objets sont en situation d'interpénétration, par exemple lorsque
-la distance les séparant est grande. Il serait tout à notre avantage
-d'ajouter au moteur une couche supplémentaire tenant compte de ces
-disparités spatiales pour accélérer la phase de détection de
-collision.
+soit peu coûteuse en termes de calcul, elle est éxécutée pour $n$
+corps au minimum $\frac{n(n-1)}{2}$ fois à chaque itération, et ce
+sans compter les détections de collision exécutées pendant la
+recherche dichotomisuqe de l'état de contact. Pourtant, il est très
+souvent inutile de détecter si deux objets sont en situation
+d'interpénétration, par exemple lorsque la distance les séparant est
+grande. Il serait tout à notre avantage d'ajouter au moteur une couche
+supplémentaire tenant compte de ces disparités spatiales pour
+accélérer la phase de détection de collision.
 
 Le principe général du partitionnement de l'espace (\textit{spatial
   partitioning}) est de subdiviser l'environnement de la simulation en
@@ -348,7 +352,7 @@ telle structure sera augmenté.
 
 Une variante plus subtile de partitionnement de l'espace est
 l'utilisation d'\textit{octrees} (\textit{quadtrees} en deux
-dimensions). Cette structure de données prend la forme d'un arbre
+dimensions) \cite{millington}. Cette structure de données prend la forme d'un arbre
 représentant l'espace à subdiviser. Chaque n\oe ud de l'arbre possède
 huit fils, chacun correspondant à un octant du volume de leur père. La
 racine de l'arbre est associée au volume complet de l'environnement

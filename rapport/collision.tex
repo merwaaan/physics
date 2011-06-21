@@ -208,10 +208,11 @@ Un point de support est un sommet de $M$ fourni par une fonction de
 support $S(\vec{d})$, avec $\vec{d}$ la direction du point du simplex
 actuellement le plus proche de l'origine à l'origine. La fonction de
 support est employée dans l'algorithme principal de GJK pour obtenir
-le sommet de $M$ le plus extrême dans la direction $\vec{d}$. Il est à
-noter que grâce à la fonction de support il n'est pas nécessaire de
-calculer explicitement la différence de Minkowski \cite{ericson}, car
-$S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) - S_B(-\vec{d})$.
+le sommet de $M$ le plus extrême dans la direction $\vec{d}$, c'est à
+dire le sommet dont la projection sur $\vec{d}$ est la plus grande. Il
+est à noter que grâce à la fonction de support il n'est pas nécessaire
+de calculer explicitement la différence de Minkowski \cite{ericson},
+car $S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) - S_B(-\vec{d})$.
 
 \begin{figure}
   \centering
@@ -553,9 +554,24 @@ système. Pour les contrer, on désactive temporairement les objets en
 état de repos; on parle de mise en sommeil. L'avantage est double
 puisqu'en plus d'améliorer la stabilité générale, on économise les
 ressources car les corps endormis ne sont plus intégrés. Pour
-déterminer si un objet doit être mis en sommeil, on observe la
-magnitude de sa vitesse. On ne peut pas se baser sur ce facteur de
-façon instantanée car un solide projeté en hauteur aura une vitesse
+déterminer si un objet doit être mis en sommeil, on observe sa
+quantité d'énergie cinétique. L'énergie $E_i$ d'une particule $i$ est
+quantifiable, avec $m$ sa masse et $\vec{v}_l$ sa vitesse relative,
+par :
+\begin{align*}
+  E_i = \frac{1}{2} m \vec{v}^{ 2}_l
+\end{align*}
+
+On choisit d'examiner cette quantité car la vitesse relative dont elle
+dépend comprend les composantes linéaire et angulaire de sa
+vitesse. Pour connaître l'énergie cinétique d'un corps, on calcule la
+somme des énergies cinétiques de ses sommets.
+\begin{align*}
+  E = \sum E_i
+\end{align*}
+
+On ne peut pas se baser sur ce facteur de façon instantanée
+car un solide projeté en hauteur bénéficiera d'une énergie cinétique
 nulle au sommet de sa trajectoire et on ne voudrait pas l'endormir à
 ce moment. On surveille plutôt sa vitesse pendant un nombre fixé de
 mises à jour et on l'endort si elle reste faible assez longtemps. On

@@ -41,6 +41,7 @@ Display::Display(int* argc, char** argv, int w, int h) :
 
   this->camera.radius = 30;
   this->camera.angle = 90;
+	this->camera.height = 10;
   this->camera.lastX = -1;
 }
 
@@ -55,10 +56,11 @@ void Display::run()
   glutMainLoop();
 }
 
-void Display::setCamera(double radius, double angle)
+void Display::setCamera(double radius, double angle, double height)
 {
 	camera.radius = radius;
 	camera.angle = angle;
+	camera.height = height;
 }
 
 void Display::setBoundingBoxesDrawn(bool draw)
@@ -99,7 +101,7 @@ void update()
 		double angleRad = cam_p->angle * M_PI/180;
     gluLookAt(
       cam_p->radius * sin(angleRad),
-      10,
+      cam_p->height,
       cam_p->radius * cos(angleRad),
       0, 0, 0,
       0, 1, 0);

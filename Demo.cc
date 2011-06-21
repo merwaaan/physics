@@ -204,7 +204,7 @@ void demoPachinko()
 	srand(0);
   glutKeyboardFunc(&inputDemoPachinko);
 
-	e->getDisplay_p()->setCamera(80, -30);
+	e->getDisplay_p()->setCamera(80, -30, 20);
 
 	// Wall.
 	Box* wall = new Box(50, 50, 0.5, 1);

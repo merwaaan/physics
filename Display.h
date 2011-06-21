@@ -7,7 +7,7 @@ struct Camera
 {
   double radius;
   double angle;
-
+	double height;
   int lastX;
 };
 
@@ -27,7 +27,7 @@ class Display
     void run();
 
     Camera* getCamera_p() { return &this->camera; }
-		void setCamera(double radius, double angle);
+		void setCamera(double radius, double angle, double height);
 
     void setLastDisplayTime(double t) { this->lastDisplayTime = t; }
     double getLastDisplayTime() { return this->lastDisplayTime; }

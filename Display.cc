@@ -12,6 +12,7 @@ Display::Display(int* argc, char** argv, int w, int h) :
 {
   glutInit(argc, argv);
   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+	glutInitWindowPosition(0, 0);
   glutInitWindowSize(w, h);
   glutCreateWindow("Demo");
 

@@ -1,1 +1,1 @@
-recordmydesktop --windowid  `xwininfo | grep "Window id:" | sed -e "s/xwininfo\:\ Window id:\ //;s/\ .*//"` --no-sound -o capture
+recordmydesktop -x 0 -y 60 --width 590 --height 590 --no-cursor --no-sound -o $1

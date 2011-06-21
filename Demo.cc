@@ -121,6 +121,10 @@ void inputBasic(unsigned char k, int x, int y)
 		e->getDisplay_p()->getCamera_p()->radius += 1;
 	else if(k == 122) // Z
 		e->getDisplay_p()->getCamera_p()->radius -= 1;
+	else if(k == 113) // Q
+		e->getDisplay_p()->getCamera_p()->angle += 1;
+	else if(k == 100) // D
+		e->getDisplay_p()->getCamera_p()->angle -= 1;
 	else if(k == 32) // Spacebar
 		e->togglePause();
 }
@@ -131,8 +135,9 @@ void inputDemoBoxes(unsigned char k, int x, int y)
 
   if(k == 97) // A
   {
-	  Box* c = new Box(randomf()*20, randomf()*5, randomf()*10, 10);
-		c->setPosition(randomf()*10-5, 10, randomf()*10-5);
+	  Box* c = new Box(randomf()*5, randomf()*5, randomf()*5, 1);
+		c->setPosition(randomf()*6-3, 10, randomf()*6-3);
+		c->setColor(100, 100, 100);
 		c->prepare();
 	  e->addRigidBody_p(c);
   }
@@ -140,15 +145,18 @@ void inputDemoBoxes(unsigned char k, int x, int y)
 
 void demoBoxes()
 {
-	srand(12);
+	srand(134);
   glutKeyboardFunc(&inputDemoBoxes);
 
 	Cube* c = new Cube(4,1);
+	c->setPosition(0, 2, 0);
+	c->setColor(232, 127, 2);
   c->setFixed(true);
   e->addRigidBody_p(c);
 
-	Box* floor = new Box(50, 3, 50, 1);
-	floor->setPosition(0, -3.5, 0);
+	Box* floor = new Box(6, 1, 20, 1);
+	floor->setPosition(0, -0.5, 0);
+	floor->setColor(232, 127, 2);
   floor->setFixed(true);
   e->addRigidBody_p(floor);
 
@@ -208,7 +216,7 @@ void demoPachinko()
 	srand(0);
   glutKeyboardFunc(&inputDemoPachinko);
 
-	e->getDisplay_p()->setCamera(90, -30, 25);
+	e->getDisplay_p()->setCamera(100, -30, 25);
 
 	// Wall.
 	Box* wall = new Box(50, 50, 0.5, 1);
@@ -374,7 +382,7 @@ int main(int argc, char** argv)
 
 	//demoZeroG(); // OK
   //demoBoxes();
-	//demoPachinko(); // OK
+	demoPachinko(); // OK
 	//demoStairs();
   demoRope(); // OK
   

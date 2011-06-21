@@ -15,6 +15,8 @@ Sphere::Sphere(double radius, double mass) :
 	this->type = SPHERE;
 
 	this->inverseMass= 1/mass;
+
+	this->restitution = 0.2;
 }
 
 Sphere::~Sphere()

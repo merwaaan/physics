@@ -250,12 +250,12 @@ Vector3* Engine::computeImpulse(Contact contact)
 	Vector3 da = p - a->getPosition();
 	Vector3 db = p - b->getPosition();
 	
-	double restitution = 0.2;
-/*	if(relativeVelocity < 0.5)
+	double restitution;
+	if(relativeVelocity < 0.5)
 		restitution = a->getRestitution() < b->getRestitution() ? a->getRestitution() : b->getRestitution();
 	else
 		restitution = 0;
-*/
+
 	Matrix3 inverseInertiaA = a->getOrientation() * a->getInverseInertiaTensor() * a->getOrientation().transpose();
 	Matrix3 inverseInertiaB = b->getOrientation() * b->getInverseInertiaTensor() * b->getOrientation().transpose();
 	

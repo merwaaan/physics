@@ -129,9 +129,8 @@ void inputDemoBoxes(unsigned char k, int x, int y)
 
   if(k == 97) // A
   {
-	  //Box* c = new Box(randomf()*10, randomf()*10, randomf()*10, 10);
-		Cylinder* c = new Cylinder(1, 6, 5, 1);
-		c->setPosition(randomf()*50-25, 10, randomf()*50-25);
+	  Box* c = new Box(randomf()*20, randomf()*5, randomf()*10, 10);
+		c->setPosition(randomf()*10-5, 10, randomf()*10-5);
 		c->prepare();
 	  e->addRigidBody_p(c);
   }
@@ -167,8 +166,8 @@ void inputDemoZeroG(unsigned char k, int x, int y)
 	  c->setPosition(randomf()*50-25, 0, randomf()*50-25);
 		c->prepare();
 		c->applyOffCenterForce(
-			Vector3(randomf()*10-5, randomf()*10-5, randomf()*10-5),
-			Vector3(randomf()*10-5, randomf()*10-5, randomf()*10-5),
+			Vector3(randomf()*3-1, randomf()*3-1, randomf()*3-1),
+			Vector3(randomf()*3-1, randomf()*3-1, randomf()*3-1),
 			1);
 	  e->addRigidBody_p(c);
   }
@@ -178,6 +177,8 @@ void demoZeroG()
 {
 	srand(12);  
   glutKeyboardFunc(&inputDemoZeroG);
+
+	e->getDisplay_p()->setCamera(80, -30, 50);
 
   e->run();
 }
@@ -284,8 +285,10 @@ void inputDemoStairs(unsigned char k, int x, int y)
 
 void demoStairs()
 {
-	srand(100);
+	srand(66786);
   glutKeyboardFunc(&inputDemoStairs);
+
+	e->getDisplay_p()->setCamera(60, 120, 20);
 
 	Box* c = NULL;
 	int height = 7;
@@ -320,11 +323,14 @@ void demoRope()
 {
 	glutKeyboardFunc(&inputDemoRope);
 
+	e->getDisplay_p()->setCamera(150, 0, 30);
+
 	Sphere* s;
 	Constraint* c;
 	Sphere* prev;
 
 	s = new Sphere(1, 1);
+	s->setPosition(0, 50, 0);
 	s->setFixed(true);
 	e->addRigidBody_p(s);	
 	prev = s;
@@ -332,7 +338,7 @@ void demoRope()
 	for(int i = 0; i < 15; ++i)
 	{
 		s = new Sphere(1, 1);
-		s->setPosition(i*3, 3 + i * 3, 0);
+		s->setPosition(i*3, 50 + 3 + i * 3, 0);
 		e->addRigidBody_p(s);
 
 		c = new DistanceConstraint(s, prev, 3);
@@ -355,11 +361,11 @@ int main(int argc, char** argv)
   //testGJK();
   //testTimeReversing();
 
-	//demoZeroG();
+	//demoZeroG(); // OK
   //demoBoxes();
-	demoPachinko();
+	demoPachinko(); // OK
 	//demoStairs();
-  //demoRope();
+  //demoRope(); // OK
   
   delete e;
 

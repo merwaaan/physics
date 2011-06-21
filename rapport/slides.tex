@@ -1,0 +1,150 @@
+\documentclass{beamer}
+
+\usepackage[francais]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{tikz}
+
+\title{TITRE}
+\author{Merwan Achibet}
+\date{}
+
+\begin{document}
+
+\begin{frame}
+  \maketitle
+\end{frame}
+
+\section{Introduction}
+
+\begin{frame}
+  Qu'est-ce qu'un moteur physique ?
+
+  Exemples
+\end{frame}
+
+\begin{frame}
+  Différentes tâches :
+  \begin{itemize}
+    \item Simulation des forces.
+    \item Détection des collisions
+    \item Réponse aux collisions.
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+  Ce projet :
+  \begin{itemize}
+    \item Moteur physique de base
+    \item Corps convexes
+    \item Corps indéformables
+  \end{itemize}
+\end{frame}
+
+\section{Dynamique}
+
+\begin{frame}
+  Lois de base
+  équation
+
+  Moteur physique :
+  entrée : forces environnementales
+  sortie : changement de position
+
+  relation de dérivation
+
+  Dans l'autre sens ?
+\end{frame}
+
+\begin{frame}
+  On approxime l'intégration
+
+  Méthode d'Euler générale
+
+  Méthode d'Euler appliquée au moteur
+\end{frame}
+
+\begin{frame}
+  Pour le mouvement angulaire ?
+
+  Même principe avec plus de variables auxiliaires :
+
+  tenseur d'inertie, etc
+\end{frame}
+
+\section{Collisions}
+
+\begin{frame}
+  Objet testés deux à deux
+
+  On présentera une méthode efficace mais coûteuse si beaucoup exécutée.
+
+  Détection grossière puis détection fine
+\end{frame}
+
+\begin{frame}
+  Détection grossière
+
+  AABB : construction
+
+  AABB : comparaison
+\end{frame}
+
+\begin{frame}
+  Détection fine
+
+  Somme
+\end{frame}
+
+\begin{frame}
+  Différence de Minkowski
+\end{frame}
+
+\begin{frame}
+  GJK
+\end{frame}
+
+\begin{frame}
+  GJK
+\end{frame}
+
+\begin{frame}
+  Correction dichotomique
+\end{frame}
+
+\begin{frame}
+  Types de contact
+
+  Vertex/face
+
+  Edge/Edge
+\end{frame}
+
+\begin{frame}
+  Impulsion
+\end{frame}
+
+\section{Le moteur}
+
+\subsection{Organisation}
+
+\begin{frame}
+  Algo
+\end{frame}
+
+\subsection{Démonstrations}
+
+\begin{frame}
+  Algo++
+\end{frame}
+
+\subsection{Perspectives}
+
+\begin{frame}
+  Tunneling
+\end{frame}
+
+\begin{frame}
+  Partitionnement de l'espace (?)
+\end{frame}
+
+\end{document}

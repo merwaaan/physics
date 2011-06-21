@@ -16,7 +16,8 @@ Engine::Engine(int* argc, char** argv, double timeStep) :
 	geometryTolerance(0.01),
 	startingTime(getAbsoluteTime()),
 	lastUpdateTime(0),
-  display(argc, argv, 600, 600)
+  display(argc, argv, 600, 600),
+	paused(false)
 {
   E = this;
 }
@@ -44,13 +45,16 @@ void Engine::run()
 
 void Engine::update()
 {
+	if(this->paused)
+		return;
+
 	if(this->updateType == IMPLICIT)
-		this->updateFixed();
+		this->updateImplicit();
 	else if(this->updateType == EXPLICIT)
-		this->updateContinuous();
+		this->updateExplicit();
 }
 
-void Engine::updateFixed()
+void Engine::updateImplicit()
 {
 	// Check for collisions.
 	for(int i = 1; i < this->bodies_p.size(); ++i)
@@ -109,7 +113,7 @@ void Engine::updateFixed()
 	//this->cleanUp();
 }
 
-void Engine::updateContinuous()
+void Engine::updateExplicit()
 {
 	// Predict contacts to come.
 	std::vector<Contact> futureContacts = this->predictContacts();

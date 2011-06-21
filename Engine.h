@@ -30,14 +30,16 @@ class Engine
 
     Display display;
 
+		bool paused;
+
   public:
     Engine(int* argc, char** argv, double timestep);
     ~Engine();
 
     void run();
     void update();
-    void updateFixed();
-    void updateContinuous();
+    void updateImplicit();
+    void updateExplicit();
 		std::vector<Contact> checkContacts(std::vector<Contact> contacts);
 		std::vector<Contact> predictContacts();
 		Vector3* computeImpulse(Contact contact);
@@ -66,6 +68,8 @@ class Engine
 
 		double getCollisionTolerance() { return this->collisionTolerance; }
 		double getGeometryTolerance() { return this->geometryTolerance; }
+
+		void togglePause() { this->paused = !this->paused; }
 };
 
 #endif

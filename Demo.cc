@@ -121,6 +121,8 @@ void inputBasic(unsigned char k, int x, int y)
 		e->getDisplay_p()->getCamera_p()->radius += 1;
 	else if(k == 122) // Z
 		e->getDisplay_p()->getCamera_p()->radius -= 1;
+	else if(k == 32) // Spacebar
+		e->togglePause();
 }
 
 void inputDemoBoxes(unsigned char k, int x, int y)

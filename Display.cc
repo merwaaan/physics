@@ -76,7 +76,7 @@ bool Display::areBoundingBoxesDrawn()
 void update()
 {
 	// Update the simulation.
-	if(E->needUpdate())
+	if(1)//E->needUpdate())
 		E->update();
 
 	// Display the simulation.

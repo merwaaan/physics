@@ -44,7 +44,7 @@ void DistanceConstraint::draw()
 {
   glPushMatrix();
 
-	glColor3f(1, 0, 0);
+	glColor3f(0, 0, 0);
 	glBegin(GL_LINE_LOOP);
 	glVertex3d(this->a_p->getPosition().X(), this->a_p->getPosition().Y(), this->a_p->getPosition().Z());
 	glVertex3d(this->b_p->getPosition().X(), this->b_p->getPosition().Y(), this->b_p->getPosition().Z());

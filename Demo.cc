@@ -338,16 +338,18 @@ void demoRope()
 	Constraint* c;
 	Sphere* prev;
 
-	s = new Sphere(1, 1);
+	s = new Sphere(0.5, 1);
 	s->setPosition(0, 50, 0);
+	s->setColor(0, 0, 0);
 	s->setFixed(true);
 	e->addRigidBody_p(s);	
 	prev = s;
 
 	for(int i = 0; i < 15; ++i)
 	{
-		s = new Sphere(1, 1);
+		s = new Sphere(0.5, 1);
 		s->setPosition(i*3, 50 + 3 + i * 3, 0);
+		s->setColor(0, 0, 0);
 		e->addRigidBody_p(s);
 
 		c = new DistanceConstraint(s, prev, 3);
@@ -372,9 +374,9 @@ int main(int argc, char** argv)
 
 	//demoZeroG(); // OK
   //demoBoxes();
-	demoPachinko(); // OK
+	//demoPachinko(); // OK
 	//demoStairs();
-  //demoRope(); // OK
+  demoRope(); // OK
   
   delete e;
 

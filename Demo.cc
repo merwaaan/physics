@@ -378,6 +378,7 @@ void demoRope()
   Force* g = new Gravity(Vector3(0, -9.81, 0));
   e->addEnvironmentalForce_p(g);
 
+	e->togglePause();
 	e->run();
 }
 
@@ -390,8 +391,8 @@ int main(int argc, char** argv)
   //testTimeReversing();
 
 	//demoZeroG(); // OK
-  demoBoxes();
-	demoPachinko(); // OK
+  //demoBoxes();
+	//demoPachinko(); // OK
 	//demoStairs();
   demoRope(); // OK
   

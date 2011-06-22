@@ -332,8 +332,8 @@ int main(int argc, char** argv)
   //testTimeReversing();
 
 	//demoZeroG(); // OK
-  demoBoxes(); // OK
-	//demoPachinko(); // OK
+  //demoBoxes(); // OK
+	demoPachinko(); // OK
   //demoRope(); // OK
   
   delete e;

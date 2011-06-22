@@ -134,14 +134,3 @@ void mouseMoved(int x, int y)
   cam_p->angle += 0.4 * (x - cam_p->lastX);
   cam_p->lastX = x;
 }
-
-void mousePressed(int button, int state, int x, int y)
-{
-	int dir;
-	if(button == 3)
-		dir = -1;
-	else if(button == 4)
-		dir = 1;
-
-	E->getDisplay_p()->getCamera_p()->radius += dir;
-}

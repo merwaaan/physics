@@ -206,7 +206,7 @@ void inputDemoPachinko(unsigned char k, int x, int y)
 			Sphere* s = new Sphere(1.3, 1);
 			double offset = randomf()*5;
 			s->setPosition(-15 + i * 10 + offset, 30 + randomf()*5-2.5, 10);
-			s->setColor(100, 100, 100);
+			s->setColor(i == 0 ? 150 : 0, i == 1 ? 150 : 0, i == 2 ? 150 : 0);
 			s->prepare();
 			e->addRigidBody_p(s);
 		}
@@ -218,7 +218,7 @@ void demoPachinko()
 	srand(0);
   glutKeyboardFunc(&inputDemoPachinko);
 
-	e->getDisplay_p()->setCamera(100, -30, 25);
+	e->getDisplay_p()->setCamera(90, 0, 25);
 
 	// Wall.
 	Box* wall = new Box(50, 50, 0.5, 1);

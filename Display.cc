@@ -39,7 +39,6 @@ Display::Display(int* argc, char** argv, int w, int h) :
 	glEnable(GL_COLOR_MATERIAL);
   
 	glutDisplayFunc(&update);
-  glutMouseFunc(&mousePressed);
   glutPassiveMotionFunc(&mouseMoved);
 
   this->camera.radius = 30;

@@ -135,8 +135,16 @@ void inputDemoBoxes(unsigned char k, int x, int y)
 
   if(k == 97) // A
   {
-	  Box* c = new Box(randomf()*5, randomf()*5, randomf()*5, 1);
-		c->setPosition(randomf()*6-3, 10, randomf()*6-3);
+	  Box* c = new Box(3, 1, 3, 1);
+		c->setPosition(6, 10, 5);
+		c->setColor(100, 100, 100);
+		c->prepare();
+	  e->addRigidBody_p(c);
+  }
+  else if(k == 101) // E
+  {
+	  Box* c = new Box(6, 3, 2, 1);
+		c->setPosition(1, 10, 0);
 		c->setColor(100, 100, 100);
 		c->prepare();
 	  e->addRigidBody_p(c);
@@ -148,13 +156,15 @@ void demoBoxes()
 	srand(134);
   glutKeyboardFunc(&inputDemoBoxes);
 
+	e->getDisplay_p()->setCamera(50, 0, 15);
+
 	Cube* c = new Cube(4,1);
 	c->setPosition(0, 2, 0);
-	c->setColor(232, 127, 2);
+	c->setColor(220, 140, 50);
   c->setFixed(true);
   e->addRigidBody_p(c);
 
-	Box* floor = new Box(6, 1, 20, 1);
+	Box* floor = new Box(30, 1, 30, 1);
 	floor->setPosition(0, -0.5, 0);
 	floor->setColor(232, 127, 2);
   floor->setFixed(true);
@@ -251,7 +261,6 @@ void demoPachinko()
 			Cylinder* pin = new Cylinder(1, 30, 20,1);
 			pin->setPosition(j * 10 - 25 + 5, i * 10 - 25 + 5, 10);
 			pin->setOrientation(o);
-			pin->setColor(73, 10, 61);
 			pin->setColor(220, 140, 50);
 			pin->setFixed(true);
 			e->addRigidBody_p(pin);
@@ -381,7 +390,7 @@ int main(int argc, char** argv)
   //testTimeReversing();
 
 	//demoZeroG(); // OK
-  //demoBoxes();
+  demoBoxes();
 	demoPachinko(); // OK
 	//demoStairs();
   demoRope(); // OK

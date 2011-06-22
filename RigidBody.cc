@@ -5,7 +5,7 @@
 extern Engine* E;
 
 RigidBody::RigidBody() :
-	restitution(0.2),
+	restitution(0.5),
   fixed(false),
 	sleeping(false),
 	kineticEnergyLowFor(0),

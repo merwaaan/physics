@@ -133,15 +133,7 @@ void inputDemoBoxes(unsigned char k, int x, int y)
 {
 	inputBasic(k, x, y);
 
-  if(k == 97) // A
-  {
-	  Box* c = new Box(3, 1, 3, 1);
-		c->setPosition(6, 10, 5);
-		c->setColor(100, 100, 100);
-		c->prepare();
-	  e->addRigidBody_p(c);
-  }
-  else if(k == 101) // E
+	if(k == 97) // A
   {
 	  Box* c = new Box(6, 3, 2, 1);
 		c->setPosition(1, 10, 0);
@@ -289,57 +281,6 @@ void demoPachinko()
   e->run();
 }
 
-void inputDemoStairs(unsigned char k, int x, int y)
-{
-	inputBasic(k, x, y);
-
-  if(k == 97) // A
-  {
-	  Cube* c = new Cube(3, 3);
-	  c->setPosition(randomf()*20-10, 10, 5 + randomf()*5);
-		c->prepare();
-	  e->addRigidBody_p(c);
-  }
-	if(k == 113) // Q
-  {
-	  Sphere* s = new Sphere(1, 10);
-	  s->setPosition(randomf()*20-10, 10, 5 + randomf()*5);
-		s->prepare();
-	  e->addRigidBody_p(s);
-  }
-}
-
-void demoStairs()
-{
-	srand(66786);
-  glutKeyboardFunc(&inputDemoStairs);
-
-	e->getDisplay_p()->setCamera(60, 120, 20);
-
-	Box* c = NULL;
-	int height = 7;
-	int steps = 5;
-	int stepSize = 2;
-
-	for(int i = 0; i < steps; ++i)
-	{
-		c = new Box(20, (steps-i) * (double)height/steps, stepSize, 1);
-		c->setPosition(0, c->getHeight()/2, 10-i*stepSize);
-		c->setFixed(true);
-		e->addRigidBody_p(c);
-	}
-			
-	Box* floor = new Box(20, 0.5, 50, 1);
-	floor->setPosition(0, 0, 0);
-  floor->setFixed(true);
-  e->addRigidBody_p(floor);
-
-  Force* g = new Gravity(Vector3(0, -9.81, 0));
-  e->addEnvironmentalForce_p(g);
-
-  e->run();
-}
-
 void inputDemoRope(unsigned char k, int x, int y)
 {
 	inputBasic(k, x, y);
@@ -391,10 +332,9 @@ int main(int argc, char** argv)
   //testTimeReversing();
 
 	//demoZeroG(); // OK
-  //demoBoxes();
+  demoBoxes(); // OK
 	//demoPachinko(); // OK
-	//demoStairs();
-  demoRope(); // OK
+  //demoRope(); // OK
   
   delete e;
 

@@ -308,6 +308,13 @@ pas de temps choisi devra correspondre à une fraction du pas de temps
 originel puisque le but de cette man\oe uvre est de déterminer à quel
 moment du pas de temps les corps sont réellement entrés en contact.
 
+\begin{figure}[h]
+  \centering
+  \input{images/dichotomie.tikz}
+  \caption{Correction dichotomique de la configuration de contact.}
+  \label{dichotomie}
+\end{figure}
+
 Usuellement, ce retour en arrière s'effectue en intégrant plusieurs
 fois la simulation par un pas de temps négatif et fixe, par exemple
 $-\frac{\deriv t}{10}$. Néanmoins cette méthode s'adapte mal aux
@@ -331,13 +338,6 @@ d'interpénétration et que la distance entre les objets est inférieure
 à un seuil de tolérance prédéfini. Ce processus est visible sur la
 figure \ref{dichotomie} et est détaillé dans l'algorithme
 \ref{algoDichotomie}.
-
-\begin{figure}
-  \centering
-  \input{images/dichotomie.tikz}
-  \caption{Correction dichotomique de la configuration de contact.}
-  \label{dichotomie}
-\end{figure}
 
 \begin{algorithm}
   \caption{Correction d'une collision}

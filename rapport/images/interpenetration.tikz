@@ -20,6 +20,6 @@
   minimum size=2cm,
   draw=rose] (b) at (B) {};
 
-\draw[->,thick,vert] (A1) to node[black,auto] {$+ \deriv t$} (A2);
+\draw[->,thick,vert,font=\Large] (A1) to node[black,auto] {$+ \deriv t$} (A2);
 
 \end{tikzpicture}

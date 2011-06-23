@@ -91,9 +91,9 @@ quelles seraient les étapes que cet objet traverserait avant d'arriver
 \subsubsection{La chute}
 
 La main s'ouvre et laisse s'échapper la balle. Notre appréhension du
-monde qui nous entoure nous permet de prévoir que l'objet tombera et
-accélérera vers le bas. Ce phénomène est quantifié par la seconde loi
-de Newton.
+monde qui nous entoure nous permet de prévoir intuitivement que
+l'objet tombera et accélérera vers le bas. Ce phénomène est quantifié
+par la seconde loi de Newton.
 \begin{align*}
   \vec{a} = \frac{1}{m} \sum_i \vec{F}_i
 \end{align*}
@@ -103,17 +103,18 @@ produit de l'inverse de sa masse $m$ et de la somme des forces
 $\vec{F}_i$ qui lui sont appliquées. Dans notre exemple, on lâche la
 balle sans lui donner d'élan initial et la seule influence qu'elle
 subit au cours de sa chute est celle de la gravité. La gravité
-terrestre est une force de $9.81 N$ dirigée vers le noyau de la
-planète mais dans la simulation, on peut la réduire à une force
-dirigée vers le bas (dans la direction négative de l'axe $y$). Afin de
-bénéficier d'un moteur physique versatile, la puissance de la gravité
-pourra être modifiée, pour simuler une situation lunaire par exemple,
-ou être totalement annulée, pour simuler une situation
-d'apesanteur. En réalité, la gravité ne sera même pas codée \og en dur
-\fg{} mais appartiendra à une liste de forces environnementales qui
-contiendra toutes les influences que le monde de la simulation fait
-subir aux corps qu'il contient. On pourra par exemple modéliser la
-résistance de l'air ou le roulis irrégulier du vent.
+terrestre est une force de $9.81 \times m$ newtons (avec $m$ la masse de la
+balle) dirigée vers le noyau de la planète mais dans la simulation, on
+peut la réduire à une force dirigée vers le bas (dans la direction
+négative de l'axe $y$). Afin de bénéficier d'un moteur physique
+versatile, la puissance de la gravité pourra être modifiée, pour
+simuler une situation lunaire par exemple, ou être totalement annulée,
+pour simuler une situation d'apesanteur. En réalité, la gravité ne
+sera même pas codée \og en dur \fg{} mais appartiendra à une liste de
+forces environnementales qui contiendra toutes les influences que le
+monde de la simulation fait subir aux corps qu'il contient. On pourra
+par exemple modéliser la résistance de l'air ou la poussée irrégulière
+du vent.
 
 Cette observation du comportement de la balle nous oriente sur la
 façon dont l'on pourra modéliser les déplacements d'objets soumis à
@@ -127,11 +128,11 @@ les méthodes employées pour simuler la dynamique des corps.
 
 \subsubsection{Le rebond}
 
-Alors que la balle s'approche du plan, on s'attend
-naturellement à ce qu'elle entre en contact avec ce dernier et qu'une
-réaction proportionnelle à la puissance du choc soit produite. Cette
-réaction dépend de nombreux facteurs, notamment des masses des objets
-et de leur vitesse respective.
+Alors que la balle s'approche du plan, on s'attend naturellement à ce
+qu'elle entre en contact avec ce dernier et qu'une réaction
+proportionnelle à la puissance du choc soit produite. Cette réaction
+dépend de nombreux facteurs, notamment des masses des objets
+considérés et de leur vitesse respective.
 
 Le moteur physique devra être capable de générer une réaction réaliste
 dont la détermination passe par une formule présentée dans la seconde
@@ -192,5 +193,5 @@ Puisque l'une des préoccupations majeures de ce projet est la vitesse
 d'exécution, d'autres considérations plus techniques entreront elles
 aussi en jeu. Une fois qu'un objet est immobile, par exemple, peut-on
 le fixer artificiellement et ne plus faire évoluer son état pour
-économiser des ressources ? Si tel est le cas, quand devra-t-on le
-réactiver ?
+économiser des ressources ? Si tel est le cas, quand devra-t-on à
+nouveau le rendre mobile ?

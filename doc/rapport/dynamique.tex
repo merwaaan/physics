@@ -18,7 +18,7 @@ spectateur est la position $\vec p$ d'un corps. Pour mettre en place
 notre affichage final, c'est cette valeur à tout instant $t$ de la
 simulation que l'on veut déterminer. Un corps possède aussi une
 vitesse $\vec v$, qui correspond à la variation de sa position pour
-une unité de temps. On note cette relation sous la forme dérivée :
+une unité de temps. On note cette relation sous forme dérivée.
 \begin{align*}
   \vec{v} = \frac{\deriv \vec{p}}{\deriv t}
 \end{align*}
@@ -50,13 +50,13 @@ que ces trois quantités partagent aussi des relations de primitive.
 \end{align*}
 
 Récapitulons. Chacun des corps rigides dont l'on veut simuler
-l'évolution possèdera trois quantités sous forme vectorielle :
-position $\vec p$, vitesse $\vec v$ et accélération $\vec a$. L'une
-des tâches de base du moteur physique sera de traduire l'application
-de forces sur un corps en un changement de sa position. On sait que
-les quantités énoncées entretiennent des relations de dérivation, il
-faudra donc procéder par intégration pour calculer la nouvelle
-position d'un objet à partir de son accélération.
+l'évolution possède trois quantités sous forme vectorielle : position
+$\vec p$, vitesse $\vec v$ et accélération $\vec a$. L'une des tâches
+de base du moteur physique est de traduire l'application de forces sur
+un corps en un changement de sa position. On sait que les quantités
+énoncées entretiennent des relations de dérivation, il faut donc
+procéder par intégration pour calculer la nouvelle position d'un objet
+à partir de son accélération.
 
 \subsubsection{Intégration}
 
@@ -104,6 +104,10 @@ statut d'application temps réel, puisque le programme doit être
 capable de calculer $\frac{1}{\deriv t}$ itérations de la simulation
 par seconde.
 
+Lorsque l'on utilise des intégrations pour faire évoluer les quantités
+physiques primaires d'un objet, on dit que l'on \textit{intègre le
+  corps}.
+
 On aurait pu choisir une autre méthode d'intégration, telle que
 l'intégration Runge-Kutta d'ordre 4 qui calcule les pentes des
 subdivisions d'un pas de temps pour obtenir des résultats moins
@@ -135,11 +139,11 @@ d'un corps et permet de calculer sa vitesse si besoin en est.
 Pour des raisons pratiques, on enregistrera dans chaque corps non pas
 sa masse, mais l'inverse de celle-ci. L'avantage principal de ce choix
 est de pouvoir aisément fixer des objets. Si l'on veut qu'un élément
-de la simulation reste immobile, un mur fixe par exemple, on peut lui
+de la simulation reste immobile, un mur par exemple, on peut lui
 attribuer une masse inverse nulle. De cette façon, à chaque
-intégration il accumulera de l'élan mais sa position restera la
-même. On élimine par la même occasion les problèmes de division par
-zéro.
+intégration il accumulera de l'élan mais le produit par l'inverse de
+sa masse annulera sa vitesse, sa position restera donc inchangée. On
+élimine par la même occasion les problèmes de division par zéro.
 
 \subsubsection{Modélisation d'un corps}
 
@@ -152,10 +156,11 @@ plus complexe ?
 
 On pourrait en premier lieu penser à représenter un tel corps par une
 liste de particules, chacune placée à un sommet de l'objet. Chaque
-particule évoluerait indépendement et des contraintes de cohésion
+particule évoluerait indépendemment et des contraintes de cohésion
 entre particules voisines seraient appliquées pour empêcher toute
-déformation du corps. Cette méthode est envisageable et existe, mais
-elle présente plusieurs désavantages. Premièrement, les règles de
+déformation du corps. En procédant ainsi, on modéliserait par exemple
+un cube par huit particules. Cette méthode est envisageable et existe,
+mais elle présente plusieurs désavantages. Premièrement, les règles de
 cohésion à mettre en place nécessiteraient des traitements
 supplémentaires, et donc un temps de calcul plus long. Deuxièment, un
 corps devrait passer par autant d'intégrations qu'il a de particules à
@@ -171,10 +176,10 @@ l'intérieur même de cet objet. La position exacte de l'origine du
 repère local dépend de la position des sommets qui forment l'objet
 mais il ne s'agit pas d'un simple centre géométrique puisque la masse
 de chaque sommet entre aussi en jeu. Cette position se nomme le centre
-de masse, ou barycentre, et sera calculée dans le repère absolu par la
+de masse, ou barycentre, et est calculée dans le repère absolu par la
 formule suivante, avec $M$ la masse totale des sommets du corps, $m_i$
 et $\vec{p}_l$ respectivement la masse et la position du sommet $i$
-dans le repère absolu :
+dans le repère absolu.
 \begin{align*}
   \vec{C} = \frac{1}{M} \sum_i m_i \vec{p}_i
 \end{align*}
@@ -226,18 +231,19 @@ De la même façon que la position représentait visuellement l'état d'un
 corps au sein de la composante linéaire, un corps doit posséder une
 orientation. En deux dimensions, une valeur représentant l'angle du
 corps par rapport à un axe fixe suffirait à décrire l'orientation d'un
-objet mais pas dans notre environnement en trois dimensions. Le repère
+objet mais pas dans notre environnement tridimensionnel. Le repère
 local d'un corps a été introduit dans la partie précédente et se
 résumait à un centre de masse faisant office d'origine, mais un repère
 possède aussi des axes et ceux du repère local ne sont pas
-nécessairement alignés avec ceux du repère absolu. Pour représenter la
+nécessairement alignés avec ceux du repère absolu; ce n'est d'ailleurs
+pas le cas sur la figure \ref{reperelocal}. Pour représenter la
 direction des axes du repère local, et donc l'orientation du corps à
 qui il appartient, on utilise une matrice $R$ de dimension 3 dans
-laquelle chaque vecteur colonne correspondra à un des axes du repère
-local. Pour illustrer ces propos, analysons la matrice identité
-d'ordre 3, qui correspond à la matrice d'orientation d'un corps
-parfaitement aligné avec les axes du repère absolu et n'ayant encore
-subit aucune rotation.
+laquelle chaque vecteur colonne correspondra à la direction d'un des
+axes du repère local. Pour illustrer ces propos, analysons la matrice
+identité d'ordre 3, qui correspond à la matrice d'orientation d'un
+corps parfaitement aligné avec les axes du repère absolu et n'ayant
+encore subit aucune rotation.
 \begin{align*}
   \begin{pmatrix}
     1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1
@@ -346,15 +352,15 @@ extérieures.
 Le moment d'inertie d'un corps représente la résistance qu'il oppose
 lorsque l'on le fait tourner autour d'un de ses axes. Un tenseur
 d'inertie est une matrice de dimension 3 dont chaque vecteur colonne
-correspond au moment d'inertie d'un axe du corps \cite{eberly}. Il
-dépend directement de la forme de l'objet considéré et affecte ses
-axes de rotation principaux. Pour calculer un tenseur d'inertie local,
-on doit effectuer des intégrations par rapport au volume du solide
-considéré et à la distribution de sa masse. Ces opérations sont un
-travail complexe en elles-mêmes mais la plupart des manuels de
-mécanique listent en annexe les tenseurs d'inertie usuels. Ci-suit, en
-exemple, le tenseur d'inertie local d'une boîte, avec $d_i$ son
-étendue le long de l'axe $i$ et $m$ sa masse.
+correspond au moment d'inertie d'un des axes du corps
+\cite{eberly}. Il dépend directement de la forme de l'objet considéré
+et affecte ses axes de rotation principaux. Pour calculer un tenseur
+d'inertie local, on doit effectuer des intégrations par rapport au
+volume du solide considéré et à la distribution de sa masse. Ces
+opérations sont un travail complexe en elles-mêmes mais la plupart des
+manuels de mécanique listent en annexe les tenseurs d'inertie
+usuels. Ci-suit, en exemple, le tenseur d'inertie local d'une boîte,
+avec $d_i$ son étendue le long de l'axe $i$ et $m$ sa masse.
 \begin{align*}
   \begin{pmatrix}
     \frac{m}{12}(d_y^2 + d_z^2) & 0 & 0 \\
@@ -364,8 +370,8 @@ exemple, le tenseur d'inertie local d'une boîte, avec $d_i$ son
 \end{align*}
 
 Le tenseur d'inertie local d'un corps sera attribué lors de la phase
-de préparation des solides et ne changera pas au long de la
-simulation, quel que soit l'état du corps.
+de préparation des solides, avant le lancement de la simulation, et ne
+changera pas par la suite.
 
 Le tenseur d'inertie absolu est une autre quantité auxiliaire, il doit
 être recalculé à chaque mise à jour puisqu'il dépend du tenseur
@@ -425,12 +431,12 @@ angulaire d'un corps sont désormais réunies.
 \end{align*}
 
 On part de la somme des composantes angulaires de chaque force subie
-par le corps pendant une itération et on obtient le nouvel élan
-angulaire. Ce dernier, utilisé conjointement avec l'inverse du tenseur
-d'inertie absolu, fournit la vitesse angulaire du corps. Il reste
-alors à mettre à jour la matrice d'orientation en lui ajoutant le
-produit de $\vec{\omega}^*$ et de l'ancienne orientation, le tout
-multiplié par le pas de temps.
+par le corps pendant une itération de la simulation et on obtient le
+nouvel élan angulaire. Ce dernier, utilisé conjointement avec
+l'inverse du tenseur d'inertie absolu, fournit la vitesse angulaire du
+corps. Il reste alors à mettre à jour la matrice d'orientation en lui
+ajoutant le produit de $\vec{\omega}^*$ et de l'ancienne orientation,
+le tout multiplié par le pas de temps.
 
 Le second calcul de cette intégration nous fournit le tenseur
 d'inertie absolu, mais il est encore nécessaire de l'inverser pour

@@ -1,31 +1,31 @@
 \section{Gestion des collisions}
 
 Maintenant que la première section nous a éclairé sur la façon dont
-les corps de la simulation évoluent indépendament les uns des autres,
+les corps de la simulation évoluent indépendamment les uns des autres,
 il est temps de les faire interagir entre eux. Cette phase se divise
 en trois étapes. Premièrement, le moteur physique doit être capable de
 déterminer si une collision a lieu entre deux corps. Ensuite, il doit
 pouvoir corriger leur état afin de contre-balancer les décalages dûs à
-l'intégration discrète de l'environnement. Finalement, une force de
+l'intégration discrète de la simulation. Finalement, une force de
 séparation doit être calculée et appliquée aux deux objets afin de
 simuler le rebond ou le repos.
 
 \subsection{Détection}
 
 Une collision fait entrer en jeu deux corps rigides dont l'intégrité
-physique a été corrompue, autrement dit : les corps rentrent l'un dans
+physique a été corrompue; autrement dit, les corps entrent l'un dans
 l'autre. Nous allons définir un traitement à appliquer à deux objets
 pour savoir si tel est le cas et ce, de façon certaine. Néanmoins,
-bien que l'algorithme que nous allons présenter a fait ses preuves
-dans le domaine des simulations physiques, il faut garder à l'esprit
-que ce test sera éxécuté à chaque intégration de la simulation et ce,
-pour chaque paire de solides. Dans de telles circonstances, l'usage
-d'un algorithme a priori rapide peut se révéler désastreux pour les
-performances du moteur.
+bien que l'algorithme que nous allons présenter par la suite a fait
+ses preuves dans le domaine des simulations physiques, il faut garder
+à l'esprit que ce test sera éxécuté à chaque intégration de la
+simulation et ce, pour chaque paire de solides. Dans de telles
+circonstances, l'usage d'un algorithme a priori rapide peut se révéler
+désastreux pour les performances du moteur.
 
 Nous faisons donc le choix de séparer la détection de collision en
 deux étapes : une détection grossière et une détection fine. La
-détection grossière fera usage d'un algorithme approximatif mais
+détection grossière fait usage d'un algorithme approximatif mais
 économique qui informe de la possibilité d'une collision, si le
 résultat est positif alors on exécute la détection fine pour confirmer
 ou infirmer le contact de façon certaine.
@@ -42,7 +42,7 @@ ce dernier cas, la détection fine invalidera la collision.
 On se base sur l'utilisation de boîtes englobantes, ou \textit{AABB}
 (\textit{axis-aligned bounding boxes}), pour détecter l'éventualité
 d'un contact. Les boîtes englobantes sont des volumes alignés avec les
-axes du repère global qui contiennent tous les sommets d'un
+axes du repère absolu qui contiennent tous les sommets d'un
 corps. Puisque tous les sommets de l'objet sont contenus dans l'AABB,
 il est évident que tous les points du corps le seront aussi. Pour
 savoir si deux corps rentrent possiblement en collision, on effectue
@@ -89,7 +89,7 @@ d'interpénétration, on utilise le théorème des axes de séparation.
 Selon ce dernier, deux boîtes alignées sur les axes du repère absolu
 n'entrent pas en contact si leur projection sur au moins un axe ne se
 superposent pas. En deux dimensions, on peut visualiser ce théorème
-par le fait que si une ligne parallèle à un des axes du repère global
+par le fait que si une ligne parallèle à un des axes du repère absolu
 sépare deux corps, alors ils ne peuvent pas être en état de
 collision. En trois dimensions le principe est le même, à la
 différence que l'on parle de plan de séparation. L'algorithme
@@ -115,7 +115,7 @@ différence que l'on parle de plan de séparation. L'algorithme
 
 La figure \ref{aabb} illustre les trois situations possibles
 impliquant deux corps; un cercle et un rectangle. Sur la sous-figure
-$a$, les boîtes englobantes ne rentrent pas en collision car leur
+$a$, les boîtes englobantes n'entrent pas en collision car leur
 projection sur l'axe des abscisses ne se superposent pas. Il est donc
 impossible que les corps qu'elles contiennent soient eux-mêmes en état
 de collision, il est inutile d'aller plus loin et de lancer la
@@ -175,14 +175,17 @@ en état d'interpénétration.
   \centering
   \subfloat{ \input{images/minkowski1.tikz} }
   \subfloat{ \input{images/minkowski2.tikz} }
-  \caption{Différence de Minkowski d'un rectangle et d'un triangle.}
+  \caption{Différence de Minkowski $M = A \ominus B$ entre un
+    rectangle $A$ et un triangle $B$. La plus petite distance reliant
+    $M$ et l'origine du répère absolu est la plus petite distance
+    entre $A$ et $B$.}
   \label{minkowski}
 \end{figure}
 
 L'algorithme de détection fine consistera donc à se baser sur la
 différence de Minkowski $M$ entre deux corps pour en calculer la plus
 petite distance la séparant de l'origine du repère absolu. Dans cette
-optique, on utilise l'algorithme GJK, pour
+optique, on utilise l'algorithme \textit{GJK}, pour
 \textit{Gilbert-Johnson-Keerthi algorithm}. De façon générale, cet
 algorithme est capable de calculer efficacement la plus petite
 distance entre la coque formée par un nuage de points et un autre
@@ -215,7 +218,7 @@ actuellement le plus proche de l'origine à l'origine. La fonction de
 support est employée dans l'algorithme principal de GJK pour obtenir
 le sommet de $M$ le plus extrême dans la direction $\vec{d}$, c'est à
 dire le sommet dont la projection sur $\vec{d}$ est la plus grande. Il
-est à noter que grâce à la fonction de support il n'est pas nécessaire
+est à noter que grâce à la fonction de support, il n'est pas nécessaire
 de calculer explicitement la différence de Minkowski \cite{ericson},
 car $S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) - S_B(-\vec{d})$.
 
@@ -239,21 +242,21 @@ détermination du point le plus proche de l'origine $O$
 \end{figure}
 
 \begin{itemize}
-\item Le vertex $A$ est choisi aléatoirement pour faire office de
+\item Le sommet $A$ est choisi aléatoirement pour faire office de
   simplex de base. Le point du simplex actuellement le plus proche de
   l'origine ne peut que être $A$. On cherche un point de support dans
   la direction $\vec{AO}$.
 \item Le sommet le plus extrême dans la direction $\vec{AO}$ est $C$,
   on l'ajoute au simplex. Le point du simplex actuellement le plus
   proche de l'origine est $S_1$.
-\item On cherche le vertex le plus extrême dans la direction
+\item On cherche le sommet le plus extrême dans la direction
   $\vec{S_1O}$.
 \item Le point de support retourné est $B$, on l'ajoute au simplex. Le
   point du simplex le plus proche de l'origine est $\vec{S_2}$.
-\item Le vertex $A$ n'est plus utile à la définition de $\vec{S_2}$,
-  on le retire du simplex. On cherche le vertex le plus extrême dans
+\item Le sommet $A$ n'est plus utile à la définition de $\vec{S_2}$,
+  on le retire du simplex. On cherche le sommet le plus extrême dans
   la direction $\vec{S_2O}$.
-\item Aucun vertex n'est plus extrême que $\vec{S_2}$ dans la
+\item Aucun sommet n'est plus extrême que $\vec{S_2}$ dans la
   direction $\vec{S_2O}$, c'est donc le point de $M$ le plus proche de
   l'origine.
 \end{itemize}
@@ -285,13 +288,13 @@ Pour trouver le point de contact réel entre deux objets en collision,
 il existe plusieurs approches. Les systèmes préférant favoriser le
 temps d'éxécution au détriment du réalisme se contentent de
 repositionner les corps à un point de contact calculé en fonction de
-la profondeur de l'interpénétration. Mais même si la position de
-contact est corrigée par cette technique, il n'en sera pas de même
-pour les autres quantités physiques, notamment l'orientation, qui est
-plus complexe à manipuler. Même si la vitesse d'éxecution est un
-facteur important dans nos choix de conception, nous allons prendre un
-chemin différent et sélectionner une méthode plus précise qui
-fonctionnera par retour en arrière.
+la profondeur de la pénétration. Mais même si la position de contact
+est corrigée par cette technique, il n'en sera pas de même pour les
+autres quantités physiques, notamment l'orientation, qui est plus
+complexe à manipuler. Même si la vitesse d'éxecution est un facteur
+important dans nos choix de conception, nous allons prendre un chemin
+différent et sélectionner une méthode plus précise qui fonctionnera
+par retour en arrière.
 
 La fonction d'intégration du moteur physique prend comme seul argument
 le pas de temps duquel faire avancer la simulation et pour l'instant
@@ -299,10 +302,10 @@ on utilisait un pas constant. Or, une caractéristique intéressante de
 cette fonction et qu'elle peut prendre en argument un pas de temps
 négatif et simuler l'évolution d'un système en sens inverse. Cette
 possibilité nous permet notamment de revenir en arrière dans la
-simulation dés qu'une interpénétration est détectée et ce jusqu'à
+simulation dés qu'une interpénétration est détectée et ce, jusqu'à
 retrouver le point de contact exact. Le terme \og exact \fg{} est à
 prendre avec des pincettes puisque le moteur physique est limité par
-l'arithmétique des nombres à virgules flottantes et que l'on doit se
+l'arithmétique des nombres à virgule flottante et que l'on doit se
 contenter d'un résultat validé par un seuil de tolérance adapté. Le
 pas de temps choisi devra correspondre à une fraction du pas de temps
 originel puisque le but de cette man\oe uvre est de déterminer à quel
@@ -311,7 +314,7 @@ moment du pas de temps les corps sont réellement entrés en contact.
 \begin{figure}[h]
   \centering
   \input{images/dichotomie.tikz}
-  \caption{Correction dichotomique de la configuration de contact.}
+  \caption{Correction dichotomique de la configuration de contact. Le cercle en tirets correspond au seuil de tolérance.}
   \label{dichotomie}
 \end{figure}
 
@@ -364,28 +367,22 @@ figure \ref{dichotomie} et est détaillé dans l'algorithme
   \BlankLine
   \SinonSi{$d = 0$}{
     \lSi{$P \ne \RECUL$}{
-      $\deriv t_2 \leftarrow \frac{\deriv t}{2}$
-    }
-    \lSinon{
-      $\deriv t_2 \leftarrow \deriv t$
+      $\deriv t \leftarrow \frac{\deriv t}{2}$
     }
     \BlankLine
-    \integrer{A,$- \deriv t_2$}\;
-    \integrer{B,$- \deriv t_2$}\;
-    \correction{A, B, \RECUL, $\deriv t_2$, $\theta$}
+    \integrer{A,$- \deriv t$}\;
+    \integrer{B,$- \deriv t$}\;
+    \correction{A, B, \RECUL, $\deriv t$, $\theta$}
   }
   \BlankLine
   \Sinon{
     \lSi{$P \ne \APPR$}{
-      $\deriv t_2 \leftarrow \frac{\deriv t}{2}$
-    }
-    \lSinon{
-      $\deriv t_2 \leftarrow \deriv t$
+      $\deriv t \leftarrow \frac{\deriv t}{2}$
     }
     \BlankLine
-    \integrer{A,$\deriv t_2$}\;
-    \integrer{B,$\deriv t_2$}\;
-    \correction{A, B, \APPR, $\deriv t_2$, $\theta$}
+    \integrer{A,$+ \deriv t$}\;
+    \integrer{B,$+ \deriv t$}\;
+    \correction{A, B, \APPR, $\deriv t$, $\theta$}
   }
 \end{algorithm}
 
@@ -398,21 +395,21 @@ atteindre à l'instant du contact.
 
 \subsection{Réponse}
 
-Une fois que la collision entre deux solides est confirmée et que
-leurs états sont corrigés, il reste à rassembler toutes les
-informations nécessaires au calcul d'une réponse. Pour cela, on aura
-besoin de déterminer quels points précis des corps entrent en contact.
-Parfois, un seul point de contact peut exister, comme lors d'une
-collision entre deux sphères. Souvent, il en existera plusieurs. Un
-corps rigide est structuré par trois types d'élément : les sommets,
-les arêtes et les faces et il est usuellement admis que seuls les
-contacts sommet-face et arête-arête sont nécessaires à nos
-besoins. Les autres associations d'éléments peuvent être ramenées à
-des configurations dégénérées de ces deux cas. Par exemple, un contact
-entre une arête et une face peut être assimilée à deux contacts
-sommet-face, chaque sommet étant une extrémité de l'arête. La figure
-\ref{contacts} illustre une configuration comprenant quatre points de
-contact.
+Une fois que la collision entre deux solides est confirmée et que leur
+état est corrigé, il reste à rassembler toutes les informations
+nécessaires au calcul d'une réponse. Pour cela, on aura besoin de
+déterminer quels points précis des corps entrent en contact.  Parfois,
+un seul point de contact peut exister, comme lors d'une collision
+entre deux sphères. Souvent, il en existera plusieurs. Un corps rigide
+est structuré par trois types d'élément : les sommets, les arêtes et
+les faces et il est usuellement admis que seuls les contacts
+sommet-face et arête-arête sont nécessaires à nos besoins. Les autres
+associations d'éléments peuvent être ramenées à des configurations
+dégénérées de ces deux cas. Par exemple, un contact entre une arête et
+une face peut être assimilée à deux contacts sommet-face, chaque
+sommet étant une extrémité de l'arête. La figure \ref{contacts}
+détaille les points de contact intervenant dans une collision entre
+deux cubes.
 
 \begin{figure}
   \centering
@@ -456,20 +453,20 @@ au temps $t$ et apparus au temps $t + \deriv t$ auront un temps
 d'impact $\deriv t$ mais la routine de correction de l'état
 collisionnel doit être capable de cibler précisément le moment du
 contact. Cette information se révélera utile dans la dernière partie
-de ce rapport, lorsque l'on souhaitera s'assurer du bon ordonnancement
+de ce rapport, lorsque l'on souhaitera assurer le bon ordonnancement
 des collisions.
 
 Après chaque intégration et si deux corps entrent en collision, des
 forces de séparation devront être générées pour annuler cette
-collision, on parle d'\textit{impulsion} \cite{mirtich}. Une collision
-provoquera autant d'impulsions qu'il existe de contacts entre les
-deux objets considérés. Dans le cas d'une boîte cubique tombant à plat
-sur le sol, quatre points de contact seront détectés : les quatres
-sommets de la face basse du cube. \`A chacune de ces positions, une
-impulsion identique sera appliquée. Dans ce cas précis, on imagine que
-la masse de la boîte est également répartie et les quatre impulsions
-devront donc être égales et dirigées vers le haut afin de ne pas
-déséquilibrer l'objet et de produire un rebond droit.
+collision, on parle d'\textit{impulsions} \cite{mirtich}. Une
+collision provoquera autant d'impulsions qu'il existe de contacts
+entre les deux objets considérés. Dans le cas d'une boîte cubique
+tombant à plat sur le sol, quatre points de contact seront détectés :
+les quatres sommets de la face basse du cube. \`A chacune de ces
+positions, une impulsion identique sera appliquée. Dans ce cas précis,
+on imagine que la masse de la boîte est également répartie, les
+quatre impulsions devront donc être égales et dirigées vers le haut
+afin de ne pas déséquilibrer l'objet et de produire un rebond droit.
 
 Pour calculer une impulsion $J$ séparant deux corps $A$ et $B$, on
 utilise cette intimidante formule d'Isaac Newton, tirée de sa loi de
@@ -494,16 +491,19 @@ de $\vec{n}$ et d'un scalaire. Plusieurs autres valeurs sont néanmoins
 encore inconnues et doivent être calculées à partir des informations
 de contact dont l'on dispose.
 
+Les vecteurs $\vec{r}_A$ et $\vec{r}_B$ correspondent aux positions du
+point de contact dans les référentiels respectifs des corps $A$ et $B$.
+
 La vitesse relative normale $v_r$ correspond à la composante de la
-vitesse relative des deux corps le long la normale du contact. On peut
-calculer la vitesse $\vec{v}_l$ d'un point quelconque du repère absolu
-dans le repère local d'un corps avec la vitesse linéaire $\vec{v}$ du
-corps, sa vitesse angulaire $\vec{\omega}$, la position $\vec{C}$ de
-son centre de masse et la position $\vec{p}_a$ du point dans le repère
-absolu.
+vitesse relative des deux corps le long de la normale du contact. On
+peut calculer la vitesse $\vec{v}_l$ d'un point quelconque du repère
+absolu dans le repère local d'un corps avec la vitesse linéaire
+$\vec{v}$ du corps, sa vitesse angulaire $\vec{\omega}$, la position
+$\vec{C}$ de son centre de masse et la position $\vec{p}_a$ du point
+dans le repère absolu.
 \begin{align*}
   \vec{v}_l &= \vec{v} + \vec{\omega} \times (\vec{p}_a - \vec{C}) \\
-            &= \frac{1}{m} \vec{L} + (I^{-1}_a \vec{A}) \times (\vec{p}_a - \vec{C})
+            &= \frac{1}{m} \vec{L} + (I^{-1}_a \vec{A}) \times \vec{r}
 \end{align*}
 
 Pour obtenir, la vitesse relative normale, il reste à projeter sur la
@@ -529,33 +529,30 @@ moteur physique, chaque objet possède son propre coefficient de
 restitution et on choisit d'utiliser le minimum des deux dans la
 formule de Newton.
 
-Les vecteurs $\vec{r}_A$ et $\vec{r}_B$ correspondent aux positions du
-point de contact dans les référentiels respectifs des corps $A$ et $B$.
-
 Une fois l'impulsion calculée, il reste à l'appliquer à un des deux
-corps impliqué dans la collision et à appliquer son inverse à l'autre
+corps impliqué dans la collision et à appliquer son opposée à l'autre
 corps pour les séparer.
 
-Il nous reste à traîter le cas des contacts de repos, c'est à dire les
-collisions entre solides posés l'un contre l'autre, comme par exemple
-une boîte placée sur la surface d'une table. Nous avons évoqué plus
-tôt le fait que les contacts de repos sont analogues aux contacts
-classiques dans la mesure o\`u la séparation des deux corps sera
-exécutée par des impulsions. La seule différence vient du fait que
-dans ce cas, on forcera l'utilisation d'un coefficient de restitution
-nul, afin de produire des impulsions non-élastiques. Autrement dit,
-les objets seront séparés afin de d'éliminer toute interpénétration
-mais aucun rebond supplémentaire ne sera injecté dans la formule. Pour
-détecter s'il est nécessaire d'appliquer un tel traitement, on vérifie
-si la vitesse relative normale des objets considérés est inférieure à
-un seuil fixé.
+Il est encore nécessaire de traîter le cas des contacts de repos,
+c'est à dire les collisions entre solides posés l'un contre l'autre,
+comme par exemple une boîte placée sur la surface d'une table. Nous
+avons évoqué plus tôt le fait que les contacts de repos sont analogues
+aux contacts classiques dans la mesure o\`u la séparation des deux
+corps sera exécutée par des impulsions. La seule différence vient du
+fait que dans ce cas, on forcera l'utilisation d'un coefficient de
+restitution nul, afin de produire des impulsions
+non-élastiques. Autrement dit, les objets seront séparés afin de
+d'éliminer toute interpénétration mais aucun rebond supplémentaire ne
+sera injecté dans la formule. Pour détecter s'il est nécessaire
+d'appliquer un tel traitement, on vérifie si la vitesse relative
+normale des objets considérés est inférieure à un seuil fixé.
 
 Bien que ce choix permette de simuler le repos d'un corps, il souffre
 de défauts majeurs, notamment le fait qu'à cause de l'utilisation
 d'impulsions, si faibles soit-elles, on remarque un léger effet de
 vibration provoqué par les forces qu'un corps subit continuellement
 pour rester à la surface d'une autre. Parfois, un corps au repos
-accumulera même tellement d'énergie qu'un faible rebond sera
+accumulera assez d'énergie pour qu'un faible rebond soit
 perceptible. Ce type d'occurence appauvrit grandement la stabilité du
 système. Pour les contrer, on désactive temporairement les objets en
 état de repos; on parle de mise en sommeil. L'avantage est double
@@ -566,7 +563,7 @@ quantité d'énergie cinétique. L'énergie $E_i$ d'une particule $i$ est
 quantifiable, avec $m$ sa masse et $\vec{v}_l$ sa vitesse relative,
 par :
 \begin{align*}
-  E_i = \frac{1}{2} m \vec{v}^{ 2}_l
+  E_i = \frac{1}{2} m \vec{v}^{\;2}_l
 \end{align*}
 
 On choisit d'examiner cette quantité car la vitesse relative dont elle
@@ -574,13 +571,13 @@ dépend comprend les composantes linéaire et angulaire de sa
 vitesse. Pour connaître l'énergie cinétique d'un corps, on calcule la
 somme des énergies cinétiques de ses sommets.
 \begin{align*}
-  E = \sum E_i
+  E = \sum_i E_i
 \end{align*}
 
-On ne peut pas se baser sur ce facteur de façon instantanée
-car un solide projeté en hauteur bénéficiera d'une énergie cinétique
-nulle au sommet de sa trajectoire et on ne voudrait pas l'endormir à
-ce moment. On surveille plutôt sa vitesse pendant un nombre fixé de
+On ne peut pas se baser sur ce facteur de façon instantanée car un
+solide projeté en hauteur possédera d'une énergie cinétique nulle au
+sommet de sa trajectoire et on ne voudrait pas l'endormir à ce
+moment. On surveille plutôt son énergie pendant un nombre fixé de
 mises à jour et on l'endort si elle reste faible assez longtemps. On
-réveille un corps quand un objet actif génère une collision avec ce
+réveille un corps quand un objet actif entre en collision avec ce
 dernier.

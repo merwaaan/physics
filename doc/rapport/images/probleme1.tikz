@@ -1,4 +1,4 @@
-\begin{tikzpicture}[scale=0.4,transform shape]
+\begin{tikzpicture}[scale=0.35,transform shape]
   \draw[black,thick] (0,0) -- (10,0);
 
   \draw[->,thick,black,font=\huge] (1,5) to node[black,auto,swap] {$\vec{G}$} (1,1);
@@ -10,11 +10,15 @@
     draw=bleu,
     thick] at (5,1) (a) {};
 
+  \node[font=\Huge] at (a.center) (al) {A};
+
   \node[
     rectangle,
     minimum width=6cm,
     minimum height=2cm,
     draw=rose,
     thick] at (5,4.5) (b) {};
+
+  \node[font=\Huge] at (b.center) (bl) {B};
 
 \end{tikzpicture}

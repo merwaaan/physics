@@ -1,4 +1,4 @@
-\begin{tikzpicture}[scale=0.4,transform shape]
+\begin{tikzpicture}[scale=0.35,transform shape]
   \draw[black,thick] (0,0) -- (10,0);
 
 

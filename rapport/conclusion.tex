@@ -1,3 +1,37 @@
 \section{Conclusion}
 
-TODO
+Le but de ce projet était d'étudier et d'implémenter un moteur
+physique de base simulant le comportement mécanique de corps
+rigides. Pour ce faire, nous nous sommes basés sur une modélisation
+des lois de Newton utilisant forces et impulsions. De nombreux choix
+concernant les solutions utilisées sont justifiés par la contrainte du
+temps réel. Désirant néanmoins une modélisation aussi précise que
+possible, il a été nécessaire d'implémenter des méthodes de correction
+permettant de conserver à la fois cohérence spatiale et cohérence
+temporelle.
+
+Le problème récurrent de ce type d'application est la stabilité, non
+pas au sens de la stabilité logicielle, mais plutôt en celui de la
+stabilité des configurations atteintes. Afin d'obtenir des simulations
+équilibrées, des seuils de tolérance calibrés ont dû être employés à
+différentes étapes du travail du moteur physique, comme lors de la
+phase de détection de collision et de correction. \`A l'heure
+actuelle, il est tout de même difficile d'obtenir certaines
+configurations, notamment des empilement de solides, cas dans lequel
+les collisions de tous les objets au repos apparaissent au même
+instant. Une solution serait de mettre en place une technique de
+correction indépendante du temps. Elle déterminerait la profondeur de
+pénétration associée à une collision et recalerait les objets en
+modifiant uniquement leur position. On perdrait la cohérence
+temporelle et on ignorerait les variations d'orientation entre l'état
+au moment de la détection et l'état après correction, mais cette
+approximation augmenterait les capacités du moteur physique tout en
+conservant l'atout du temps réel.
+
+D'autres modélisations existent et sont fondées sur la résolution de
+systèmes linéaires pour gérer les contacts. \`A chaque mise à jour, on
+converge progressivement vers une configuration satisfaisante. Il
+n'est dans ce cas pas gênant que des interpénétrations existent tant
+qu'elles restent imperceptibles. La stabilité fourni par ce genre de
+méthode justifie à elle seule l'emploi de telles techniques. Il serait
+intéressant de les étudier à l'avenir.

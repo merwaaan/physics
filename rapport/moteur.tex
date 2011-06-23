@@ -211,8 +211,8 @@ contact isolées à une paire de corps et ignorant les autres objets.
 
 Commençons par mettre en place une simulation basique faisant
 intervenir la gravité. Un cube est fixé sur une plate-forme et on fait
-apparaître une boîte à quelques mètres de hauteur. Observons son
-comportement (figure \ref{demoBox}).
+apparaître une boîte à quelques mètres de hauteur. Son comportement
+est commenté sur la figure \ref{demoBox}.
 
 \begin{figure}
   \centering
@@ -230,14 +230,14 @@ comportement (figure \ref{demoBox}).
     \includegraphics[width=3.5cm]{images/screenshots/box/4.jpg}
   }
   \qquad
-  \subfloat[La boîte rebondit à nouveau sur le cube. Cette fois
-    ci, sa vitesse angulaire la projette vers l'extérieur.]{
+  \subfloat[Au sommet de la trajectoire, la gravité reprend le dessus
+    et la boîte redescend vers le cube.]{
     \includegraphics[width=3.5cm]{images/screenshots/box/5.jpg}
     \includegraphics[width=3.5cm]{images/screenshots/box/6.jpg}
   }
   \qquad
-  \subfloat[La boîte entre en collision avec le sol et est projetée en
-    dehors de la plate-forme.]{
+  \subfloat[La boîte rebondit à nouveau sur le cube. Cette fois
+    ci, sa vitesse angulaire la projette vers l'extérieur.]{
     \includegraphics[width=3.5cm]{images/screenshots/box/7.jpg}
     \includegraphics[width=3.5cm]{images/screenshots/box/8.jpg}
   }
@@ -255,33 +255,43 @@ comportement (figure \ref{demoBox}).
 \subsubsection*{Pachinko}
 
 Le pachinko est un jeu de hasard japonais dans lequel des billes
-métalliques sont lachées dans un parcours vertical parsemé de petites
-tiges les déviant de leur trajectoire. Selon le chemin qu'elles
-empruntent, de nouvelles billes peuvent être remportées, à la manière
-d'une machine à sous.
+métalliques sont lachées dans un parcours vertical parsemé de tiges
+les déviant de leur trajectoire. Selon le chemin qu'elles empruntent,
+de nouvelles billes peuvent être remportées, à la manière d'une
+machine à sous.
 
 Utilisons l'exemple de la machine à Pachinko pour illustrer les
-capacités de notre moteur physique.
+capacités de notre moteur physique. Différentes étapes d'une chute de
+billes sont commentées sur la figure \ref{demoPachinko}.
 
 
 \begin{figure}
   \centering
-  \subfloat[]{
+  \subfloat[Les billes disposent initialement d'une vitesse nulle mais
+    accélèrent rapidement vers le bas sous l'influence de la
+    gravité. Elles passent la première rangée de tige sans qu'aucune
+    collision ne s'opère.]{
     \includegraphics[width=3.5cm]{images/screenshots/pachinko/1.jpg}
     \includegraphics[width=3.5cm]{images/screenshots/pachinko/2.jpg}
   }
   \qquad
-  \subfloat[]{
+  \subfloat[La trajectoire de la bille rouge est déviée par une
+    tige. Il en est de même pour la bille verte. Elles sont toutes
+    deux projetées vers d'autres tiges. La bille bleue continue son
+    chemin sans n'avoir encore touché aucune tige.]{
     \includegraphics[width=3.5cm]{images/screenshots/pachinko/4.jpg}
     \includegraphics[width=3.5cm]{images/screenshots/pachinko/5.jpg}
   }
   \qquad
-  \subfloat[]{
+  \subfloat[La bille bleue est sortie de la machine à pachinko. Les
+    deux autres billes se dirigent l'une vers l'autre jusqu'à ce
+    qu'elles entrent en contact.]{
     \includegraphics[width=3.5cm]{images/screenshots/pachinko/7.jpg}
     \includegraphics[width=3.5cm]{images/screenshots/pachinko/8.jpg}
   }
   \qquad
- \subfloat[]{
+ \subfloat[Les billes restantes sont séparées et continuent leur
+   course dans le vide.]{
     \includegraphics[width=3.5cm]{images/screenshots/pachinko/9.jpg}
   }
   \caption{}

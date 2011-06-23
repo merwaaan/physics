@@ -88,7 +88,7 @@ collision.
   \centering
   \subfloat[]{ \input{images/probleme1.tikz} }
   \subfloat[]{ \input{images/probleme2.tikz} }
-  \caption{Interpénétration collatéralement provoquée par une correction collisionnelle}
+  \caption{Interpénétration collatéralement provoquée par une correction collisionnelle.}
   \label{probleme}
 \end{figure}
 
@@ -103,7 +103,7 @@ précédent.
 
 Autre problème de taille : la simulation empruntera des chemins
 différents selon l'ordre dans lequel les collisions sont détectées. La
-figure \ref{issues} nous montre deux corp ainsi que la position qu'ils
+figure \ref{ordre} nous montre deux corp ainsi que la position qu'ils
 atteindraient à l'itération suivante si l'on ignorait les collisions
 (en pointillés). On peut aisément se rendre compte des conséquences de
 l'ordre dans lequel les objets sont traîtés. Si le corps bleu est
@@ -118,9 +118,9 @@ trajectoire, rien ne se passera !
 
 \begin{figure}
   \centering
-  \subfloat{ \input{images/issues.tikz} }
-  \caption{Deux issues possibles selon l'ordre du traitement des collisions}
-  \label{issues}
+  \subfloat{ \input{images/ordre.tikz} }
+  \caption{Deux issues possibles selon l'ordre du traitement des collisions.}
+  \label{ordre}
 \end{figure}
 
 Tous les problèmes cités sont clairement liés à un manque de cohérence
@@ -264,7 +264,6 @@ Utilisons l'exemple de la machine à Pachinko pour illustrer les
 capacités de notre moteur physique. Différentes étapes d'une chute de
 billes sont commentées sur la figure \ref{demoPachinko}.
 
-
 \begin{figure}
   \centering
   \subfloat[Les billes disposent initialement d'une vitesse nulle mais
@@ -319,19 +318,22 @@ entièrement traversé $B$. \`A aucun de ces deux instants une collision
 n'a été détectée et pourtant $A$ est impunément passé à travers
 $B$. Le pas de temps utilisé pour réguler l'intégration du système
 était donc trop faible pour s'assurer des collisions entre corps
-évoluant à haute vitesse. Ce phénomène est appelé
-\textit{tunneling}. \`A l'heure de l'écriture de ce rapport, le moteur
-physique est sensible à ce genre de situation. Réellement, ce cas ne
-se produit pas, puisque les simulations développées représentent des
-situations terrestres qui font participer des forces d'opposition
-telles que le frottement de l'air et donc les corps n'atteignent
-jamais de vitesses démesurées. On souhaite tout de même disposer d'un
-moteur physique solide et versatile, évaluons les possibilités qui
-s'offrent à nous pour pallier ce problème.
+évoluant à haute vitesse. Ce phénomène est appelé \textit{tunneling}
+et est visible sur la figure \ref{tunneling1}. \`A l'heure de
+l'écriture de ce rapport, le moteur physique est sensible à ce genre
+de situation. Réellement, ce cas ne se produit pas, puisque les
+simulations développées représentent des situations terrestres qui
+font participer des forces d'opposition telles que le frottement de
+l'air et donc les corps n'atteignent jamais de vitesses démesurées. On
+souhaite tout de même disposer d'un moteur physique solide et
+versatile, évaluons les possibilités qui s'offrent à nous pour pallier
+ce problème.
+
 \begin{figure}
   \centering
   \input{images/tunneling1.tikz}
-  \caption{Le phénomène du tunneling}
+  \caption{Le phénomène du tunneling apparaît lorsqu'un objet va trop
+    vite pour que les collisions entre deux intégrations soit détectées.}
   \label{tunneling1}
 \end{figure}
 
@@ -346,45 +348,46 @@ perdra son statut d'application temps réel.
 
 Une technique usuellement admise est le lancer de rayons
 (\textit{raycasting}) entre les points de la position de départ du
-solide et les points de sa position d'arrivée. Si l'un des rayons
-touche un autre corps, on sait qu'une collision aurait dû être
-détectée et on peut revenir en arrière. Cette méthode présente
-pourtant une faiblesse de taille, car le résultat de cette recherche
-dépend directement de la concentration de rayons. Si on lance peu de
-rayons, on risque de ne pas détecter les corps de petite taille et
-donc de les traverser tandis qu'une concentration élevée de rayons
-pourrait se réveler regrettable en terme de coûts de calcul.
+solide et les points de sa position d'arrivée (figure
+\ref{tunneling2}). Si l'un des rayons touche un autre corps, on sait
+qu'une collision aurait dû être détectée et on peut revenir en
+arrière. Cette méthode présente pourtant une faiblesse de taille, car
+le résultat de cette recherche dépend directement de la concentration
+de rayons. Si on lance peu de rayons, on risque de ne pas détecter les
+corps de petite taille et donc de les traverser tandis qu'une
+concentration élevée de rayons pourrait se réveler regrettable en
+terme de coûts de calcul.
 
 \begin{figure}
   \centering
   \input{images/tunneling2.tikz}
-  \caption{Lancer de rayons pour la détection de tunneling}
+  \caption{Lancer de rayons pour la détection d'effet de tunneling.}
   \label{tunneling2}
 \end{figure}
 
 La technique de la détection de collision continue (\textit{continuous
   collision detection}) permet de contrôler de façon certaine tout
-phénomène de tunneling. L'idée est la suivante : soit deux corps $A$
-et $B$ dont l'on veut détecter l'éventuelle collision. On construit
-deux volumes fantômes $C_A$ et $C_B$ englobant tous les points par
-lesquels passent respectivement $A$ et $B$ entre deux
-intégrations. Ces volumes n'interviendront pas dans les collisions des
-autres objets de la simulation, et on vérifie simplement s'ils entrent
-tous deux en collision. Si tel est le cas, alors on sait qu'il est
-possible qu'un tunneling se soit produit et on peut revenir en arrière
-jusqu'à ce que le problème soit résolu. Pour accélérer cette phase, il
-est envisageable d'utiliser des boîtes englobantes de la même façon
-que lors de la détection grossière de collision. L'un des avantages
-majeurs de cette méthode, en plus de sa certitude de ne manquer aucun
-tunneling, est sa simplicité de mise en place puisque toutes les
-routines de détection et de retour en arrière utilisées ont déjà été
-écrites et entrent en jeu dans le fonctionnement de base du moteur
-physique.
+phénomène de tunneling (figure \ref{tunneling3}). L'idée est la
+suivante : soit deux corps $A$ et $B$ dont l'on veut détecter
+l'éventuelle collision. On construit deux volumes fantômes $C_A$ et
+$C_B$ englobant tous les points par lesquels passent respectivement
+$A$ et $B$ entre deux intégrations. Ces volumes n'interviendront pas
+dans les collisions des autres objets de la simulation, et on vérifie
+simplement s'ils entrent tous deux en collision. Si tel est le cas,
+alors on sait qu'il est possible qu'un tunneling se soit produit et on
+peut revenir en arrière jusqu'à ce que le problème soit résolu. Pour
+accélérer cette phase, il est envisageable d'utiliser des boîtes
+englobantes de la même façon que lors de la détection grossière de
+collision. L'un des avantages majeurs de cette méthode, en plus de sa
+certitude de ne manquer aucun tunneling, est sa simplicité de mise en
+place puisque toutes les routines de détection et de retour en arrière
+utilisées ont déjà été écrites et entrent en jeu dans le
+fonctionnement de base du moteur physique.
 
-\begin{figure}
+\begin{figure}[h]
   \centering
   \input{images/tunneling3.tikz}
-  \caption{Boîtes englobantes pour la détection de tunneling}
+  \caption{Utilisation de boîtes englobantes pour la détection de tunneling.}
   \label{tunneling3}
 \end{figure}
 

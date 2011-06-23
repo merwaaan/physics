@@ -135,12 +135,17 @@ détection fine sera appelée et confirmera la collision.
 
 \begin{figure}
   \centering
-  \subfloat[]{ \input{images/boundingboxes1.tikz} }
+  \subfloat[Les boîtes ne se touchent pas, on est certain qu'aucune
+    collision entre les corps n'a lieu.]{ \input{images/boundingboxes1.tikz} }
   \qquad
-  \subfloat[]{ \input{images/boundingboxes2.tikz} }
+  \subfloat[Les boîtes se touchent et pourtant les corps ne sont pas
+    en collision. La détection fine réfutera le résultat de la
+    détection grossière.]{ \input{images/boundingboxes2.tikz} }
   \qquad
-  \subfloat[]{ \input{images/boundingboxes3.tikz} }
-  \caption{Trois configurations impliquant deux boîtes englobantes}
+  \subfloat[Les boîtes se touchent et les corps qu'elles contiennent
+    aussi. La détection fine validera le résultat de la détection
+    grossière.]{ \input{images/boundingboxes3.tikz} }
+  \caption{}
   \label{aabb}
 \end{figure}
 
@@ -168,9 +173,9 @@ en état d'interpénétration.
 
 \begin{figure}
   \centering
-  \subfloat[]{ \input{images/minkowski1.tikz} }
-  \subfloat[]{ \input{images/minkowski2.tikz} }
-  \caption{Différence de Minkowski d'un rectangle et d'un triangle}
+  \subfloat{ \input{images/minkowski1.tikz} }
+  \subfloat{ \input{images/minkowski2.tikz} }
+  \caption{Différence de Minkowski d'un rectangle et d'un triangle.}
   \label{minkowski}
 \end{figure}
 
@@ -214,7 +219,10 @@ est à noter que grâce à la fonction de support il n'est pas nécessaire
 de calculer explicitement la différence de Minkowski \cite{ericson},
 car $S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) - S_B(-\vec{d})$.
 
-\begin{figure}
+La figure \ref{gjk} illustre la succession d'étapes qui amènent à la
+détermination du point le plus proche de l'origine $O$
+
+\begin{figure}[h]
   \centering
   \subfloat[]{ \input{images/gjk1a.tikz} }
   \subfloat[]{ \input{images/gjk1b.tikz} }
@@ -224,12 +232,11 @@ car $S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) - S_B(-\vec{d})$.
   \qquad
   \subfloat[]{ \input{images/gjk3a.tikz} }
   \subfloat[]{ \input{images/gjk3b.tikz} }
-  \caption{{\'E}tapes de l'algorithme GJK}
+  \caption{{\'E}tapes de l'algorithme GJK fournissant la plus petite
+    distance entre une différence de Minkowski et le centre du repère
+    absolu.}
   \label{gjk}
 \end{figure}
-
-La figure \ref{gjk} illustre la succession d'étapes qui amènent à la
-détermination du point le plus proche de l'origine $O$
 
 \begin{itemize}
 \item Le vertex $A$ est choisi aléatoirement pour faire office de
@@ -260,17 +267,18 @@ improbable qu'une collision soit détectée au moment exact o\`u elle se
 produit (c'est à dire à l'instant précis o\`u les deux corps sont
 posés l'un contre l'autre). On est donc en permanence témoin de
 situations d'interpénétration au sein desquelles deux objets rentrent
-l'un dans l'autre.  On pourrait ignorer cette imprécision et malgré
-tout calculer les forces de rebond appropriées à ce contact mais
-plusieurs situations critiques risquent d'apparaître. On pense
-notamment au fait que la force de séparation calculée soit sensible à
-cette erreur et ne déplace pas assez les corps à l'itération suivante
-pour qu'ils soient séparés.
+l'un dans l'autre (figure \ref{interpenetration}).  On pourrait
+ignorer cette imprécision et malgré tout calculer les forces de rebond
+appropriées à ce contact mais plusieurs situations critiques risquent
+d'apparaître. On pense notamment au fait que la force de séparation
+calculée soit sensible à cette erreur et ne déplace pas assez les
+corps à l'itération suivante pour qu'ils soient séparés.
 
 \begin{figure}
   \centering
   \input{images/interpenetration.tikz}
-  \caption{Situation d'interpénétration}
+  \caption{Situation d'interpénétration due à l'intégration discrète.}
+  \label{interpenetration}
 \end{figure}
 
 Pour trouver le point de contact réel entre deux objets en collision,
@@ -327,7 +335,7 @@ figure \ref{dichotomie} et est détaillé dans l'algorithme
 \begin{figure}
   \centering
   \input{images/dichotomie.tikz}
-  \caption{Correction dichotomique de la configuration de contact}
+  \caption{Correction dichotomique de la configuration de contact.}
   \label{dichotomie}
 \end{figure}
 
@@ -404,7 +412,7 @@ des configurations dégénérées de ces deux cas. Par exemple, un contact
 entre une arête et une face peut être assimilée à deux contacts
 sommet-face, chaque sommet étant une extrémité de l'arête. La figure
 \ref{contacts} illustre une configuration comprenant quatre points de
-contact : deux sommet-face (en rose) et deux arête-arête (en bleu).
+contact.
 
 \begin{figure}
   \centering
@@ -412,7 +420,8 @@ contact : deux sommet-face (en rose) et deux arête-arête (en bleu).
     \input{images/contacts1.tikz}
     \input{images/contacts2.tikz}
   }
-  \caption{Quatre points de contacts entre deux cubes}
+  \caption{Quatre points de contact entre deux cubes : deux
+    sommet-face (en rose) et deux arête-arête (en bleu).}
   \label{contacts}
 \end{figure}
 

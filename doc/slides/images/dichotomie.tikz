@@ -1,0 +1,51 @@
+\begin{tikzpicture}[scale=0.7, transform shape]
+
+\coordinate (A1) at (0,0);
+\coordinate (B) at (8,0);
+
+\coordinate (A2) at (6.7,0);
+\coordinate (A2prec) at (A1);
+\input{images/dichotomie_base.tikz}
+\draw[->,thick,vert,font=\Large] (A2prec) to node[black,auto] {$+ \deriv t$} (A2);
+
+\coordinate (A1) at ($(A1) + (0,-3)$);
+\coordinate (A2) at ($(A2) + (0,-3)$);
+\coordinate (A2prec) at ($(A2prec) + (0,-3)$);
+\coordinate (B) at ($(B) + (0,-3)$);
+\coordinate (A2precT) at (A2prec);
+\coordinate (A2prec) at (A2);
+\coordinate (A2) at ($(A2)!0.5!(A2precT)$);
+\input{images/dichotomie_base.tikz}
+\draw[->,thick,vert,font=\Large] (A2prec) to node[black,auto,swap] {$- \frac{\deriv t}{2}$} (A2);
+
+\coordinate (A1) at ($(A1) + (0,-3)$);
+\coordinate (A2) at ($(A2) + (0,-3)$);
+\coordinate (A2prec) at ($(A2prec) + (0,-3)$);
+\coordinate (B) at ($(B) + (0,-3)$);
+\coordinate (A2precT) at (A2prec);
+\coordinate (A2prec) at (A2);
+\coordinate (A2) at ($(A2)!0.5!(A2precT)$);
+\input{images/dichotomie_base.tikz}
+\draw[->,thick,vert,font=\Large] (A2prec) to node[black,auto] {$+ \frac{\deriv t}{4}$} (A2);
+
+\coordinate (A1) at ($(A1) + (0,-3)$);
+\coordinate (A2) at ($(A2) + (0,-3)$);
+\coordinate (A2prec) at ($(A2prec) + (0,-3)$);
+\coordinate (B) at ($(B) + (0,-3)$);
+\coordinate (A2precT) at (A2prec);
+\coordinate (A2prec) at (A2);
+\coordinate (A2) at ($(A2)!-1!(A2precT)$);
+\input{images/dichotomie_base.tikz}
+\draw[->,thick,vert,font=\Large] (A2prec) to node[black,auto] {$+ \frac{\deriv t}{4}$} (A2);
+
+\coordinate (A1) at ($(A1) + (0,-3)$);
+\coordinate (A2) at ($(A2) + (0,-3)$);
+\coordinate (A2prec) at ($(A2prec) + (0,-3)$);
+\coordinate (B) at ($(B) + (0,-3)$);
+\coordinate (A2precT) at (A2prec);
+\coordinate (A2prec) at (A2);
+\coordinate (A2) at ($(A2)!0.5!(A2precT)$);
+\input{images/dichotomie_base.tikz}
+\draw[->,thick,vert,font=\Large] (A2prec) to node[black,auto,swap] {$- \frac{\deriv t}{8}$} (A2);
+
+\end{tikzpicture}

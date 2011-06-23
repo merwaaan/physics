@@ -1,0 +1,14 @@
+\coordinate (A) at (9,2);
+\coordinate (B) at (4,1);
+\coordinate (C) at (1,4);
+\coordinate (D) at (7,5);
+\coordinate (O) at (2,2);
+
+\node[origine] (origin) at (O) {};
+\path[draw=black] (A) -- (B) -- (C) -- (D) -- cycle;
+
+\node[font=\Large] at ($(A)+(0.5,0)$) (la) {$A$};
+\node[font=\Large] at ($(B)+(0,-0.5)$) (lb) {$B$};
+\node[font=\Large] at ($(C)+(-0.5,0)$) (lc) {$C$};
+\node[font=\Large] at ($(D)+(0,0.5)$) (ld) {$D$};
+\node[font=\Large] at ($(O)+(0.5,-0.5)$) (lo) {$0$};

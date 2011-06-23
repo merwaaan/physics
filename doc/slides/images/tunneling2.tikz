@@ -1,0 +1,9 @@
+\begin{tikzpicture}[scale=0.7, transform shape]
+  \input{images/tunneling_base.tikz}
+
+  \path[rayon] (a1.north) -- (a2.north);
+  \path[rayon] (a1.west) -- (a2.west);
+  \path[rayon] (a1.north west) -- (a2.north west);
+  \path[rayon] (a1.south) -- (a2.south);
+  \path[rayon] (a1.south west) -- (a2.south west);
+\end{tikzpicture}

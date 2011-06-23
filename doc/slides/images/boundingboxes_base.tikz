@@ -1,0 +1,38 @@
+% Figures
+\node[fig,
+  rectangle,
+  rotate=-30,
+  minimum height=4cm,
+  minimum width=3cm,
+  draw=black] (rect) at (R) {};
+
+\node[fig,
+  circle,
+  minimum size=3cm,
+  inner sep=0pt,
+  draw=black] (cerc) at (C) {};
+
+% Bounding boxes
+\node[aabb,
+  fit=(rect.north west) (rect.north east) (rect.south east) (rect.south west),
+  draw=bleu] (bbrect) {};
+\node[aabb,
+  fit=(cerc),
+  draw=rose] (bbcerc) {};
+
+% Separation axis
+\draw[bleu,thick] let \p1=(bbrect.north) in 
+  let \p2=(bbrect.south) in
+    (-0.5,\y1) -- (-0.5,\y2);
+
+\draw[rose,thick] let \p1=(bbcerc.north) in 
+  let \p2=(bbcerc.south) in
+    (-0.25,\y1) -- (-0.25,\y2);
+
+\draw[bleu,thick] let \p1=(bbrect.west) in 
+  let \p2=(bbrect.east) in
+    (\x1,-0.5) -- (\x2,-0.5);
+
+\draw[rose,thick] let \p1=(bbcerc.west) in 
+  let \p2=(bbcerc.east) in
+    (\x1,-0.25) -- (\x2,-0.25);

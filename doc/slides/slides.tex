@@ -1,0 +1,361 @@
+\documentclass{beamer}
+
+\usepackage[francais]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{color}
+\usepackage{tikz}
+\usepackage[adobe-utopia]{mathdesign}
+
+\newcommand{\deriv}{\partial \!}
+
+% Couleurs inspirées de famfamfam.com
+\definecolor{vert}{HTML}{59FF2D}
+\definecolor{bleu}{HTML}{0BCEFF}
+\definecolor{rose}{HTML}{FF0B5B}
+\definecolor{gris}{gray}{0.5}
+
+\usetikzlibrary{shapes,fit,calc,3d}
+
+\tikzset{line/.style={
+    shorten >= -#1,
+    shorten <= -#1}}
+\tikzset{halfline/.style={
+    shorten >= -#1}}
+\tikzset{axe/.style={
+    ->,
+    thin}}
+\tikzset{fig/.style={
+    thick}}
+\tikzset{origine/.style={
+    draw=black,
+    cross out}}
+\tikzset{aabb/.style={
+  dashed,
+  thick,
+  inner sep=0}}
+\tikzset{gjknode/.style={
+    fill=rose,
+    circle}}
+\tikzset{gjkedge/.style={
+    draw=rose,
+    thick}}
+\tikzset{gjkdir/.style={
+    halfline=0.5cm,
+    draw=gris,
+    very thick,
+    dashed}}
+\tikzset{gjkclosest/.style={
+    circle,
+    fill=bleu}}
+\tikzset{rayon/.style={
+    ->,
+    dashed,
+    draw=gris}}
+
+\title{Simulation physique de corps rigides avec interaction}
+\author{Merwan Achibet}
+\date{}
+
+\begin{document}
+
+\shorthandoff{!} % Pour éviter bug de Tikz + Babel french
+
+\begin{frame}
+  \maketitle
+\end{frame}
+
+\section{Les moteur physiques}
+
+\begin{frame}
+  Moteur physique : système de simulation de comportements mécaniques.
+
+  \begin{itemize}
+    \item Industrie, science : précis, modélisation complexe, long
+    \item Réalité virtuelle, jeu vidéo : approximatif, temps réel
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  Ce projet : un moteur physique basique gérant les interactions entre corps rigides convexes
+  \begin{description}
+    \item[Convexes] 
+    \item[Rigides] Indéformables, incassable
+  \end{description}
+\end{frame}
+
+\begin{frame}
+  Différentes tâches :
+  \begin{itemize}
+    \item Dynamique.
+    \item Gestion des collisions
+      \begin{itemize}
+        \item Détection
+        \item Correction
+        \item Réponse
+      \end{itemize}
+    \end{itemize}
+\end{frame}
+
+\section{Dynamique}
+
+\subsection{La composante linéaire}
+
+\begin{frame}
+  Entrée : forces environnementales
+  Sortie : changement de position
+
+  \begin{align*}
+    \vec{a} = \frac{1}{m} \sum_i \vec{F}_i
+  \end{align*}
+
+  On connait l'accélération à partir des forces subies.
+\end{frame}
+
+\begin{frame}
+  Quantités utiles :
+  \begin{itemize}
+    \item accélération
+    \item vitesse
+    \item position
+  \end{itemize}
+
+  \begin{align*}
+    \vec{v} = \frac{\deriv \vec{p}}{\deriv t}
+  \end{align*}
+
+  \begin{align*}
+    \vec{a} = \frac{\deriv \vec{v}}{\deriv t}
+  \end{align*}
+
+  \begin{align*}
+    \vec{a} = \frac{\deriv \vec{v}}{\deriv t} = \frac{\partial^2 \vec{p}}{\deriv t}
+  \end{align*}
+\end{frame}
+
+\begin{frame}
+  Intégration d'Euler
+  \begin{align*}
+    x_{n+1} = x_{n} + x' \deriv t
+  \end{align*}
+
+  Appliquée à nos besoins
+  \begin{align*}
+    \vec{a}_{n+1} &= \frac{1}{m} \sum_i \vec{F}_i \\ \\
+    \vec{v}_{n+1} &= \vec{v}_n + \vec{a}_{n+1} \deriv t \\ \\
+    \vec{p}_{n+1} &= \vec{p}_n + \vec{v}_{n+1} \deriv t
+  \end{align*}
+
+\end{frame}
+
+\begin{frame}
+  
+  \begin{align*}
+    \sum_i \vec{F}_i = \frac{\deriv \vec{L}}{\deriv t} = \frac{\deriv (m\vec{v})}{\deriv t}
+  \end{align*}
+
+  \begin{align*}
+    \vec{L}_{n+1} &= \vec{L}_n + {\sum_i \vec{F}_i} \\ \\
+    \vec{p}_{n+1} &= \vec{p}_n + \frac{1}{m}\vec{L}_{n+1} \deriv t
+  \end{align*}
+
+\end{frame}
+
+\subsection{Modélisation d'un corps}
+
+\subsection{La composante angulaire}
+
+\begin{frame}
+  Il manque quelquechose
+
+  \'Elan angulaire et orientation sont analogues à l'élan linéaire à la position.
+
+  orientation
+\end{frame}
+
+
+\begin{frame}
+  Elan angulaire
+\end{frame}
+
+\begin{frame}
+  Elan angulaire
+\end{frame}
+
+\section{Collisions}
+
+\subsection{Détection}
+
+\begin{frame}  
+  Les corps sont testés par paires.
+
+  
+\end{frame}
+
+\begin{frame}
+  Détection grossière
+
+  \begin{figure}
+    \centering
+    \input{images/boundingboxes1.tikz}
+    \input{images/boundingboxes2.tikz}
+    \input{images/boundingboxes3.tikz}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  Détection fine
+
+  Somme de Minkoswki : $A \oplus B = \{a + b \mid a \in A, b \in B\}$
+
+  Différence de Minkowski : $A \ominus B = A \oplus (-B)$
+
+  \begin{figure}
+    \centering
+    \input{images/minkowski1.tikz}
+    \input{images/minkowski2.tikz}
+  \end{figure}
+
+  Particularité : la plus petite distance de la différence de Minkowski à l'origine est la plus petite distance entre les corps $A$ et $B$.
+\end{frame}
+
+\begin{frame}
+  Comment calculer la plus petite distance de $M$ à l'origine ?
+
+  GJK
+
+  simplex
+\end{frame}
+
+\begin{frame}
+  fonction de support
+
+  
+\end{frame}
+
+\begin{frame}
+  \begin{figure}
+    \centering
+    \input{images/gjk1a.tikz}
+    \input{images/gjk1b.tikz}
+    \input{images/gjk2a.tikz}
+    \input{images/gjk2b.tikz}
+    \input{images/gjk3a.tikz}
+    \input{images/gjk3b.tikz}
+  \end{figure}
+\end{frame}
+
+\subsection{Correction}
+
+\begin{frame}
+  Simulation discrète : pas de temps fixe
+
+  Les collisions sont toujours pénétrantes
+
+  \begin{figure}
+    \centering
+    \input{images/interpenetration.tikz}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  L'intégration peut aussi se faire en arrière !
+
+  On procède par dichotomie.
+
+  \begin{figure}
+    \centering
+    \input{images/dichotomie.tikz}
+  \end{figure}
+\end{frame}
+
+\subsection{Réponse}
+
+\begin{frame}
+  Un corps
+  \begin{itemize}
+    \item sommets
+    \item arêtes
+    \item faces
+  \end{itemize}
+
+  On s'intéresse uniquement aux contacts sommet-face et arête-arête.
+
+  \begin{figure}
+    \centering
+    \input{images/contacts1.tikz}
+    \input{images/contacts2.tikz}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  Un \textit{contact}
+  \begin{itemize}
+    \item position
+    \item normale
+    \item temps
+  \end{itemize}
+
+  Un contact = une impulsion
+
+  \begin{align*}
+    J = \vec{n} 
+    \frac{-(1 + \varepsilon) v_r}{
+      \frac{1}{m_A} +
+      \frac{1}{m_B} +
+      \vec{n}
+      (I_A^{-1} (\vec{r}_A \times \vec{n})) \times \vec{r}_A +
+      (I_B^{-1} (\vec{r}_b \times \vec{n})) \times \vec{r}_B
+    }
+  \end{align*}
+
+  r
+\end{frame}
+
+\begin{frame}
+
+\end{frame}
+
+\section{Le moteur}
+
+\subsection{Organisation}
+
+\begin{frame}
+  \begin{enumerate}
+    \item détection de collision
+    \item Application de forces environnementales
+    \item intégration
+  \end{enumerate}
+
+  défauts
+\end{frame}
+
+\subsection{Démonstrations}
+
+\begin{frame}
+  \begin{enumerate}
+    \item détection de collision
+    \item Application de forces environnementales
+    \item intégration
+  \end{enumerate}
+
+  mieux
+\end{frame}
+
+\subsection{Perspectives}
+
+\begin{frame}
+  \begin{figure}
+    \centering
+    \input{images/tunneling1.tikz}
+    \input{images/tunneling2.tikz}
+    \input{images/tunneling3.tikz}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  
+\end{frame}
+
+
+\end{document}

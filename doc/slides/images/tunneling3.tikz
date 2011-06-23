@@ -1,0 +1,14 @@
+\begin{tikzpicture}[scale=0.7, transform shape]
+  \input{images/tunneling_base.tikz}
+
+  \coordinate (a1n) at ($(a1.north)+(0,0.2)$);
+  \coordinate (a2s) at ($(a2.south)+(0,-0.2)$);
+
+  \node[fit=(a1) (a2),
+    draw=gris,
+    dashed] (aabb1) {};
+
+  \node[fit=(b),
+    draw=gris,
+    dashed] (aabb2) {};
+\end{tikzpicture}

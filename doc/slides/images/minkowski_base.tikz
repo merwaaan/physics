@@ -1,0 +1,17 @@
+% Rectangle
+\coordinate (a1) at (4,5);
+\coordinate (a2) at (4,3);
+\coordinate (a3) at (6,3);
+\coordinate (a4) at (6,5);
+
+% Triangle
+\coordinate (b1) at (1,2);
+\coordinate (b2) at (1,1);
+\coordinate (b3) at (3,1);
+
+% Minkowski difference
+\coordinate (m1) at (1,4);
+\coordinate (m2) at (1,2);
+\coordinate (m3) at (3,1);
+\coordinate (m4) at (5,1);
+\coordinate (m5) at (5,4);

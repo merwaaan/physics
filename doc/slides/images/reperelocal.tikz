@@ -1,0 +1,25 @@
+\begin{tikzpicture}[scale=0.7,transform shape]
+  % Figure
+  \coordinate (R) at (5,5);
+  \node[fig,
+    draw=black,
+    rotate=-30,
+    minimum width=3cm,
+    minimum height=5cm] at (R) (rect) {};
+
+  % repère local  
+  \begin{scope}[shift=(R),scale=0.5,rotate around={-30:(R)}]
+    \input{images/repere.tikz}
+  \end{scope}
+
+  \node[fill=black,circle] at (rect.south east) (x) {};
+  \node at ($(x)+(0.4,0)$) (xlabel) {$x$};
+
+  \draw[->,bleu,thick] (0,0) -- node[auto,color=black]{$\vec{p}_a$} (x);
+
+  \draw[->,rose,thick] (R) -- node[auto,color=black]{$\vec{p}_l$} (x);
+
+  \draw[->,vert,thick] (0,0) -- node[auto,color=black]{$\vec{C}$} (R);
+
+  \input{images/repere.tikz}
+\end{tikzpicture}

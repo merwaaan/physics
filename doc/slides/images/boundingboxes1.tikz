@@ -1,0 +1,8 @@
+\begin{tikzpicture}[scale=0.5, transform shape]
+  \input{images/repere.tikz}
+
+  \coordinate (R) at (7,4);
+  \coordinate (C) at (2,7);
+
+  \input{images/boundingboxes_base.tikz}
+\end{tikzpicture}

@@ -1,0 +1,8 @@
+\begin{tikzpicture}[scale=0.4,transform shape]
+	\input{images/gjk_base.tikz}
+
+	\node[gjknode] (a) at (A) {};
+
+  \draw[gjkdir] (a) -- (O);
+  \node[gjkclosest,draw=bleu,fill=none,thick] (closest) at (A) {};
+\end{tikzpicture}

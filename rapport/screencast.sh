@@ -1,1 +1,0 @@
-recordmydesktop -x 0 -y 60 --width 590 --height 590 --no-cursor --no-sound -o $1

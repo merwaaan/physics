@@ -115,14 +115,16 @@
   \end{enumerate}
 \end{frame}
 
-\begin{frame}{Modules}
-  Différentes tâches :
+\begin{frame}{Différentes tâches}
   \begin{itemize}
   \item Dynamique
     \begin{itemize}
     \item Composante linéaire
     \item Composante angulaire
     \end{itemize}
+
+    \vfill
+
   \item Gestion des collisions
     \begin{itemize}
     \item Détection
@@ -162,7 +164,7 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Intégration approximée}
+\begin{frame}{Intégration de la composante linéaire}
   Intégration d'Euler :
   \begin{align*}
     x_{n+1} = x_{n} + x' \deriv t
@@ -236,8 +238,8 @@
   Il manque quelque chose... Les rotations !
 
   \begin{description}
-  \item[Orientation]
-    Une matrice : un vecteur colonne = un axe du repère local
+  \item[Matrice d'orientation]
+    Un vecteur colonne = un axe du repère local
     \begin{align*}
       \begin{pmatrix}
         1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1
@@ -273,20 +275,67 @@
   \end{description}
 \end{frame}
 
-\begin{frame}{Quantités auxiliaires}
+\begin{frame}{Quantités auxiliaires I}
   Passage de l'élan à la nouvelle orientation moins direct.
   
+  \vfill
+
   \begin{description}
   \item[Tenseur d'inertie local]
+    Matrice représentant les efforts à fournir pour produire une rotation le long de chaque axe
+
+    \vfill
+
   \item[Tenseur d'inertie absolu]
+    Pendant absolu du tenseur d'inertie local
     \begin{align*}
       I_a = R I_l {}^t\!\!R
     \end{align*}
-  \item[]
+
+    \vfill
+
+  \item[Vitesse angulaire]
+    \begin{align*}
+      \vec{\omega} = I^{-1}_a \vec{A}
+    \end{align*}
   \end{description}
 \end{frame}
 
-\begin{frame}{Intégration}
+\begin{frame}{Quantités auxiliaires II}
+  On définit l'opérateur $*$ :
+
+  \begin{align*}
+    \begin{pmatrix}
+      x \\ y \\ z
+    \end{pmatrix}
+    ^*
+    =
+    \begin{pmatrix}
+      0 & -z & y \\ z & 0 & -x \\ -y & x & 0
+    \end{pmatrix}
+  \end{align*}
+  
+  \vfill
+
+  On multiplie $\vec{\omega}$ et chaque axe de $R$ : 
+  \begin{align*}
+    \frac{\deriv R}{\deriv t} =
+    \begin{pmatrix}
+      \vec{\omega}^* \begin{pmatrix} R_{xx} \\ R_{xy} \\ R_{xz} \end{pmatrix} & 
+      \vec{\omega}^* \begin{pmatrix} R_{yx} \\ R_{yy} \\ R_{yz} \end{pmatrix} & 
+      \vec{\omega}^* \begin{pmatrix} R_{zx} \\ R_{zy} \\ R_{zz} \end{pmatrix} \\
+    \end{pmatrix}
+  \end{align*}
+    
+  \vfill
+
+  Soit :
+  \begin{align*}
+    \frac{\deriv R}{\deriv t} = \vec{\omega}^*R
+  \end{align*}  
+\end{frame}
+
+\begin{frame}{Intégration de la composante angulaire}
   \begin{align*}
     \vec{A}_{t + \deriv t} &= \vec{A}_t + \sum_i \vec{\tau}_i \\ \\
     I_a &= R_t I_l {}^t\!\!R_t \\ \\
@@ -364,7 +413,7 @@
 
   \begin{description}
   \item[Particularité]
-    la plus petite distance de la différence de Minkowski à l'origine est la plus petite distance entre les corps $A$ et $B$
+    La plus petite distance de la différence de Minkowski à l'origine est la plus petite distance entre les corps $A$ et $B$
   \end{description}
 \end{frame}
 
@@ -375,13 +424,13 @@
 
   \begin{description}
   \item[Algorithme GJK]
-    Expansion d'un simplex aléatoire jusqu'à ce qu'il contienne le point le plus proche de l'origine.
+    Expansion d'un simplex jusqu'à ce qu'il contienne le point le plus proche de l'origine.
   \end{description}
 
   \vfill
 
   \begin{description}
-  \item[Simplex]
+  \item[Simplex] Structure géométrique entièrement contenue dans $M$ et liée à une dimension.
     \begin{description}
     \item[0] Sommet
     \item[1] Arête
@@ -396,12 +445,16 @@
 
   \vfill
 
-  Fonction de support $S(\vec{d})$
+  \begin{description}
+    \item[$S(\vec{d})$]
+      Fonction de support renvoyant le sommet de $M$ le plus extrême dans la direction $\vec{d}$
 
-  Renvoit le sommet de $M$ le plus extrême dans la direction $\vec{d}$.
+      \vfill
 
-  Avantage  $S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) - S_B(-\vec{d})$
-  Inutile de calculer explicitement la différence de Minkowski !
+    \item[Avantage]
+      $S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) - S_B(-\vec{d})$ \\
+      Inutile de calculer explicitement $M$ !
+  \end{description}
 \end{frame}
 
 \begin{frame}{détection fine IV}
@@ -488,15 +541,65 @@
   \end{align*}
 \end{frame}
 
+\begin{frame}{Réponse III}
+  Et pour les contacts de repos ?
+
+  \vfill
+
+  On force un $\varepsilon$ valant 0 pour produire une collision non-élastique.
+
+  \vfill
+
+  \begin{description}
+    \item[Problème] Les collisions continuelles font vibrer les corps
+    \item[Solution] On endort les corps dont l'énergie cinétique est faible pendant un laps de temps.
+  \end{description}
+  
+  \vfill
+
+  \begin{columns}
+    \begin{column}{3cm}
+      \begin{align*}
+        E_i = \frac{1}{2} m \vec{v}^{\;2}_l
+      \end{align*}
+    \end{column}
+    \begin{column}{3cm}
+      \begin{align*}
+        E = \sum_i E_i
+      \end{align*}
+    \end{column}
+  \end{columns}
+\end{frame}
 \section{Le moteur}
 
 \subsection{Algorithme principal}
 
 \begin{frame}{Algorithme principal}
+  \begin{figure}
+    \includegraphics[width=9cm]{images/algo1.png}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Défauts de cet algorithme}
+  \begin{itemize}
+    \item Aucune cohérence temporelle
+
+      \vfill
+
+    \item L'ordre d'intégration des corps change l'issue de la simulation \\
+
+      \vfill
+
+      \begin{figure}
+        \input{images/ordre.tikz}
+      \end{figure}
+  \end{itemize}
 \end{frame}
 
 \begin{frame}{Algorithme principal amélioré}
-
+  \begin{figure}
+    \includegraphics[width=6cm]{images/algo2.png}
+  \end{figure}
 \end{frame}
 
 \subsection{Démonstrations}
@@ -511,6 +614,13 @@
 \subsection{Perspectives d'évolution}
 
 \begin{frame}{Tunneling}
+  \begin{description}
+    \item[Problème]
+      Les corps se traversent mais aucune collision détectée
+  \end{description}
+
+  \vfill
+
   \begin{overprint}
 
     \onslide<1>
@@ -518,32 +628,51 @@
       \centering
       \input{images/tunneling1.tikz}
     \end{figure}
-    Un effet négatif de l'intégration discrète
-    
 
     \onslide<2>
     \begin{figure}
       \centering
       \input{images/tunneling2.tikz}
     \end{figure}
-    Solution : le lancer de rayons
+    \vfill
+    \begin{description}
+    \item[Solution] Lancer de rayons
+    \item[+] \'Economique
+    \item[-] Peut manquer les plus petits corps
+    \end{description}
 
     \onslide<3>
     \begin{figure}
       \centering
       \input{images/tunneling3.tikz}
     \end{figure}
-    Solution : Boîtes englobantes sur les trajectoires
+    \vfill
+    \begin{description}
+    \item[Solution] Boîtes englobant les positions avant/après
+    \item[+] Procédures de base déjà utilisées pour la détection grossière
+    \item[-] Certaines trajectoires peu avantageuses (diagonales)
+    \end{description}
 
   \end{overprint}
-
-  Les corps se traversent mais aucune collision n'est détectée !
 \end{frame}
 
-\section{conclusion}
+\section{Conclusion}
 
 \begin{frame}{Conclusion}
-  
+  Différentes perspectives d'évolution :
+  \begin{itemize}
+    \item Partitionnement de l'espace
+    \item Contraintes
+    \item Plus de stabilitité (empilement)
+  \end{itemize}
+
+  \vfill
+
+  Une voie intéressante : résolution de systèmes linéaires pour les contact de repos.
+\end{frame}
+
+\begin{frame}
+  Questions
 \end{frame}
 
 \end{document}

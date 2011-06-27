@@ -5,10 +5,12 @@
   \coordinate (a2s) at ($(a2.south)+(0,-0.2)$);
 
   \node[fit=(a1) (a2),
+    inner sep=0,
     draw=gris,
     dashed] (aabb1) {};
 
   \node[fit=(b),
+    inner sep=0,
     draw=gris,
     dashed] (aabb2) {};
 \end{tikzpicture}

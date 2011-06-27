@@ -1,0 +1,33 @@
+\begin{tikzpicture}[scale=0.7,transform shape]
+  \coordinate (A1) at (0,0);
+  \coordinate (A2) at (4.2,0);
+  \coordinate (B1) at (5,0);
+  \coordinate (B2) at (5,-3);
+
+  \node[
+    circle,
+    minimum size=1cm,
+    draw=bleu,
+    thick] at (A1) (a1) {};
+  \node[
+    circle,
+    minimum size=1cm,
+    draw=bleu,
+    thick,
+    dotted] at (A2) (a2) {};
+  \draw[->,thick,vert,font=\large] (A1) to node[black,auto] {$+ \deriv t$} (A2);
+
+  \node[
+    circle,
+    minimum size=1cm,
+    draw=rose,
+    thick] at (B1) (b1) {};
+  \node[
+    circle,
+    minimum size=1cm,
+    draw=rose,
+    thick,
+    dotted] at (B2) (b2) {};
+  \draw[->,thick,vert,font=\large] (B1) to node[black,auto] {$+ \deriv t$} (B2);
+
+\end{tikzpicture}

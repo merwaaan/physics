@@ -63,8 +63,23 @@
 
 \shorthandoff{!} % Pour éviter bug de Tikz + Babel french
 
+\AtBeginSection[]
+{
+  \thispagestyle{empty}
+  \addtocounter{framenumber}{-1}
+  \begin{frame}<beamer>{}
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
 \begin{frame}
   \maketitle
+\end{frame}
+
+\setcounter{framenumber}{0}
+\begin{frame}
+  \frametitle{Table des matières}
+  \tableofcontents
 \end{frame}
 
 \section{Introduction}
@@ -135,6 +150,8 @@
 \end{frame}
 
 \section{Dynamique}
+
+\subsection{Composante linéaire}
 
 \begin{frame}{La composante linéaire}
   \begin{description}
@@ -233,6 +250,8 @@
     \vec{p}_l = \vec{p}_a - \vec{C}
   \end{align*}
 \end{frame}
+
+\subsection{Composante angulaire}
 
 \begin{frame}{La composante angulaire}
   Il manque quelque chose... Les rotations !
@@ -672,7 +691,9 @@
 \end{frame}
 
 \begin{frame}
-  Questions
+  \begin{center}
+    \Huge{Questions}
+  \end{center}
 \end{frame}
 
 \end{document}

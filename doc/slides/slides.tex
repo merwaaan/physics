@@ -6,6 +6,7 @@
 \usepackage{color}
 \usepackage{tikz}
 \usepackage{graphicx}
+\usepackage{algorithm2e}
 \usepackage[adobe-utopia]{mathdesign}
 
 \newcommand{\deriv}{\partial \!}
@@ -55,7 +56,7 @@
     draw=gris}}
 
 \title{Simulation physique de corps rigides avec interaction}
-\author{Merwan Achibet}
+\author{Merwan Achibet\\ Université du Havre, 2011}
 \date{}
 
 \begin{document}
@@ -71,7 +72,7 @@
 \begin{frame}{Moteur physique ?}
   Moteur physique : système de simulation mécanique
   \begin{description}
-  \item[Industrie, science, cinéma] précis, coûteux 
+  \item[Industrie, science, cinéma] précis, lents
   \item[Jeu vidéo, réalité virtuelle] approximatifs, temps réel
   \end{description}
 
@@ -88,25 +89,29 @@
 
 \begin{frame}{\'Etude de cas}
   \begin{enumerate}
-    \item
-      La chute
+  \item
+    La chute
 
-      \begin{align*}
-        \vec{a} = \frac{1}{m} \sum_i \vec{F}_i
-      \end{align*}
-    \item
-      Le rebond
+    \begin{align*}
+      \vec{a} = \frac{1}{m} \sum_i \vec{F}_i
+    \end{align*}
+  \item
+    Le rebond
 
-      \begin{align*}
-        &\vec{v}_1 = \gamma \vec{v}_2
-      \end{align*}
-    \item
-      Le repos
+    \begin{align*}
+      &\vec{v}_1 = \gamma \vec{v}_2
+    \end{align*}
+  \item
+    Le repos
 
-      \begin{align*}
-        &\vec{F}_{A/B} = -\vec{F}_{B/A} \\
-        &\vec{F}_{A/B} + \vec{F}_{B/A} = 0
-      \end{align*}
+    \begin{columns}
+      \begin{column}{3cm}
+        \[\vec{F}_{A/B} = -\vec{F}_{B/A}\]
+      \end{column}
+      \begin{column}{3cm}
+        \[\vec{F}_{A/B} + \vec{F}_{B/A} = 0\]
+      \end{column}
+    \end{columns}
   \end{enumerate}
 \end{frame}
 
@@ -115,8 +120,8 @@
   \begin{itemize}
   \item Dynamique
     \begin{itemize}
-      \item Mouvement linéaire
-      \item Mouvement angulaire
+    \item Composante linéaire
+    \item Composante angulaire
     \end{itemize}
   \item Gestion des collisions
     \begin{itemize}
@@ -130,21 +135,31 @@
 \section{Dynamique}
 
 \begin{frame}{La composante linéaire}
-  \begin{itemize}
-    \item Entrée : forces environnementales
-    \item Sortie : changement de position
-  \end{itemize}
+  \begin{description}
+  \item[Entrée] Forces environnementales
+  \item[Sortie] Changement de position
+  \end{description}
 
-  \begin{align*}
-    \vec{v} &= \frac{\deriv \vec{p}}{\deriv t} \\
-    \vec{a} &= \frac{\deriv \vec{v}}{\deriv t}
-  \end{align*}
+  \vfill
 
-  \begin{align*}
-    \vec{p} = \int \vec{v}\; \deriv t \\
-    \vec{v} = \int \vec{a}\; \deriv t
-  \end{align*}
-
+  \begin{columns}
+    \begin{column}{3cm}
+      \begin{align*}
+        \vec{v} &= \frac{\deriv \vec{p}}{\deriv t} \\ \\
+        \vec{a} &= \frac{\deriv \vec{v}}{\deriv t}
+      \end{align*}
+    \end{column}
+    \begin{column}{2cm}
+      \centering
+      $\iff$
+    \end{column}
+    \begin{column}{3cm}
+      \begin{align*}
+        \vec{p} = \int \vec{v}\; \deriv t \\ \\
+        \vec{v} = \int \vec{a}\; \deriv t
+      \end{align*}
+    \end{column}
+  \end{columns}
 \end{frame}
 
 \begin{frame}{Intégration approximée}
@@ -157,28 +172,41 @@
 
   Appliquée à nos besoins :
   \begin{align*}
-    \vec{a}_{n+1} &= \frac{1}{m} \sum_i \vec{F}_i \\ \\
-    \vec{v}_{n+1} &= \vec{v}_n + \vec{a}_{n+1} \deriv t \\ \\
-    \vec{p}_{n+1} &= \vec{p}_n + \vec{v}_{n+1} \deriv t
+    \vec{a}_{t + \deriv t} &= \frac{1}{m} \sum_i \vec{F}_i \\ \\
+    \vec{v}_{t + \deriv t} &= \vec{v}_t + \vec{a}_{t + \deriv t} \deriv t \\ \\
+    \vec{p}_{t + \deriv t} &= \vec{p}_t + \vec{v}_{t + \deriv t} \deriv t
   \end{align*}
 \end{frame}
 
 \begin{frame}{Simplification grâce à l'élan linéaire}
-  \begin{align*}
-    \sum_i \vec{F}_i = \frac{\deriv \vec{L}}{\deriv t} = \frac{\deriv (m\vec{v})}{\deriv t}
-  \end{align*}
+  L'élan linéaire :
+  \begin{columns}
+    \begin{column}{3cm}
+      \begin{align*}
+        \vec{L} = m \vec{v}
+      \end{align*}
+    \end{column}
+    \begin{column}{3cm}
+      \begin{align*}
+        \sum_i \vec{F}_i = \frac{\deriv \vec{L}}{\deriv t} = \frac{\deriv (m\vec{v})}{\deriv t}
+      \end{align*}
+    \end{column}
+  \end{columns}
 
+  \vfill
+
+  La nouvelle intégration :
   \begin{align*}
-    \vec{L}_{n+1} &= \vec{L}_n + {\sum_i \vec{F}_i} \\ \\
-    \vec{p}_{n+1} &= \vec{p}_n + \frac{1}{m}\vec{L}_{n+1} \deriv t
+    \vec{L}_{t + \deriv t} &= \vec{L}_t + {\sum_i \vec{F}_i} \\ \\
+    \vec{p}_{t + \deriv t} &= \vec{p}_t + \frac{1}{m}\vec{L}_{t + \deriv t} \deriv t
   \end{align*}
 \end{frame}
 
 \begin{frame}{Modélisation d'un corps}
   OK pour une particule, mais un objet plus complexe ?
   \begin{description}
-    \item[Une particule = un sommet] Non
-    \item[Une unique particule judicieusement placée] Oui, le centre de masse
+  \item[Une particule = un sommet] Non
+  \item[Une unique particule judicieusement placée] Oui, le centre de masse
   \end{description}
 
   \vfill
@@ -208,35 +236,63 @@
   Il manque quelque chose... Les rotations !
 
   \begin{description}
-    \item[Orientation]
-      Une matrice : un vecteur colonne = un axe du repère local
-      \begin{align*}
-        \begin{pmatrix}
-          1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1
-        \end{pmatrix}
-        \rightarrow
-        \begin{pmatrix}
-          1 \\ 0 \\ 0
-        \end{pmatrix}
-        \begin{pmatrix}
-          0 \\ 1 \\ 0
-        \end{pmatrix}
-        \begin{pmatrix}
-          0 \\ 0 \\ 1
-        \end{pmatrix}
-      \end{align*}
-      
-    \item[\'Elan angulaire]
-      Analogue à l'élan linéaire
-      \begin{align*}
-        \vec{A}_{n+1} &= \vec{A}_n + {\sum_i \vec{\tau}_i} \\
-        \vec{\tau}_i &= (\vec{x} - \vec{C}) \times \vec{F}_i
-      \end{align*}
+  \item[Orientation]
+    Une matrice : un vecteur colonne = un axe du repère local
+    \begin{align*}
+      \begin{pmatrix}
+        1 & 0 & 0 \\ 0 & 1 & 0 \\ 0 & 0 & 1
+      \end{pmatrix}
+      \rightarrow
+      \begin{pmatrix}
+        1 \\ 0 \\ 0
+      \end{pmatrix}
+      \begin{pmatrix}
+        0 \\ 1 \\ 0
+      \end{pmatrix}
+      \begin{pmatrix}
+        0 \\ 0 \\ 1
+      \end{pmatrix}
+    \end{align*}
+    
+    \vfill
+
+  \item[\'Elan angulaire]
+    Analogue à l'élan linéaire
+    \begin{columns}
+      \begin{column}{3cm}
+        \begin{align*}
+          \vec{A}_{t + \deriv t} &= \vec{A}_n + {\sum_i \vec{\tau}_i}
+        \end{align*}
+      \end{column}
+      \begin{column}{3cm}
+        \begin{align*}
+          \vec{\tau}_i &= (\vec{x} - \vec{C}) \times \vec{F}_i
+        \end{align*}
+      \end{column}
+    \end{columns}
   \end{description}
 \end{frame}
 
-\begin{frame}
-  quantités auxiliaires
+\begin{frame}{Quantités auxiliaires}
+  Passage de l'élan à la nouvelle orientation moins direct.
+  
+  \begin{description}
+  \item[Tenseur d'inertie local]
+  \item[Tenseur d'inertie absolu]
+    \begin{align*}
+      I_a = R I_l {}^t\!\!R
+    \end{align*}
+  \item[]
+  \end{description}
+\end{frame}
+
+\begin{frame}{Intégration}
+  \begin{align*}
+    \vec{A}_{t + \deriv t} &= \vec{A}_t + \sum_i \vec{\tau}_i \\ \\
+    I_a &= R_t I_l {}^t\!\!R_t \\ \\
+    \vec{\omega} &= I^{-1}_a \vec{A}_{t + \deriv t} \\ \\
+    R_{t + \deriv t} &= R_t + \vec{\omega}^* R_t \deriv t
+  \end{align*}
 \end{frame}
 
 \section{Collisions}
@@ -246,49 +302,58 @@
 \begin{frame}{Deux niveaux de précision}
   On teste les collisions entre paires de corps : $\frac{n(n-1)}{2}$ tests
 
-  \begin{enumerate}
-    \item Détection grossière
-    \item Détection fine
-  \end{enumerate}
-\end{frame}
+  \vfill
 
-\begin{frame}{Détection grossière I}
-  \begin{figure}
-    \centering
-    \input{images/boundingboxes1.tikz}
-  \end{figure}
+  Beaucoup de tests, on veut accélérer le processus.
+
+  \vfill
 
   \begin{description}
-    \item[Boîte englobante] Contient tous les points d'un corps
-    \item[SAT] Test de collision rapide
+  \item[1. Détection grossière] \'Economique, faux positif possible 
+  \item[2. Détection fine] Précise, plus coûteuse
   \end{description}
 \end{frame}
 
-\begin{frame}{Détection grossière II}
-  \begin{figure}
-    \centering
-    \input{images/boundingboxes2.tikz}
-  \end{figure}
+\begin{frame}{Détection grossière}
+  \begin{overprint}
 
-  \begin{itemize}
-    \item Résultat positif quand deux corps s'interpénètrent, mais aussi parfois quand ce n'est pas le cas.
-    \item La détection fine validera/infirmera la collision
-  \end{itemize}
-\end{frame}
+    \onslide<1>
+    \begin{figure}
+      \centering
+      \input{images/boundingboxes1.tikz}
+    \end{figure}
+    \begin{description}
+    \item[Boîte englobante] Contient tous les sommets, donc tous les points
+    \item[SAT] Test rapide de collision entre boîtes
+    \end{description}
 
-\begin{frame}{Détection grossière III}
-  \begin{figure}
-    \centering
-    \input{images/boundingboxes3.tikz}
-  \end{figure}
+    \onslide<2>
+    \begin{figure}
+      \centering
+      \input{images/boundingboxes2.tikz}
+    \end{figure}
+    \begin{description}
+    \item[Faux positif] La détection fine invalidera le résultat
+    \end{description}
+
+    \onslide<3>
+    \begin{figure}
+      \centering
+      \input{images/boundingboxes3.tikz}
+    \end{figure}
+    \begin{description}
+    \item[Collision détectée] La détection fine validera le résultat
+    \end{description}
+
+  \end{overprint}
 \end{frame}
 
 \begin{frame}{Détection fine I}
   \begin{description}
-    \item[Somme de Minkowski]
-      $A \oplus B = \{a + b \mid a \in A, b \in B\}$
-    \item[Différence de Minkowski]
-      $A \ominus B = A \oplus (-B)$
+  \item[Somme de Minkowski]
+    $A \oplus B = \{a + b \mid a \in A, b \in B\}$
+  \item[Différence de Minkowski]
+    $A \ominus B = A \oplus (-B)$
   \end{description}
 
   \begin{figure}
@@ -298,26 +363,48 @@
   \end{figure}
 
   \begin{description}
-    \item[Particularité]
-      la plus petite distance de la différence de Minkowski à l'origine est la plus petite distance entre les corps $A$ et $B$
+  \item[Particularité]
+    la plus petite distance de la différence de Minkowski à l'origine est la plus petite distance entre les corps $A$ et $B$
   \end{description}
 \end{frame}
 
 \begin{frame}{Détection fine II}
   Comment calculer la plus petite distance entre $M$ et l'origine ?
 
-  Un simplex :
+  \vfill
+
   \begin{description}
-    \item[1] Sommet
-    \item[2] Arête
-    \item[3] Triangle
-    \item[4] Tétraèdre
+  \item[Algorithme GJK]
+    Expansion d'un simplex aléatoire jusqu'à ce qu'il contienne le point le plus proche de l'origine.
   \end{description}
 
-  Une fonction de support :
+  \vfill
+
+  \begin{description}
+  \item[Simplex]
+    \begin{description}
+    \item[0] Sommet
+    \item[1] Arête
+    \item[2] Triangle
+    \item[3] Tétraèdre
+    \end{description}
+  \end{description}
 \end{frame}
 
-\begin{frame}{détection fine III}
+\begin{frame}{Détection fine III}
+  Comment guider la recherche ?
+
+  \vfill
+
+  Fonction de support $S(\vec{d})$
+
+  Renvoit le sommet de $M$ le plus extrême dans la direction $\vec{d}$.
+
+  Avantage  $S_{A \ominus B}(\vec{d}) = S_A(\vec{d}) - S_B(-\vec{d})$
+  Inutile de calculer explicitement la différence de Minkowski !
+\end{frame}
+
+\begin{frame}{détection fine IV}
   \begin{figure}
     \centering
     \input{images/gjk1a.tikz}
@@ -329,10 +416,12 @@
   \end{figure}
 \end{frame}
 
+\subsection{Correction}
+
 \begin{frame}{Correction I}
   \begin{description}
-    \item[Simulation discrète] Pas de temps fixe
-    \item[Problème] Les collisions sont toujours pénétrantes
+  \item[Intégration d'Euler] Simulation discrète, pas de temps fixe
+  \item[Problème] Les collisions sont toujours pénétrantes
   \end{description}
 
   \vfill
@@ -341,28 +430,33 @@
     \centering
     \input{images/interpenetration.tikz}
   \end{figure}
+
+  \vfill
+
+  \begin{description}
+  \item[Solution] Intégrer en arrière, par dichotomie
+  \end{description}
 \end{frame}
 
 \begin{frame}{Correction II}
- \begin{description}
-    \item[Solution] Intégrer en arrière, par dichotomie
-  \end{description}
-
   \begin{figure}
     \centering
     \input{images/dichotomie.tikz}
   \end{figure}
 \end{frame}
 
+\subsection{Réponse}
+
 \begin{frame}{Réponse I}
-  Un corps rigide :
-  \begin{itemize}
-  \item Sommets
-  \item Arêtes
-  \item Faces
-  \end{itemize}
+  \begin{description}
+  \item[Corps rigide] Défini par sommets, arêtes et faces
+  \end{description}
+  
+  \vfill
 
   On s'intéresse uniquement aux contacts sommet-face et arête-arête.
+
+  \vfill
 
   \begin{figure}
     \centering
@@ -381,7 +475,7 @@
 
   \vfill
 
-  Un contact = une \textit{impulsion}
+  \`A chaque contact, une \textit{impulsion} :
   \begin{align*}
     J = \vec{n} 
     \frac{-(1 + \varepsilon) v_r}{
@@ -398,26 +492,11 @@
 
 \subsection{Algorithme principal}
 
-\begin{frame}{Algorithme}
-  \begin{enumerate}
-  \item
-    Détection de collision
-    \begin{enumerate}
-      \item Détection grossière
-      \item Détection fine
-      \item Recherche des contacts
-      \item Application d'impulsions
-    \end{enumerate}
-  \item Application de forces environnementales
-  \item intégration
-  \end{enumerate}
-
-  défauts
+\begin{frame}{Algorithme principal}
 \end{frame}
 
-\begin{frame}{Algorithme amélioré}
+\begin{frame}{Algorithme principal amélioré}
 
-  mieux
 \end{frame}
 
 \subsection{Démonstrations}
@@ -431,31 +510,34 @@
 
 \subsection{Perspectives d'évolution}
 
-\begin{frame}{Tunneling I}
-  Toujours à cause de l'intégration discrète :
-  \begin{figure}
-    \centering
-    \input{images/tunneling1.tikz}
-  \end{figure}
+\begin{frame}{Tunneling}
+  \begin{overprint}
+
+    \onslide<1>
+    \begin{figure}
+      \centering
+      \input{images/tunneling1.tikz}
+    \end{figure}
+    Un effet négatif de l'intégration discrète
+    
+
+    \onslide<2>
+    \begin{figure}
+      \centering
+      \input{images/tunneling2.tikz}
+    \end{figure}
+    Solution : le lancer de rayons
+
+    \onslide<3>
+    \begin{figure}
+      \centering
+      \input{images/tunneling3.tikz}
+    \end{figure}
+    Solution : Boîtes englobantes sur les trajectoires
+
+  \end{overprint}
 
   Les corps se traversent mais aucune collision n'est détectée !
-\end{frame}
-
-\begin{frame}{Tunneling II}
-  \begin{figure}
-    \centering
-    \input{images/tunneling2.tikz}
-    \input{images/tunneling3.tikz}
-  \end{figure}
-\end{frame}
-
-\begin{frame}{Partitionnement de l'espace}
-  \begin{figure}
-    \centering
-    \input{images/tunneling1.tikz}
-    \input{images/tunneling2.tikz}
-    \input{images/tunneling3.tikz}
-  \end{figure}
 \end{frame}
 
 \section{conclusion}

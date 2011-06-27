@@ -55,6 +55,11 @@
     dashed,
     draw=gris}}
 
+\setbeamertemplate{headline}{
+  \begin{beamercolorbox}[leftskip=5pt,ht=10pt]{section in head/foot}
+    \insertsectionhead
+  \end{beamercolorbox}
+}
 \setbeamertemplate{footline}[frame number]
 \setbeamertemplate{navigation symbols}{}
 
@@ -65,7 +70,10 @@
 \definecolor{thoughtless2}{HTML}{53777A}
 
 %\usecolortheme[named=tpe]{structure}
+\setbeamercolor{title}{fg=brick}
 \setbeamercolor{section in toc}{fg=thoughtless2}
+\setbeamercolor{headline}{fg=thought}
+\setbeamerfont{headline}{series=\small}
 \setbeamercolor{frametitle}{fg=brick}
 \setbeamerfont{frametitle}{series=\bfseries}
 \setbeamercolor{item}{fg=thoughtless2}
@@ -606,7 +614,8 @@
     \end{column}
   \end{columns}
 \end{frame}
-\section{Le moteur}
+
+\section{Moteur}
 
 \subsection{Algorithme principal}
 

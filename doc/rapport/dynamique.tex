@@ -89,9 +89,9 @@ une unité de temps et de la variation de temps $\deriv t$ par rapport
 Si l'on adapte cette méthode à notre problème, on obtient la
 succession de calculs suivante :
 \begin{align*}
-  \vec{a}_{n+1} &= \frac{1}{m} \sum_i \vec{F}_i \\ \\
-  \vec{v}_{n+1} &= \vec{v}_n + \vec{a}_{n+1} \deriv t \\ \\
-  \vec{p}_{n+1} &= \vec{p}_n + \vec{v}_{n+1} \deriv t
+  \vec{a}_{t + \deriv t} &= \frac{1}{m} \sum_i \vec{F}_i \\ \\
+  \vec{v}_{t + \deriv t} &= \vec{v}_t + \vec{a}_{t + \deriv t} \deriv t \\ \\
+  \vec{p}_{t + \deriv t} &= \vec{p}_t + \vec{v}_{t + \deriv t} \deriv t
 \end{align*}
 
 On calcule l'accélération à un instant $t$ puis on intègre en fonction
@@ -129,8 +129,8 @@ la variation de force exercée instantanément sur le corps.
 Ce qui signifie que l'on peut réduire l'intégration de l'état d'un
 corps à :
 \begin{align*}
-  \vec{L}_{n+1} &= \vec{L}_n + {\sum_i \vec{F}_i} \\ \\
-  \vec{p}_{n+1} &= \vec{p}_n + \frac{1}{m}\vec{L}_{n+1} \deriv t
+  \vec{L}_{t + \deriv t} &= \vec{L}_t + {\sum_i \vec{F}_i} \\ \\
+  \vec{p}_{t + \deriv t} &= \vec{p}_t + \frac{1}{m}\vec{L}_{t + \deriv t} \deriv t
 \end{align*}
 
 L'élan linéaire nous débarasse de l'accélération dans la définition
@@ -333,8 +333,8 @@ différentes forces $\vec{F}_i$ subies pendant une itération. Le $\sum_i
 \vec{F}_i$ de l'intégration de la composante linéaire vue plus tôt
 correspond quant à lui à la somme des composantes linéaires.
 \begin{align*}
-  \vec{A}_{n+1} &= \vec{A}_n + {\sum_i \vec{\tau}_i} \\ \\
-  \vec{L}_{n+1} &= \vec{L}_n + {\sum_i \vec{F}_i}
+  \vec{A}_{t + \deriv t} &= \vec{A}_t + {\sum_i \vec{\tau}_i} \\ \\
+  \vec{L}_{t + \deriv t} &= \vec{L}_t + {\sum_i \vec{F}_i}
 \end{align*}
 
 \subsubsection{Quantités auxiliaires}
@@ -424,10 +424,10 @@ en :
 Toutes les quantités nécessaires à l'intégration de la composante
 angulaire d'un corps sont désormais réunies.
 \begin{align*}
-  \vec{A}_{n+1} &= \vec{A}_n + \sum_i \vec{\tau}_i \\ \\
-  I_a &= R_n I_l {}^t\!\!R_n \\ \\
-  \vec{\omega} &= I^{-1}_a \vec{A}_{n+1} \\ \\
-  R_{n+1} &= R_n + \vec{\omega}^* R_n \deriv t
+  \vec{A}_{t + \deriv t} &= \vec{A}_t + \sum_i \vec{\tau}_i \\ \\
+  I_a &= R_t I_l {}^t\!\!R_t \\ \\
+  \vec{\omega} &= I^{-1}_a \vec{A}_{t + \deriv t} \\ \\
+  R_{t + \deriv t} &= R_t + \vec{\omega}^* R_t \deriv t
 \end{align*}
 
 On part de la somme des composantes angulaires de chaque force subie
@@ -444,5 +444,5 @@ calculer la vitesse angulaire. Afin de nous débarasser de cette
 opération supplémentaire, un corps contiendra non pas un tenseur
 d'inertie local, mais son inverse. On remplace donc ce calcul par :
 \begin{align*}
-  I^{-1}_a = (R_n I_l {}^t\!\!R_n)^{-1} = R_n I^{-1}_l {}^t\!\!R_n
+  I^{-1}_a = (R_t I_l {}^t\!\!R_t)^{-1} = R_t I^{-1}_l {}^t\!\!R_t
 \end{align*}

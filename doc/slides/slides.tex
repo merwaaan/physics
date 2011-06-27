@@ -11,13 +11,13 @@
 
 \newcommand{\deriv}{\partial \!}
 
+\usetikzlibrary{shapes,fit,calc,3d}
+
 % Couleurs inspirées de famfamfam.com
 \definecolor{vert}{HTML}{59FF2D}
 \definecolor{bleu}{HTML}{0BCEFF}
 \definecolor{rose}{HTML}{FF0B5B}
 \definecolor{gris}{gray}{0.5}
-
-\usetikzlibrary{shapes,fit,calc,3d}
 
 \tikzset{line/.style={
     shorten >= -#1,
@@ -54,6 +54,23 @@
     ->,
     dashed,
     draw=gris}}
+
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{navigation symbols}{}
+
+% http://www.colourlovers.com/palette/694737/Thought_Provoking
+\definecolor{brick}{HTML}{D95B43}
+\definecolor{thoughtless}{HTML}{C02942}
+\definecolor{thought}{HTML}{542427}
+\definecolor{thoughtless2}{HTML}{53777A}
+
+%\usecolortheme[named=tpe]{structure}
+\setbeamercolor{section in toc}{fg=thoughtless2}
+\setbeamercolor{frametitle}{fg=brick}
+\setbeamerfont{frametitle}{series=\bfseries}
+\setbeamercolor{item}{fg=thoughtless2}
+\setbeamerfont{item title}{series=\bfseries}
+\setbeamertemplate{itemize item}[square]
 
 \title{Simulation physique de corps rigides avec interaction}
 \author{Merwan Achibet\\ Université du Havre, 2011}
@@ -657,7 +674,7 @@
     \begin{description}
     \item[Solution] Lancer de rayons
     \item[+] \'Economique
-    \item[-] Peut manquer les plus petits corps
+    \item[--] Peut manquer les plus petits corps
     \end{description}
 
     \onslide<3>
@@ -668,8 +685,9 @@
     \vfill
     \begin{description}
     \item[Solution] Boîtes englobant les positions avant/après
+    \item[+] Ne manque aucun tunneling
     \item[+] Procédures de base déjà utilisées pour la détection grossière
-    \item[-] Certaines trajectoires peu avantageuses (diagonales)
+    \item[--] Certaines trajectoires peu avantageuses (diagonales)
     \end{description}
 
   \end{overprint}

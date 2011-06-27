@@ -178,7 +178,7 @@ void inputDemoZeroG(unsigned char k, int x, int y)
 	  c->setPosition(randomf()*50-25, 0, randomf()*50-25);
 		c->prepare();
 		c->applyOffCenterForce(
-			Vector3(randomf()*3-1, randomf()*3-1, randomf()*3-1),
+			Vector3(randomf()*3-4, randomf()*3-4, randomf()*3-4),
 			Vector3(randomf()*3-1, randomf()*3-1, randomf()*3-1),
 			1);
 	  e->addRigidBody_p(c);
@@ -331,7 +331,7 @@ int main(int argc, char** argv)
   //testGJK();
   //testTimeReversing();
 
-	//demoZeroG(); // OK
+	demoZeroG(); // OK
   //demoBoxes(); // OK
 	demoPachinko(); // OK
   //demoRope(); // OK
